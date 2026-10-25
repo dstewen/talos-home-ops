@@ -1,0 +1,36 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: tuppr
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: tuppr
+  interval: 30m
+  values:
+    # https://github.com/home-operations/tuppr/blob/main/charts/tuppr/values.yaml
+    env:
+      - name: TZ
+        value: Australia/Melbourne
+    replicaCount: 2
+    monitoring:
+      serviceMonitor:
+        enabled: true
+      prometheusRule:
+        enabled: true
+      dashboards:
+        enabled: true
+        grafanaOperator:
+          enabled: true
+          matchLabels:
+            dashboards: grafana
+    notification:
+      enabled: true
+      secretName: tuppr-secret
+      secretKey: url
+    silences:
+      enabled: true
+      alertmanager:
+        address: http://alertmanager.monitoring.svc.cluster.local:9093

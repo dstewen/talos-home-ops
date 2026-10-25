@@ -1,0 +1,16 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: storage
+components:
+  - ../../components/sops
+resources:
+  # Flux-Kustomizations
+  #  - ./democratic-csi-iscsi-synology/ks.yaml
+  - ./garage/ks.yaml
+  - ./kopiur/ks.yaml
+  #  - ./local-path-provisioner/ks.yaml
+  #  - ./minio/ks.yaml
+  #  - ./synology-csi/ks.yaml
+  - ./snapshot-controller/ks.yaml

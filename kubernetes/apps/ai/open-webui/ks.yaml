@@ -1,0 +1,41 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: &app open-webui
+  namespace: ai
+spec:
+  targetNamespace: ai
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *app
+  path: ./kubernetes/apps/ai/open-webui/app
+  dependsOn:
+    - name: external-secrets-stores
+      namespace: external-secrets
+    - name: ollama
+      namespace: ai
+    - name: cloudnative-pg-cluster18
+      namespace: database
+    - name: dragonfly-operator
+      namespace: database
+    - name: searxng
+      namespace: selfhosted
+    - name: qdrant
+      namespace: ai
+  components:
+    - ../../../../components/dragonfly
+  postBuild:
+    substitute:
+      APP: open-webui
+      DRAGONFLY_REPLICAS: "1"
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  wait: false
+  interval: 30m
+  retryInterval: 1m
+  timeout: 5m

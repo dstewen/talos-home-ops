@@ -1,0 +1,28 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: network
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
+  name: netboot-config
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: ceph-block
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: network
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
+  name: netboot-data
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 50Gi
+  storageClassName: ceph-block

@@ -1,0 +1,97 @@
+---
+apiVersion: inference.llmkube.dev/v1alpha1
+kind: Model
+metadata:
+  name: gpt-oss-20b
+spec:
+  source: pvc://llmkube/unsloth/gpt-oss-20b-GGUF/gpt-oss-20b-UD-Q4_K_XL.gguf
+  format: gguf
+  quantization: UD-Q4_K_XL
+  hardware:
+    accelerator: intel
+    gpu:
+      enabled: true
+      count: 1
+      vendor: intel
+      layers: -1
+      resourceClaims:
+        - name: gpu
+          resourceClaimTemplateName: llmkube-models-gpu
+  resources:
+    cpu: "500m"
+    memory: 8Gi
+---
+apiVersion: inference.llmkube.dev/v1alpha1
+kind: InferenceService
+metadata:
+  name: gpt-oss-20b
+  labels:
+    krr/ignore: "true"
+spec:
+  modelRef: gpt-oss-20b
+  replicas: 1
+  image: ghcr.io/ggml-org/llama.cpp:server-intel@sha256:2ecfe61c6aa395589ca3b437999ae97f07ca909a88fe2fe426e150ea88a06117
+  contextSize: 131072
+  parallelSlots: 2
+  flashAttention: true
+  batchSize: 1024
+  uBatchSize: 512
+  extraArgs:
+    - --alias
+    - gpt-oss-20b
+    - --fit
+    - "off"
+    - --cont-batching
+    - "-sps"
+    - "0.90"
+    - --no-context-shift
+    - --cache-prompt
+    - --kv-unified
+    - --image-min-tokens
+    - "280"
+    - --image-max-tokens
+    - "280"
+    - --temp
+    - "1.0"
+    - --top-p
+    - "0.95"
+    - --top-k
+    - "64"
+    - --threads
+    - "6"
+    - --threads-batch
+    - "6"
+    - --mmap
+  env:
+    - name: ZES_ENABLE_SYSMAN
+      value: "1"
+    - name: ONEAPI_DEVICE_SELECTOR
+      value: level_zero:gpu
+    - name: UR_L0_ENABLE_RELAXED_ALLOCATION_LIMITS
+      value: "1"
+    - name: LD_LIBRARY_PATH
+      value: /app
+  resources:
+    cpu: 500m
+    memory: 8Gi
+  podSecurityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 102
+    supplementalGroups:
+      - 44
+      - 102
+    seccompProfile:
+      type: RuntimeDefault
+  securityContext:
+    allowPrivilegeEscalation: false
+    runAsNonRoot: true
+    runAsUser: 1000
+    capabilities:
+      drop:
+        - ALL
+    seccompProfile:
+      type: RuntimeDefault
+  endpoint:
+    port: 8080
+    type: ClusterIP

@@ -1,0 +1,51 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/inference.llmkube.dev/model_v1alpha1.json
+apiVersion: inference.llmkube.dev/v1alpha1
+kind: Model
+metadata:
+  name: phi4-mini-instruct
+  namespace: ai
+spec:
+  source: pvc://llmkube/unsloth/Phi-4-mini-instruct-GGUF/Phi-4-mini-instruct-Q4_K_M.gguf
+  format: gguf
+  hardware:
+    accelerator: intel
+    gpu:
+      enabled: true
+      count: 1
+      vendor: intel
+      layers: -1
+      resourceClaims:
+        - name: gpu
+          resourceClaimTemplateName: llmkube-models-gpu
+  resources:
+    cpu: "2"
+    memory: "8Gi"
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/inference.llmkube.dev/inferenceservice_v1alpha1.json
+apiVersion: inference.llmkube.dev/v1alpha1
+kind: InferenceService
+metadata:
+  name: phi4-mini-instruct
+  namespace: ai
+spec:
+  modelRef: phi4-mini-instruct
+  replicas: 1
+  image: ghcr.io/ggml-org/llama.cpp:server-intel@sha256:2ecfe61c6aa395589ca3b437999ae97f07ca909a88fe2fe426e150ea88a06117
+  resources:
+    gpu: 1
+    cpu: "2"
+    memory: "8Gi"
+  securityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    privileged: true
+#  podSecurityContext:
+#    runAsUser: 1000
+#    runAsGroup: 1000
+#    fsGroup: 102
+#    supplementalGroups:
+#      - 44
+#      - 102
+#    seccompProfile:
+#      type: RuntimeDefault

@@ -1,0 +1,33 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/inference.llmkube.dev/model_v1alpha1.json
+apiVersion: inference.llmkube.dev/v1alpha1
+kind: Model
+metadata:
+  name: qwen3-embedding
+spec:
+  source: pvc://llmkube-models/qwen/Qwen3-Embedding-0.6B-GGUF/Qwen3-Embedding-0.6B-Q8_0.gguf
+  format: gguf
+  hardware:
+    accelerator: intel
+    gpu:
+      enabled: true
+      count: 1
+      vendor: intel
+      layers: -1
+      resourceClaims:
+        - name: gpu
+          resourceClaimTemplateName: llmkube-models-gpu
+  resources:
+    cpu: "2"
+    memory: "4Gi"
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/inference.llmkube.dev/inferenceservice_v1alpha1.json
+apiVersion: inference.llmkube.dev/v1alpha1
+kind: InferenceService
+metadata:
+  name: qwen3-embedding
+spec:
+  modelRef: qwen3-embedding
+  mode: embedding
+  runtime: llamacpp
+  replicas: 1

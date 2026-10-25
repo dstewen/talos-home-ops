@@ -1,0 +1,109 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: boinc-arm64
+spec:
+  interval: 1h
+  chartRef:
+    kind: OCIRepository
+    name: boinc-arm64
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  values:
+    controllers:
+      boinc-arm64:
+        pod:
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                  - matchExpressions:
+                      - key: kubernetes.io/arch
+                        operator: In
+                        values:
+                          - arm64
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - weight: 50
+                  preference:
+                    matchExpressions:
+                      - key: node-role.kubernetes.io/worker
+                        operator: In
+                        values:
+                          - worker
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: boinc/client
+              tag: arm64v8
+            env:
+              TZ: "${TIMEZONE}"
+              #              BOINC_GUI_RPC_PASSWORD: "123"
+              BOINC_CMD_LINE_OPTIONS: "--allow_remote_gui_rpc"
+            envFrom:
+              - secretRef:
+                  name: boinc-arm64-secret
+              - secretRef:
+                  name: cluster-secrets
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                cpu: 2000m
+                memory: 1Gi
+
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile: { type: RuntimeDefault }
+    #      annotations:
+    #        k8s.v1.cni.cncf.io/networks: |
+    #          [{
+    #            "name":"multus-iot",
+    #            "namespace": "kube-system",
+    #            "ips": ["172.16.20.99/24"]
+    #          }]
+    service:
+      app:
+        controller: boinc-arm64
+        type: LoadBalancer
+        annotations:
+          lbipam.cilium.io/ips: ${SVC_BOINC_ADDR_ARM64}
+        ports:
+          http:
+            port: &port 80
+          https:
+            port: 443
+          manager:
+            port: 31416
+
+    route:
+      app:
+        hostnames: ["boinc-arm64.${SECRET_DOMAIN}"]
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+            sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: *port
+
+    persistence:
+      config:
+        existingClaim: boinc-arm64-config
+        globalMounts:
+          - path: /var/lib/boinc
+            readOnly: false

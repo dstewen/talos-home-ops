@@ -1,0 +1,157 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app immich-server
+spec:
+  interval: 1h
+  chartRef:
+    kind: OCIRepository
+    name: immich-server
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+
+  values:
+    #    defaultPodOptions:
+    #      affinity:
+    #        nodeAffinity:
+    #          requiredDuringSchedulingIgnoredDuringExecution:
+    #            nodeSelectorTerms:
+    #            - matchExpressions:
+    #              - key: kubernetes.io/arch
+    #                operator: In
+    #                values:
+    #                - arm64
+    #          preferredDuringSchedulingIgnoredDuringExecution:
+    #          - weight: 50
+    #            preference:
+    #              matchExpressions:
+    #              - key: node-role.kubernetes.io/worker
+    #                operator: In
+    #                values:
+    #                - worker
+    controllers:
+      immich-server:
+        replicas: 1
+        strategy: RollingUpdate
+        annotations:
+          reloader.stakater.com/auto: "true"
+          configmap.reloader.stakater.com/reload: &configMap immich-configmap
+          secret.reloader.stakater.com/reload: &secret immich
+
+        initContainers:
+          01-init-db:
+            image:
+              repository: ghcr.io/home-operations/postgres-init
+              tag: 18.6.0@sha256:87627baaddb0cabed4ebe033e75038e5c7b6b081c18e86514c99067179a90719
+
+            envFrom: &envFrom
+              - configMapRef:
+                  name: *configMap
+              - secretRef:
+                  name: *secret
+              - secretRef:
+                  name: cluster-secrets
+        containers:
+          app:
+            image:
+              repository: ghcr.io/immich-app/immich-server
+              tag: v3.3.5@sha256:485d546a2e31d6a8b4db8423fcba5c109de8c218d93410af115fd1ccfc4352a6
+            #            args: ["start-server.sh"]
+
+            env:
+              IMMICH_MEDIA_LOCATION: &mediaLocation /usr/src/app/upload
+
+            envFrom: *envFrom
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /server-info/ping
+                    port: &port 2283
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 5
+              readiness: *probes
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/server/ping
+                    port: *port
+                  failureThreshold: 30
+                  periodSeconds: 5
+                  successThreshold: 1
+                  timeoutSeconds: 1
+            resources:
+              requests:
+                cpu: 100m
+                memory: 250Mi
+        pod:
+          topologySpreadConstraints:
+            - maxSkew: 1
+              topologyKey: kubernetes.io/hostname
+              whenUnsatisfiable: DoNotSchedule
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: *app
+    service:
+      app:
+        controller: *app
+        ports:
+          http:
+            port: &httpPort 2283
+
+    route:
+      app:
+        annotations:
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/group: Media
+          gethomepage.dev/name: Immich
+          gethomepage.dev/icon: immich.png
+          gethomepage.dev/description: Self-hosted photo and video management solution
+          gethomepage.dev/widget.type: immich
+          gethomepage.dev/widget.url: https://photos.davidstewen.com
+          gethomepage.dev/widget.key: "{{`{{HOMEPAGE_VAR_LIDARR_TOKEN}}`}}"
+          gethomepage.dev/widget.version: "2"
+        hostnames: ["photos.${SECRET_DOMAIN}"]
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+            sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: *httpPort
+
+    persistence:
+      config:
+        type: configMap
+        name: *configMap
+        globalMounts:
+          - path: /config
+
+      library:
+        existingClaim: immich-upload-pvc
+        globalMounts:
+          - path: *mediaLocation
+
+      geocoding-dump:
+        type: emptyDir
+        globalMounts:
+          - path: /usr/src/app/.reverse-geocoding-dump
+
+      transformers-cache:
+        type: emptyDir
+        globalMounts:
+          - path: /usr/src/app/.transformers_cache

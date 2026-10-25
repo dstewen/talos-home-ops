@@ -1,0 +1,38 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: gha-rs-controller
+  namespace: actions-runner-system
+  labels:
+    release: kube-prometheus-stack
+spec:
+  podMetricsEndpoints:
+    - interval: 30s
+      port: "8080"
+      path: /metrics
+  namespaceSelector:
+    matchNames:
+      - actions-runner-system
+  selector:
+    matchLabels:
+      app.kubernetes.io/part-of: gha-rs-controller
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: gha-runner-scale-set
+  namespace: actions-runner-system
+  labels:
+    release: kube-prometheus-stack
+spec:
+  podMetricsEndpoints:
+    - interval: 30s
+      port: "8080"
+      path: /metrics
+  namespaceSelector:
+    matchNames:
+      - actions-runner-system
+  selector:
+    matchLabels:
+      app.kubernetes.io/part-of: gha-runner-scale-set

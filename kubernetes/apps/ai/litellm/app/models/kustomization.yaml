@@ -1,0 +1,27 @@
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources: []
+##  - google-ai-gemini-2.5-flash-lite.yaml
+##  - google-ai-gemini-2.5-flash.yaml
+##  - google-ai-gemini-3-flash-preview.yaml
+##  - google-ai-gemini-3.1-flash-lite.yaml
+##  - google-ai-gemini-3.5-flash-lite.yaml
+##  - google-ai-gemini-3.6-flash.yaml
+##  - google-ai-gemini-3.7-flash.yaml
+##  - google-ai-gemini-3.8-flash.yaml
+##  - google-ai-gemma-4-26b-a4b-it.yaml
+##  - google-ai-gemma-4-31b.yaml
+##  - groq-ai-openai-gpt-oss-20b.yaml
+##  - groq-ai-openai-gpt-oss-120b.yaml
+##  - groq-ai-qwen-qwen3.8-27b.yaml
+##  - groq-ai-whisper-large-v3.yaml
+##  - groq-ai-whisper-large-v3-turbo.yaml
+#- minimax-m2-7-anthropic.yaml
+#- minimax-m2-7.yaml
+#- minimax-m3-anthropic.yaml
+#- minimax-m3.yaml
+#- opencode-go-deepseek-v4-flash.yaml
+#- opencode-go-glm-5-2.yaml
+#- opencode-go-qwen3-6-plus.yaml
+#- opencode-go-qwen3-7-max.yaml

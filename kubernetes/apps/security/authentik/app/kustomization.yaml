@@ -1,0 +1,16 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ./externalsecret.yaml
+  - ./helmrelease.yaml
+  - ./ocirepository.yaml
+  - ./route.yaml
+#configMapGenerator:
+#  - name: authentik-branding
+#    files:
+#      - ./branding/favicon.png
+#      - ./branding/logo.svg
+#    options:
+#      disableNameSuffixHash: true

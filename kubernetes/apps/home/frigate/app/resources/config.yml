@@ -1,0 +1,120 @@
+---
+version: "0.14"
+mqtt:
+  host: 10.200.15.228
+  topic_prefix: frigate
+  port: 1883
+  user: "{FRIGATE_MQTT_USERNAME}"
+  password: "{FRIGATE_MQTT_PASSWORD}"
+
+ffmpeg:
+  #  global_args: ["-hide_banner", "-loglevel", "warning"]
+  #  hwaccel_args: preset-vaapi
+  output_args:
+    record: preset-record-generic-audio-aac
+
+detectors:
+  coral:
+    type: edgetpu
+    device: pci
+#detectors:
+#  cpu1:
+#    type: cpu
+#    num_threads: 3
+
+audio:
+  enabled: true
+  # https://github.com/blakeblackshear/frigate/blob/dev/audio-labelmap.txt
+  listen:
+    - fire_alarm
+    - speech
+    - laughter
+    - crying
+    - child_singing
+    - gasp
+    - cough
+    - sneeze
+    - hiccup
+    - wheeze
+    - sniff
+    - gargling
+    - children_playing
+
+record:
+  enabled: true
+
+objects:
+  track:
+    - person
+    - dog
+    - cat
+
+snapshots:
+  enabled: true
+  timestamp: false
+  bounding_box: true
+  retain:
+    default: 20
+
+go2rtc:
+  streams:
+    # Android RTSP Server (IP Camera Pro)
+    #    phone_rtsp:
+    #      - rtsp://{FRIGATE_RTSP_USER_PHONEAPP}:{FRIGATE_RTSP_PASSWORD_PHONEAPP}@{FRIGATE_RTSP_HOST_PHONE_IP}:8554/live
+    #    phone_rtsp_sub:
+    #      - rtsp://{FRIGATE_RTSP_USER_PHONEAPP}:{FRIGATE_RTSP_PASSWORD_PHONEAPP}@{FRIGATE_RTSP_HOST_PHONE_IP}:8554/live
+    office:
+      - rtsp://{FRIGATE_RTSP_USER_WYZE3}:{FRIGATE_RTSP_PASSWORD_WYZE3}@{FRIGATE_RTSP_HOST_WYZE3}:554/ch0#timeout=30
+    office_sub:
+      - rtsp://{FRIGATE_RTSP_USER_WYZE3}:{FRIGATE_RTSP_PASSWORD_WYZE3}@{FRIGATE_RTSP_HOST_WYZE3}:554/ch1#timeout=30
+  webrtc:
+    #    listen: ":8555"
+    candidates:
+      - 10.200.15.238:8555 # <--- enter frigate host IP here
+      - stun:8555
+live:
+  streams:
+    main_stream: office
+    sub_stream: office_sub
+cameras:
+  #  phone_rtsp:
+  #    enabled: true
+  #    ffmpeg:
+  #      inputs:
+  #        - path: rtsp://127.0.0.1:8554/phone_rtsp
+  #          input_args: preset-rtsp-restream
+  #          roles:
+  #            - record
+  #        - path: rtsp://127.0.0.1:8554/phone_rtsp_sub
+  #          input_args: preset-rtsp-restream
+  #          roles:
+  #            - audio
+  #            - detect
+  #      output_args:
+  #        record: preset-record-generic-audio-copy
+  #    live:
+  #      stream_name: phone_rtsp
+  #    detect:
+  #      width: 640
+  #      height: 480
+  #      fps: 10
+  office:
+    enabled: true
+    ffmpeg:
+      inputs:
+        - path: rtsp://127.0.0.1:8554/office?timeout=30
+          input_args: preset-rtsp-restream-low-latency
+          roles:
+            - record
+        - path: rtsp://127.0.0.1:8554/office_sub?timeout=30
+          input_args: preset-rtsp-restream-low-latency
+          roles:
+            - audio
+            - detect
+      output_args:
+        record: preset-record-generic-audio-aac
+    onvif:
+      host: 192.168.10.86
+      port: 80
+      user: "{FRIGATE_RTSP_USER_WYZE3}"
+      password: "{FRIGATE_RTSP_PASSWORD_WYZE3}"

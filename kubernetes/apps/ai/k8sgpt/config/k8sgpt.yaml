@@ -1,0 +1,14 @@
+---
+apiVersion: core.k8sgpt.ai/v1alpha1
+kind: K8sGPT
+metadata:
+  name: k8sgpt-ollama
+  namespace: ai
+spec:
+  ai:
+    backend: ollama
+    baseUrl: http://ollama.ai:11434/v1
+    #model: gpt-3.5-turbo
+    model: deepseek-coder:6.7b
+  noCache: false
+  version: v0.4.17

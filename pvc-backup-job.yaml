@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: restic-pvc-backup
+  namespace: ai
+spec:
+  template:
+    spec:
+      volumes:
+        - name: data-volume
+          persistentVolumeClaim:
+            claimName: llmkube-models-cache
+      containers:
+        - name: restic
+          image: restic/restic:latest
+          command:
+            - "/bin/sh"
+            - "-c"
+            - |
+              # Initialize the repository if it doesn't exist
+              restic init || echo "Repository already initialized"
+              # Run the backup on the mounted directory
+              restic backup /data
+          envFrom:
+            - secretRef:
+                name: restic-secret
+          volumeMounts:
+            - name: data-volume
+              mountPath: /data
+              readOnly: true # Safeguard your live data
+      restartPolicy: OnFailure

@@ -1,0 +1,30 @@
+---
+# yaml-language-server: $schema=https://github.com/datreeio/CRDs-catalog/raw/refs/heads/main/barmancloud.cnpg.io/objectstore_v1.json
+apiVersion: barmancloud.cnpg.io/v1
+kind: ObjectStore
+metadata:
+  name: minio-pg18
+spec:
+  configuration:
+    data:
+      compression: bzip2
+    destinationPath: s3://cnpg-v18-backups/
+    endpointURL: http://192.168.10.198:9000
+    s3Credentials:
+      accessKeyId:
+        name: cloudnative-pg-secret
+        key: minio-access-key-id
+      secretAccessKey:
+        name: cloudnative-pg-secret
+        key: minio-secret-access-key
+    wal:
+      compression: bzip2
+      maxParallel: 1
+  retentionPolicy: 30d
+  # Maybe fixes https://github.com/cloudnative-pg/plugin-barman-cloud/issues/393
+  instanceSidecarConfiguration:
+    env:
+      - name: AWS_REQUEST_CHECKSUM_CALCULATION
+        value: when_required
+      - name: AWS_RESPONSE_CHECKSUM_VALIDATION
+        value: when_required

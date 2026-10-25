@@ -1,0 +1,19 @@
+name: Matrix
+
+on:
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  run-matrix:
+    permissions: {}
+    strategy:
+      matrix:
+        os: [talos-mixed-amd64-runner]
+        version: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: simple
+        run: |
+          echo "Hello from: "${{ matrix.version }}

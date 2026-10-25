@@ -1,0 +1,75 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: rsyslog
+spec:
+  interval: 30m
+  chartRef:
+    kind: OCIRepository
+    name: rsyslog
+  values:
+    defaultPodOptions:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/arch
+                    operator: In
+                    values:
+                      - amd64
+    controllers:
+      rsyslog:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: rsyslog/rsyslog-collector
+              tag: 2026-04
+              pullPolicy: IfNotPresent
+            env:
+              REMOTE_SERVER_NAME: 10.200.15.229
+              REMOTE_SERVER_PORT: 1514
+              RSYSLOG_HOSTNAME: rsyslog
+              TZ: Australia/Melbourne
+            securityContext:
+              runAsUser: 0
+              runAsGroup: 0
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+              startup:
+                enabled: false
+            resources:
+              requests:
+                memory: 50M
+              limits:
+                memory: 100M
+    service:
+      app:
+        controller: rsyslog
+        type: LoadBalancer
+        #        externalTrafficPolicy: Cluster
+        annotations:
+          lbipam.cilium.io/ips: 10.200.15.226
+        ports:
+          syslog-udp:
+            enabled: true
+            port: 514
+            protocol: UDP
+          syslog-tcp:
+            enabled: true
+            port: 514
+            protocol: TCP
+    persistence:
+      config:
+        enabled: true
+        type: configMap
+        name: rsyslog-configmap
+        globalMounts:
+          - path: "/etc/rsyslog.d"

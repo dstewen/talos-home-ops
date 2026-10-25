@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: litellm-db-init-config
+  namespace: database
+data:
+  init.sql: |
+    CREATE DATABASE litellm;
+    CREATE USER litellm WITH PASSWORD 'change_me';
+    GRANT ALL PRIVILEGES ON DATABASE litellm TO litellm;
+    \c litellm
+    GRANT ALL ON SCHEMA public TO litellm;

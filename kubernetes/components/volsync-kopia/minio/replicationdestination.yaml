@@ -1,0 +1,27 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/volsync.backube/replicationdestination_v1alpha1.json
+apiVersion: volsync.backube/v1alpha1
+kind: ReplicationDestination
+metadata:
+  name: "${APP}-kopia-bootstrap"
+  labels:
+    kustomize.toolkit.fluxcd.io/ssa: IfNotPresent
+spec:
+  trigger:
+    manual: restore-once
+  restic:
+    accessModes: ["${VOLSYNC_ACCESSMODES:-ReadWriteOnce}"]
+    capacity: "${VOLSYNC0_CAPACITY:-2Gi}"
+    cleanupCachePVC: true
+    cleanupTempPVC: true
+    copyMethod: Snapshot
+    enableFileDeletion: true
+    moverSecurityContext:
+      runAsUser: ${APP_UID:-1000}
+      runAsGroup: ${APP_GID:-1000}
+      fsGroup: ${APP_GID:-1000}
+    repository: "${APP}-volsync-kopia-nfs"
+    sourceIdentity:
+      sourceName: ${APP}-kopia-minio-rsrc
+    storageClassName: "${VOLSYNC_STORAGECLASS:-ceph-block}"
+    volumeSnapshotClassName: "${VOLSYNC_SNAPSHOTCLASS:-csi-ceph-blockpool}"

@@ -1,0 +1,54 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/external-secrets.io/externalsecret_v1.json
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: calibre-web-local-minio-restic
+  namespace: media
+spec:
+  refreshInterval: 5m
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: onepassword-connect
+  target:
+    name: calibre-web-local-minio-restic-secret
+    creationPolicy: Owner
+    template:
+      metadata:
+        annotations:
+          replicator.v1.mittwald.de/replicate-to: "volsync"
+      engineVersion: v2
+      data:
+        RESTIC_REPOSITORY: "{{ .REPOSITORY_TEMPLATE }}/v1-calibre-web"
+        RESTIC_PASSWORD: "{{ .RESTIC_PASSWORD }}"
+        AWS_ACCESS_KEY_ID: "{{ .AWS_ACCESS_KEY_ID }}"
+        AWS_SECRET_ACCESS_KEY: "{{ .AWS_SECRET_ACCESS_KEY }}"
+  dataFrom:
+    - extract:
+        key: volsync-local-minio-restic-template
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/volsync.backube/replicationsource_v1alpha1.json
+apiVersion: volsync.backube/v1alpha1
+kind: ReplicationSource
+metadata:
+  name: calibre-web-local-minio
+  namespace: media
+spec:
+  sourcePVC: calibre-web-config-0
+  trigger:
+    schedule: "0 16 * * *"
+  restic:
+    moverSecurityContext:
+      runAsUser: 568
+      runAsGroup: 568
+      fsGroup: 568
+    copyMethod: Snapshot
+    pruneIntervalDays: 10
+    repository: calibre-web-local-minio-restic-secret
+    cacheCapacity: 2Gi
+    volumeSnapshotClassName: csi-ceph-blockpool
+    storageClassName: ceph-block
+    cacheStorageClassName: local-path
+    retain:
+      daily: 2
+      within: 10d

@@ -1,0 +1,40 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  packageRules: [
+    {
+      description: "Changelog URL for Blackbox-Exporter",
+      matchPackageNames: ["/blackbox-exporter/"],
+      changelogUrl: "https://prometheus-community.github.io/helm-charts/changelog/?owner=prometheus-community&repo=helm-charts&chart=prometheus-blackbox-exporter",
+    },
+    {
+      description: "Changelog URL for Cloudflared",
+      matchPackageNames: ["/cloudflared/"],
+      changelogUrl: "https://github.com/cloudflare/cloudflared/blob/master/RELEASE_NOTES",
+    },
+    {
+      description: "Changelog URL for Code-Server",
+      matchPackageNames: ["/code-server/"],
+      changelogUrl: "https://github.com/coder/code-server/blob/main/CHANGELOG.md",
+    },
+    {
+      description: "Changelog URL for n8n",
+      matchPackageNames: ["/n8n/"],
+      changelogUrl: "https://github.com/n8n-io/n8n/blob/master/CHANGELOG.md",
+    },
+    {
+      description: "Changelog URL for Prometheus-SNMP-Exporter",
+      matchPackageNames: ["/snmp-exporter/"],
+      changelogUrl: "https://prometheus-community.github.io/helm-charts/changelog/?owner=prometheus-community&repo=helm-charts&chart=prometheus-snmp-exporter",
+    },
+    {
+      description: "Changelog URL for Spegel",
+      matchPackageNames: ["/spegel/"],
+      changelogUrl: "https://github.com/spegel-org/spegel/blob/main/CHANGELOG.md",
+    },
+    {
+      description: "Enable fetchChangeLogs for Toolhive Operator",
+      matchSourceUrls: ["https://github.com/stacklok/toolhive/"],
+      fetchChangeLogs: "pr",
+    },
+  ],
+}

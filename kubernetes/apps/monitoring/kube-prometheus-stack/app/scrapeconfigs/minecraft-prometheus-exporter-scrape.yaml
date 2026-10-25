@@ -1,0 +1,14 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/monitoring.coreos.com/scrapeconfig_v1alpha1.json
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: ScrapeConfig
+metadata:
+  name: minecraft
+spec:
+  staticConfigs:
+    - targets:
+        - "minecraft-ftb-metrics.gameserver.svc.cluster.local:19565"
+        - "ftb-2-metrics.gameserver.svc.cluster.local:19565"
+#      labels:
+#        application: MyMinecraftModPack
+#        instance: node1.unrealhosting.fr

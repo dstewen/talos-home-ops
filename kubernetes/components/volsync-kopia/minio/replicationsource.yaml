@@ -1,0 +1,27 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/volsync.backube/replicationsource_v1alpha1.json
+apiVersion: volsync.backube/v1alpha1
+kind: ReplicationSource
+metadata:
+  name: "${APP}-kopia-minio-rsrc"
+spec:
+  sourcePVC: "${VOLSYNC_CLAIM:-${APP}}"
+  trigger:
+    schedule: "30 * * * *"
+  kopia:
+    accessModes: ["${VOLSYNC_ACCESSMODES:-ReadWriteOnce}"]
+    compression: zstd-fastest
+    copyMethod: Snapshot
+    moverSecurityContext:
+      runAsUser: ${APP_UID:-1000}
+      runAsGroup: ${APP_GID:-1000}
+      fsGroup: ${APP_GID:-1000}
+    repository: "${APP}-volsync-kopia-nfs"
+    retain:
+      hourly: 24
+      daily: 10
+      weekly: 4
+      monthly: 3
+      yearly: 1
+    storageClassName: "${VOLSYNC_STORAGECLASS:-ceph-block}"
+    volumeSnapshotClassName: "${VOLSYNC_SNAPSHOTCLASS:-csi-ceph-blockpool}"

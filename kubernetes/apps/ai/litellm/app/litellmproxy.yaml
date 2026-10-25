@@ -1,0 +1,144 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/litellm.home-operations.com/litellmproxy_v1alpha1.json
+apiVersion: litellm.home-operations.com/v1alpha1
+kind: LiteLLMProxy
+metadata:
+  name: litellm
+spec:
+  # renovate: datasource=docker depName=ghcr.io/berriai/litellm
+  image: ghcr.io/berriai/litellm:v1.106.3@sha256:74d0696a9f0afcc993c7659d246f0c542f003368298633e852228250779f1032
+  replicas: 1
+  applyMode: file
+  generalSettings:
+    health_check_endpoint: /v1/health
+  routerSettings:
+    routing_strategy: simple-shuffle
+    redis_host: os.environ/REDIS_HOST
+    redis_port: os.environ/REDIS_PORT
+    num_retries: 3
+    timeout: 600
+  litellmSettings:
+    success_callback:
+      - prometheus
+    failure_callback:
+      - prometheus
+    prometheus_adapter: true
+    require_auth_for_metrics_endpoint: false
+    cache: true
+    cache_params:
+      type: redis
+      host: os.environ/REDIS_HOST
+      port: os.environ/REDIS_PORT
+      ttl: 300
+      supported_call_types:
+        - embedding
+        - aembedding
+    drop_params: true
+    merge_reasoning_content_in_choices: true
+    set_verbose: true
+  #    # OIDC and Model List configuration
+  #    # Note: We use the 'model_list' to define the cloud models
+  #    model_list:
+  #      - model_name: gemini-1.5-pro
+  #        litellm_params:
+  #          model: gemini/gemini-1.5-pro
+  #          api_key: os.environ/GEMINI_API_KEY
+  #      - model_name: gemini-3.5-flash-lite
+  #        litellm_params:
+  #          model: gemini/gemini-3.5-flash-lite
+  #          api_key: os.environ/GEMINI_API_KEY
+  env:
+    - name: LITELLM_LOG
+      value: INFO
+    - name: LITELLM_MODE
+      value: PRODUCTION
+    - name: REDIS_HOST
+      value: litellm-dragonfly.ai.svc.cluster.local
+    - name: REDIS_PORT
+      value: "6379"
+    - name: LITELLM_MASTER_KEY
+      valueFrom:
+        secretKeyRef:
+          name: litellm-secret
+          key: LITELLM_MASTER_KEY
+    - name: GEMINI_API_KEY
+      valueFrom:
+        secretKeyRef:
+          name: litellm-secret
+          key: GEMINI_API_KEY
+    - name: GENERIC_CLIENT_ID
+      valueFrom:
+        secretKeyRef:
+          name: litellm-secret
+          key: GENERIC_CLIENT_ID
+    - name: GENERIC_CLIENT_SECRET
+      valueFrom:
+        secretKeyRef:
+          name: litellm-secret
+          key: GENERIC_CLIENT_SECRET
+    - name: GENERIC_AUTHORIZATION_ENDPOINT
+      valueFrom:
+        secretKeyRef:
+          name: litellm-secret
+          key: GENERIC_AUTHORIZATION_ENDPOINT
+    - name: GENERIC_TOKEN_ENDPOINT
+      valueFrom:
+        secretKeyRef:
+          name: litellm-secret
+          key: GENERIC_TOKEN_ENDPOINT
+    - name: GENERIC_USERINFO_ENDPOINT
+      valueFrom:
+        secretKeyRef:
+          name: litellm-secret
+          key: GENERIC_USERINFO_ENDPOINT
+    - name: GROQ_API_KEY
+      valueFrom:
+        secretKeyRef:
+          name: litellm-secret
+          key: GROQ_API_KEY
+    # Swagger is served at / by default, and litellm only registers the root
+    # redirect when DOCS_URL is off "/" — so moving the docs is what makes
+    # ROOT_REDIRECT_URL take effect, not just an aesthetic choice.
+    - name: DOCS_URL
+      value: /docs
+    - name: ROOT_REDIRECT_URL
+      value: /ui
+    # Must match the provider's property_mappings in
+    # terraform/authentik/litellm.tofu (openid/email/profile + litellm_role).
+    # LiteLLM defaults GENERIC_SCOPE to "openid email profile", so without this
+    # the custom litellm_role scope is never requested and Authentik never emits
+    # the claim - first login then lands as INTERNAL_USER_VIEW_ONLY.
+    - name: GENERIC_SCOPE
+      value: openid email profile litellm_role
+    # Claim name Authentik puts on the token/userinfo payload. LiteLLM defaults
+    # this to "role"; the image reads it via get_nested_value (ui_sso.py).
+    - name: GENERIC_USER_ROLE_ATTRIBUTE
+      value: litellm_role
+    # Send the UI straight to Authentik instead of showing the master-key form
+    # first. Master-key browser login moves to /fallback/login once this is on;
+    # API callers using the master key are unaffected.
+    - name: AUTO_REDIRECT_UI_LOGIN_TO_SSO
+      value: "false"
+    # Pair with auto-redirect: LiteLLM logout only clears the local UI session,
+    # so without an end-session hop the next /ui hit immediately re-authenticates
+    # against the still-live Authentik SSO cookie. Slug matches
+    # authentik_application.litellm.
+    - name: PROXY_LOGOUT_URL
+      value: https://id.davidstewen.com/application/o/litellm/end-session/
+    - name: PROXY_BASE_URL
+      value: https://litellm.davidstewen.com
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 2Gi
+  service:
+    type: ClusterIP
+    port: 4000
+  route:
+    hostnames:
+      - litellm.davidstewen.com
+    parentRefs:
+      - name: envoy-internal
+        namespace: network

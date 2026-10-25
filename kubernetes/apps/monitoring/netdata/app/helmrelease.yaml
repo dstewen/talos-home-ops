@@ -1,0 +1,91 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: netdata
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: netdata
+      version: 3.7.139
+      sourceRef:
+        kind: HelmRepository
+        name: netdata
+        namespace: flux-system
+
+  maxHistory: 3
+
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+
+  uninstall:
+    keepHistory: false
+
+  values:
+    image:
+      repository: netdata/netdata
+      tag: "v2.12.2"
+
+    ingress:
+      enabled: true
+      annotations:
+        #        cert-manager.io/cluster-issuer: "letsencrypt-production"
+        kubernetes.io/ingress.class: internal
+        kubernetes.io/tls-acme: "true"
+        hajimari.io/enable: "true"
+        hajimari.io/appName: "Net Data"
+        hajimari.io/icon: mdi:console-network-outline
+        hajimari.io/group: "monitoring"
+      #        hajimari.io/instance: "admin"
+      path: /
+      pathType: Prefix
+      hosts:
+        - &host netdata.${SECRET_DOMAIN}
+      spec:
+        ingressClassName: internal
+    parent:
+      enabled: true
+
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/arch
+                    operator: In
+                    values:
+                      - amd64
+
+      envFrom:
+        - secretRef:
+            name: netdata-secret
+      alarms:
+        storageclass: "ceph-block"
+      database:
+        storageclass: "ceph-block"
+
+    child:
+      enabled: true
+      envFrom:
+        - secretRef:
+            name: netdata-secret
+    k8sState:
+      enabled: true
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/arch
+                    operator: In
+                    values:
+                      - amd64

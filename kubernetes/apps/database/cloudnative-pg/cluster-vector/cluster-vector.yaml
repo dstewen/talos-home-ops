@@ -1,0 +1,63 @@
+---
+# yaml-language-server: $schema=https://github.com/datreeio/CRDs-catalog/raw/refs/heads/main/postgresql.cnpg.io/cluster_v1.json
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: postgres-vector
+  annotations:
+    cnpg.io/skipEmptyWalArchiveCheck: "enabled"
+spec:
+  instances: 3
+  # renovate: datasource=docker depName=ghcr.io/cloudnative-pg/postgresql versioning=docker
+  imageName: ghcr.io/cloudnative-pg/postgresql:18.6
+  primaryUpdateStrategy: unsupervised
+  storage:
+    size: 10Gi
+    storageClass: openebs-hostpath-1tb
+  superuserSecret:
+    name: cloudnative-pg-secret
+  enableSuperuserAccess: true
+  postgresql:
+    parameters:
+      max_connections: "600"
+      max_slot_wal_keep_size: 10GB
+      shared_buffers: 512MB
+    extensions:
+      - name: vchord
+        image:
+          reference: ghcr.io/tensorchord/vchord-scratch:pg18-v1.1.1
+        dynamic_library_path:
+          - /usr/lib/postgresql/18/lib/
+        extension_control_path:
+          - /usr/share/postgresql/18/
+    shared_preload_libraries: ["vchord.so"]
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      memory: 4Gi
+  monitoring:
+    enablePodMonitor: false
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: minio-pg18-vector
+        serverName: postgres-vector-v4
+  bootstrap:
+    recovery:
+      source: source
+  #      recoveryTarget:
+  #        backupID: "20260222T085909"
+  externalClusters:
+    - name: source
+      plugin:
+        name: barman-cloud.cloudnative-pg.io
+        parameters:
+          barmanObjectName: minio-pg18-vector
+          serverName: postgres-vector-v3
+  affinity:
+    tolerations:
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists

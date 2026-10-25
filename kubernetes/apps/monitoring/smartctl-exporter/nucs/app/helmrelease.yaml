@@ -1,0 +1,45 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app smartctl-exporter-nucs
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: smartctl-exporter-nucs
+  interval: 1h
+  dependsOn:
+    - name: kube-prometheus-stack
+      namespace: monitoring
+  values:
+    fullnameOverride: *app
+    image:
+      repository: ghcr.io/joryirving/smartctl_exporter
+      tag: 0.15.0@sha256:96874f3e5f890904c91bae542cbccbe35c1751ab5f3e129f4a9ae3e09a495e87
+    config:
+      devices:
+        - /dev/nvme0n1
+        - /dev/sda
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: kubernetes.io/arch
+                  operator: In
+                  values:
+                    - amd64
+                - key: node-role.kubernetes.io/worker
+                  operator: Exists
+    serviceMonitor:
+      enabled: true
+    prometheusRules:
+      enabled: false
+
+    resources:
+      limits:
+        memory: 64M
+      requests:
+        cpu: 10m
+        memory: 32M

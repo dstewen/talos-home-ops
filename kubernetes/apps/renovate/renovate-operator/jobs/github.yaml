@@ -1,0 +1,106 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/generators.external-secrets.io/githubaccesstoken_v1alpha1.json
+apiVersion: generators.external-secrets.io/v1alpha1
+kind: GithubAccessToken
+metadata:
+  name: self-hosted-test-auth-token
+spec:
+  appID: "351645"
+  installID: "41646220"
+  auth:
+    privateKey:
+      secretRef:
+        name: selfhosted-test-pem
+        key: private_key_pem
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/external-secrets.io/externalsecret_v1.json
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: &name self-hosted-test-auth-token
+spec:
+  target:
+    name: *name
+    template:
+      type: Opaque
+      engineVersion: v2
+      data:
+        GITHUB_COM_TOKEN: "{{ .token }}"
+        GITHUB_COM_USER: ZHN0ZXdlbg==
+        RENOVATE_TOKEN: "{{ .token }}"
+  dataFrom:
+    - sourceRef:
+        generatorRef:
+          apiVersion: generators.external-secrets.io/v1alpha1
+          kind: GithubAccessToken
+          name: self-hosted-test-auth-token
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/renovate-operator.mogenius.com/renovatejob_v1alpha1.json
+apiVersion: renovate-operator.mogenius.com/v1alpha1
+kind: RenovateJob
+metadata:
+  name: dstewen
+  namespace: renovate
+spec:
+  discoveryFilters:
+    - "dstewen/*"
+  provider:
+    name: github
+    endpoint: https://api.github.com/
+  extraEnv:
+    - name: LOG_LEVEL
+      value: debug
+    - name: RENOVATE_ALLOWED_COMMANDS
+      value: '["pnpm run bundle"]'
+    #    - name: RENOVATE_ENDPOINT
+    #      value: https://api.github.com/
+    #    - name: RENOVATE_PLATFORM
+    #      value: github
+    - name: RENOVATE_PLATFORM_COMMIT
+      value: "true"
+    - name: DOCKERHUB_USERNAME
+      valueFrom:
+        secretKeyRef:
+          name: docker-hub-token
+          key: DOCKERHUB_USERNAME
+    - name: DOCKERHUB_TOKEN
+      valueFrom:
+        secretKeyRef:
+          name: docker-hub-token
+          key: DOCKERHUB_TOKEN
+    - name: RENOVATE_HOST_RULES
+      value: >-
+        [
+          {
+            "hostType": "docker",
+            "matchHost": "docker.io",
+            "username": "$(DOCKERHUB_USERNAME)",
+            "password": "$(DOCKERHUB_TOKEN)"
+          }
+        ]
+  image: ghcr.io/renovatebot/renovate:44.181.5
+  parallelism: 5
+  metadata:
+    labels:
+      app: renovate
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchLabels:
+                app: renovate
+            topologyKey: kubernetes.io/hostname
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  schedule: 0 2 * * *
+  allowedGroups:
+    - ldap_renovate_allow_access
+  secretRef: self-hosted-test-auth-token
+  webhook:
+    enabled: true
+    authentication:
+      enabled: false
