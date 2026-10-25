@@ -1,1 +1,0 @@
-# talos-home-ops
