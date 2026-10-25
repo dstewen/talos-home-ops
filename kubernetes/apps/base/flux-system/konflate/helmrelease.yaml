@@ -1,0 +1,45 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: konflate
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: konflate
+  interval: 15m
+  dependsOn: []
+  values:
+    config:
+      clusterPath: ./kubernetes/clusters/${CLUSTER}
+      statusChecks: true
+      statusCheckName: "Konflate (${CLUSTER})"
+      prComments: ${KONFLATE_PR_COMMENTS:=true}
+      publicUrl: "https://${SUBDOMAIN}${SUBDOMAIN_SUFFIX:=}.jory.dev"
+      repo: github://joryirving/home-ops
+      mcp: true
+    persistence:
+      enabled: false
+    secret:
+      existingSecret: konflate
+    podAnnotations:
+      reloader.stakater.com/auto: "true"
+    httpRoute:
+      enabled: true
+      annotations:
+        gatus.home-operations.com/endpoint: |-
+          conditions: ["[STATUS] == 200"]
+      parentRefs:
+        - name: envoy-external
+          namespace: network
+      hostnames: ["${SUBDOMAIN}${SUBDOMAIN_SUFFIX:=}.jory.dev"]
+    monitoring:
+      serviceMonitor:
+        enabled: true
+    resources:
+      requests:
+        cpu: 50m
+      limits:
+        cpu: 4000m
+        memory: 4Gi

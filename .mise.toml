@@ -1,0 +1,15 @@
+[env]
+# File paths
+KUBECONFIG = "{{config_root}}/kubernetes/clusters/main/kubeconfig:{{config_root}}/kubernetes/clusters/test/kubeconfig:{{config_root}}/kubernetes/clusters/utility/kubeconfig"
+MINIJINJA_CONFIG_FILE = "{{config_root}}/.minijinja.toml"
+
+# File paths
+BOOTSTRAP_DIR = "{{config_root}}/bootstrap"
+KUBERNETES_DIR = "{{config_root}}/kubernetes"
+ROOT_DIR = "{{config_root}}"
+TALOS_DIR = "{{config_root}}/talos"
+
+_.file = ["{{config_root}}/.secrets.env"]
+
+[tools]
+"github:home-operations/flate" = "0.6.5"

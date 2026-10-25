@@ -1,0 +1,17 @@
+---
+apiVersion: towonel.io/v1alpha1
+kind: TowonelAgent
+metadata:
+  # Keep the operator's generated identity so source-managed routes stay attached.
+  name: ${TOWONEL_AGENT_NAME}
+  labels:
+    app.kubernetes.io/managed-by: towonel-operator
+spec:
+  mode: Managed
+  tunnelRef:
+    name: towonel-${CLUSTER}
+    namespace: network
+  workload:
+    disableUDPGSO: true
+    # Track agent releases independently of the operator chart.
+    image: codeberg.org/towonel/towonel-agent:1.13.3@sha256:3625db8942abc1301eecdde08ccc67c6f9d8d617c69a0d2a3dcf360e959f24cb

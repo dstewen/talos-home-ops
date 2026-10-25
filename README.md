@@ -1,0 +1,219 @@
+<div align="center">
+
+<img src="https://avatars.githubusercontent.com/u/46251616?v=4" align="center" width="144px" height="144px"/>
+
+### <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f680/512.gif" alt="🚀" width="16" height="16"> My Home Operations Repository <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f6a7/512.gif" alt="🚧" width="16" height="16">
+
+_... managed with Flux, Renovate, and GitHub Actions_ <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f916/512.gif" alt="🤖" width="16" height="16">
+
+</div>
+
+<div align="center">
+
+[![Discord](https://img.shields.io/discord/673534664354430999?label&logo=discord&logoColor=white&color=blue)](https://discord.gg/home-operations)&nbsp;&nbsp;
+[![Talos](https://kromgo.jory.dev/badges/talos_version)](https://talos.dev)&nbsp;&nbsp;
+[![Kubernetes](https://kromgo.jory.dev/badges/kubernetes_version)](https://kubernetes.io)&nbsp;&nbsp;
+[![Flux](https://kromgo.jory.dev/badges/flux_version)](https://fluxcd.io)&nbsp;&nbsp;
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/joryirving/home-ops)&nbsp;&nbsp;
+
+</div>
+
+<div align="center">
+
+[![Home-Internet](https://img.shields.io/endpoint?url=https%3A%2F%2Fhealthchecks.io%2Fbadge%2Ff0288b6a-305e-4084-b492-bb0a54%2FKkxSOeO1-2.shields&style=for-the-badge&logo=ubiquiti&logoColor=white&label=Home%20Internet)](https://status.jory.dev)&nbsp;&nbsp;
+[![Status-Page](https://img.shields.io/endpoint?url=https%3A%2F%2Fstatus.jory.dev%2Fapi%2Fv1%2Fendpoints%2Fmain-external_gatus-sidecar%2Fhealth%2Fbadge.shields&style=for-the-badge&logo=statuspage&logoColor=white&label=Status%20Page)](https://status.jory.dev/endpoints/main-external_gatus-sidecar)&nbsp;&nbsp;
+[![Columbina](https://img.shields.io/endpoint?url=https%3A%2F%2Fstatus.jory.dev%2Fapi%2Fv1%2Fendpoints%2Fbuddy_columbina%2Fhealth%2Fbadge.shields&style=for-the-badge&logo=statuspage&logoColor=white&label=Columbina)](https://status.jory.dev/endpoints/buddy_columbina)&nbsp;&nbsp;
+[![Plex](https://img.shields.io/endpoint?url=https%3A%2F%2Fstatus.jory.dev%2Fapi%2Fv1%2Fendpoints%2Fmain-external_plex%2Fhealth%2Fbadge.shields&style=for-the-badge&logo=plex&logoColor=white&label=Plex)](https://status.jory.dev/endpoints/main-external_plex)
+
+</div>
+
+<div align="center">
+
+[![Age](https://kromgo.jory.dev/badges/cluster_birth_age)](https://github.com/home-operations/kromgo)&nbsp;&nbsp;
+[![Uptime](https://kromgo.jory.dev/badges/cluster_uptime_age)](https://github.com/home-operations/kromgo)&nbsp;&nbsp;
+[![Nodes](https://kromgo.jory.dev/badges/cluster_node_count)](https://github.com/home-operations/kromgo)&nbsp;&nbsp;
+[![Pods](https://kromgo.jory.dev/badges/cluster_pod_count)](https://github.com/home-operations/kromgo)&nbsp;&nbsp;
+[![CPU](https://kromgo.jory.dev/badges/cluster_cpu_usage)](https://github.com/home-operations/kromgo)&nbsp;&nbsp;
+[![Memory](https://kromgo.jory.dev/badges/cluster_memory_usage)](https://github.com/home-operations/kromgo)&nbsp;&nbsp;
+[![Power](https://kromgo.jory.dev/badges/cluster_power_usage)](https://github.com/home-operations/kromgo)&nbsp;&nbsp;
+[![Alerts](https://kromgo.jory.dev/badges/cluster_alert_count)](https://github.com/home-operations/kromgo)
+
+</div>
+
+---
+
+## Overview
+
+This is a monorepository for my home Kubernetes clusters.
+I try to adhere to Infrastructure as Code (IaC) and GitOps practices using tools like [OpenTofu](https://opentofu.org/), [Kubernetes](https://kubernetes.io/), [Flux](https://github.com/fluxcd/flux2), [Renovate](https://github.com/renovatebot/renovate), and [GitHub Actions](https://github.com/features/actions).
+
+The purpose here is to learn k8s, while practicing Gitops.
+
+---
+
+## ⛵ Kubernetes
+
+My Kubernetes clusters are deployed with [Talos](https://www.talos.dev). One is a test cluster, one is a low-power utility cluster, running important services, and the other is a semi-hyper-converged cluster, workloads and block storage are sharing the same available resources on my nodes while I have a separate NAS with ZFS for NFS/SMB shares, bulk file storage and backups.
+
+There is a template over at [onedr0p/cluster-template](https://github.com/onedr0p/cluster-template) if you want to try and follow along with some of the practices I use here.
+
+### Core Components
+
+- **Networking & Ingress**: [cilium](https://github.com/cilium/cilium) provides eBPF-based networking (kube-proxy replacement, BGP on main/utility, L2 announcements on test), and [multus](https://github.com/k8snetworkplumbingwg/multus-cni) adds secondary pod networks on main and utility. [Envoy Gateway](https://gateway.envoyproxy.io/) implements the Gateway API for L7 ingress through the `envoy-internal` and `envoy-external` Gateways. [Towonel](https://github.com/eleboucher/towonel) (via towonel-operator) fronts public ingress through a small OVH VPS, and [external-dns](https://github.com/kubernetes-sigs/external-dns) keeps DNS records in sync automatically.
+- **Security & Secrets**: [cert-manager](https://github.com/cert-manager/cert-manager) automates SSL/TLS certificate management. For secrets, I use [external-secrets](https://github.com/external-secrets/external-secrets) with [1Password Connect](https://github.com/1Password/connect) to inject secrets into Kubernetes.
+- **Storage & Data Protection**: [rook](https://github.com/rook/rook) provides distributed Ceph storage on main. `local-hostpath` volumes come from [openebs](https://github.com/openebs/openebs) on main and [democratic-csi](https://github.com/democratic-csi/democratic-csi) on utility and test. kopiur takes [Kopia](https://kopia.io/) backups of PVCs into a repository on the NAS. [spegel](https://github.com/spegel-org/spegel) runs a stateless, cluster-local OCI image mirror on main.
+- **Automation & CI/CD**: [flux-operator](https://github.com/controlplaneio-fluxcd/flux-operator) manages each cluster's Flux install through a `FluxInstance`. [actions-runner-controller](https://github.com/actions/actions-runner-controller) runs self-hosted GitHub Actions runners directly in the cluster for continuous integration workflows. tuppr drives Talos and Kubernetes upgrades from `TalosUpgrade`/`KubernetesUpgrade` resources. For IaC, [tofu-controller](https://github.com/flux-iac/tofu-controller) runs OpenTofu from within the utility cluster.
+
+### GitOps
+
+[Flux](https://github.com/fluxcd/flux2) watches the clusters in my [kubernetes](./kubernetes/) folder (see Directories below) and makes the changes to my clusters based on the state of my Git repository.
+
+The way Flux works for me here is it will apply the `kubernetes/apps/${cluster}` folder. Each namespace directory there has a `kustomization.yaml` that pulls in the `components/namespace` component (the Namespace resource and alerts) and lists one Flux Kustomization per app (`<app>.yaml`), each pointing at that app's manifests in `kubernetes/apps/base/<namespace>/<app>`. Under the control of those Flux Kustomizations there will be a `HelmRelease` or other resources related to the application which will be applied.
+
+[Renovate](https://github.com/renovatebot/renovate) watches my **entire** repository looking for dependency updates, when they are found a PR is automatically created. When some PRs are merged Flux applies the changes to my cluster.
+
+### Directories
+
+This Git repository contains the following directories under [Kubernetes](./kubernetes/).
+
+```sh
+📁 kubernetes
+├── 📁 apps              # app configurations
+│   ├── 📁 base          # base app configuration
+│   ├── 📁 main          # cluster specific overlay
+│   ├── 📁 utility
+│   ├── 📁 test
+├── 📁 clusters          # Cluster flux configurations
+│   ├── 📁 main
+│   ├── 📁 utility
+│   ├── 📁 test
+├── 📁 components        # re-useable components
+```
+
+### Networking
+
+<details>
+  <summary>Click to see a high-level network diagram</summary>
+
+  <img src="https://raw.githubusercontent.com/joryirving/home-ops/main/docs/src/assets/network-topology.png" align="center" alt="dns"/>
+</details>
+
+---
+
+## ☁️ Cloud Dependencies
+
+While most of my infrastructure and workloads are self-hosted I do rely upon the cloud for certain key parts of my setup. This saves me from having to worry about two things. (1) Dealing with chicken/egg scenarios and (2) services I critically need whether my cluster is online or not.
+
+The alternative solution to these two problems would be to host a Kubernetes cluster in the cloud and deploy applications like [HCVault](https://www.vaultproject.io/), [Vaultwarden](https://github.com/dani-garcia/vaultwarden), and [ntfy](https://ntfy.sh/). However, maintaining another cluster and monitoring another group of workloads is a lot more time and effort than I am willing to put in.
+
+The one exception is status monitoring: the OVH VPS (Columbina) that fronts Towonel also runs a standalone [Gatus](https://gatus.io/) as a buddy monitor. It watches the clusters' status pages and receives Alertmanager heartbeats from the main and utility clusters, alerting to Discord if a cluster goes dark, while the main cluster's Gatus watches Columbina in return.
+
+| Service                                     | Use                                                               | Cost           |
+| ------------------------------------------- | ----------------------------------------------------------------- | -------------- |
+| [1Password](https://1Password.com/)         | Secrets with [External Secrets](https://external-secrets.io/)     | ~$80/yr        |
+| [Cloudflare](https://www.cloudflare.com/)   | Domain, DNS, WAF and R2 bucket (S3 Compatible endpoint)           | ~$40/yr        |
+| [GitHub](https://github.com/)               | Hosting this repository and continuous integration/deployments    | Free           |
+| [Healthchecks.io](https://healthchecks.io/) | Monitoring internet connectivity and external facing applications | Free           |
+| [OVHcloud](https://www.ovhcloud.com/)       | VPS edge for Towonel and out-of-cluster status monitoring         | ~$6/mo         |
+| [UptimeRobot](https://uptimerobot.com/)     | External uptime monitors (managed in `terraform/uptimerobot`)     | Free           |
+|                                             |                                                                   | Total: ~$16/mo |
+
+---
+
+## 🌐 DNS
+
+In my clusters there are two instances of [ExternalDNS](https://github.com/kubernetes-sigs/external-dns) running. `unifi-dns` syncs private DNS records to my `UDM-SE` using [ExternalDNS webhook provider for UniFi](https://github.com/kashalls/external-dns-unifi-webhook), from every `HTTPRoute` and from `Service`s with an `external-dns.kubernetes.io/hostname` annotation. `cloudflare-dns` syncs public DNS to `Cloudflare` from `HTTPRoute`s attached to the `envoy-external` Gateway and from `DNSEndpoint` resources. There are no `Ingress` objects: an app attaches its `HTTPRoute` to `envoy-internal` for private access or `envoy-external` for public access.
+
+---
+
+## 🔧 Hardware
+
+### Main Kubernetes Cluster
+
+| Name  | Device                  | CPU               | OS Disk    | Local Disk | Rook Disk  | RAM   | OS    | Purpose           |
+| ----- | ----------------------- | ----------------- | ---------- | ---------- | ---------- | ----- | ----- | ----------------- |
+| Ayaka | MS-01                   | i9-13900H         | 960GB NVMe | 1TB NVMe   | 1.92TB U.2 | 128GB | Talos | k8s control-plane |
+| Eula  | MS-01                   | i9-13900H         | 960GB NVMe | 1TB NVMe   | 1.92TB U.2 | 128GB | Talos | k8s control-plane |
+| Ganyu | MS-01                   | i9-13900H         | 960GB NVMe | 1TB NVMe   | 1.92TB U.2 | 128GB | Talos | k8s control-plane |
+| Skirk | Bosgame M5 (Halo Strix) | Ryzen AI Max+ 395 | 500GB NVMe | 2TB NVMe   | -          | 128GB | Talos | k8s worker (LLM)  |
+
+Control Plane OS Disk: m.2 Samsung PM9A3 960GB
+Control Plane Local Disk: m.2 WD SN770 1TB
+Control Plane Rook Disk: u.2 Samsung PM9A3 1.92TB
+Ganyu GPU: NVIDIA RTX 3090 24GB (OCuLink eGPU)
+Skirk GPU: Strix Halo iGPU
+
+Total CPU: 58 Cores/92 Threads
+Total RAM: 512GB
+
+### Utility Kubernetes Cluster
+
+| Name     | Device     | CPU           | OS Disk   | Local Disk | RAM  | OS    | Purpose           |
+| -------- | ---------- | ------------- | --------- | ---------- | ---- | ----- | ----------------- |
+| Celestia | Bosgame P1 | Ryzen 7 5700U | 500GB SSD | 1TB NVMe   | 64GB | Talos | k8s control-plane |
+
+OS Disk: 2.5" Samsung 870 EVO SSD
+Local Disk: m.2 WD SN770 1TB
+
+Total CPU: 8 Cores/16 Threads
+Total RAM: 64GB
+
+### Test Kubernetes Cluster
+
+| Name    | Device         | CPU           | OS Disk      | Local Disk | RAM  | OS    | Purpose           |
+| ------- | -------------- | ------------- | ------------ | ---------- | ---- | ----- | ----------------- |
+| Citlali | Beelink Mini-S | Celeron N5095 | 1TB M.2 SATA | 480GB SSD  | 32GB | Talos | k8s control-plane |
+
+OS Disk: m.2 Timetec SATA SSD
+Local Disk: 2.5" Kingston SA400 SSD
+
+Total CPU: 4 Cores/4 Threads
+Total RAM: 32GB
+
+### Supporting Hardware
+
+| Name    | Device            | CPU        | OS Disk    | Data Disk     | RAM   | OS           | Purpose           |
+| ------- | ----------------- | ---------- | ---------- | ------------- | ----- | ------------ | ----------------- |
+| Voyager | MS-01             | i5-12600H  | 32GB USB   | -             | 96GB  | Unraid       | NAS/NFS/Backup    |
+| DAS     | Lenovo SA120      | -          | -          | 6x14TB Raidz2 | -     | -            | ZFS               |
+| Venti   | Raspberry Pi5     | Cortex A76 | 250GB NVMe | -             | 8GB   | Raspbian     | NUT/SSH (Main)    |
+| Sayu    | Raspberry Pi5     | Cortex A76 | 500GB NVMe | -             | 8GB   | Raspbian     | NUT/SSH (Utility) |
+| PiKVM   | Raspberry Pi4     | Cortex A72 | 64GB mSD   | -             | 4GB   | PiKVM (Arch) | KVM (Main)        |
+| JetKVM  | JetKVM            | RV1106G3   | 8GB EMMC   | -             | 256MB | Linux 5.10   | KVM (Utility)     |
+| PDU     | UniFi USP PDU Pro | -          | -          | -             | -     | -            | PDU               |
+| TESmart | 8 port KVM        | -          | -          | -             | -     | -            | Network KVM       |
+
+### Networking/UPS Hardware
+
+| Device                      | Purpose              |
+| --------------------------- | -------------------- |
+| Unifi UDM-SE                | Network - Router     |
+| Back-UPS 600                | Network - UPS        |
+| Unifi USW-Enterprise-24-PoE | Server - 2.5G Switch |
+| Unifi USW-Aggregation       | Server - 10G Switch  |
+| Tripp Lite 1500             | Server - UPS         |
+| Ecoflow Delta 3 Plus        | Server - UPS         |
+
+---
+
+## ⭐ Stargazers
+
+<div align="center">
+
+[![Star History Chart](https://api.star-history.com/svg?repos=joryirving/home-ops&type=Date)](https://star-history.com/#joryirving/home-ops&Date)
+
+</div>
+
+---
+
+## 🤝 Thanks
+
+Big shout out to the [cluster-template](https://github.com/onedr0p/cluster-template), and the [Home Operations](https://discord.gg/home-operations) Discord community. Be sure to check out [kubesearch.dev](https://kubesearch.dev/) for ideas on how to deploy applications or get ideas on what you may deploy.
+
+---
+
+<div align="center">
+
+[![DeepWiki](https://img.shields.io/badge/deepwiki-purple?label=&logo=deepl&style=for-the-badge&logoColor=white)](https://deepwiki.com/joryirving/home-ops)
+
+</div>

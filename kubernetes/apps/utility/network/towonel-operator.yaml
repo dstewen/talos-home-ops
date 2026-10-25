@@ -1,0 +1,43 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: towonel-operator
+spec:
+  dependsOn:
+    - name: kube-prometheus-stack
+      namespace: observability
+  interval: 1h
+  path: ./kubernetes/apps/base/network/towonel-operator/app
+  postBuild:
+    substitute:
+      TOWONEL_METRICS_ENABLED: "true"
+  wait: true
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: towonel-tunnel
+spec:
+  dependsOn:
+    - name: envoy-config
+    - name: towonel-operator
+  interval: 1h
+  path: ./kubernetes/apps/base/network/towonel-operator/config
+  postBuild:
+    substitute:
+      EXTERNAL_DOMAIN: ${CLUSTER}-external
+      TOWONEL_AGENT_NAME: network-towonel-utility-f95a62a0
+  wait: false
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system

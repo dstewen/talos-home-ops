@@ -1,0 +1,41 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: rtlamr2mqtt
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: rtlamr2mqtt
+  interval: 15m
+  dependsOn:
+    - name: mosquitto
+  values:
+    defaultPodOptions:
+      nodeSelector:
+        kubernetes.io/hostname: celestia
+    controllers:
+      rtlamr2mqtt:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: docker.io/allangood/rtlamr2mqtt
+              tag: 2026.10.15@sha256:6e7315df0b06f8293504077a7c0d751d36cc0421366db44c7cdf85fd9f06ef30
+            securityContext:
+              privileged: true
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 256Mi
+    persistence:
+      config-file:
+        type: secret
+        name: "{{ .Release.Name }}"
+        globalMounts:
+          - path: /etc/rtlamr2mqtt.yaml
+            subPath: rtlamr2mqtt.yaml
+            readOnly: true

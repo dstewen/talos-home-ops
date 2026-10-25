@@ -1,0 +1,53 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kavita
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: kavita
+  interval: 15m
+  dependsOn: []
+  values:
+    controllers:
+      kavita:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: ghcr.io/kareadita/kavita
+              tag: 0.9.1@sha256:31181a32f0dda73cae68721867028a7253d57881b58bea5754cd9e578e75421a
+            env:
+              TZ: America/Edmonton
+            resources:
+              requests:
+                cpu: 15m
+                memory: 300Mi
+              limits:
+                memory: 1Gi
+    persistence:
+      config:
+        existingClaim: "{{ .Release.Name }}"
+        globalMounts:
+          - path: /kavita/config
+      media:
+        type: nfs
+        server: voyager.internal
+        path: /mnt/akademiya/data
+        globalMounts:
+          - path: /data
+            subPath: media
+    route:
+      app:
+        hostnames: ["comics.jory.dev"]
+        parentRefs:
+          - name: envoy-external
+            namespace: network
+    service:
+      app:
+        ports:
+          http:
+            port: 5000

@@ -1,0 +1,35 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: free-game-notifier
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: free-game-notifier
+  interval: 15m
+  dependsOn: []
+  values:
+    controllers:
+      free-game-notifier:
+        containers:
+          app:
+            image:
+              repository: ghcr.io/ctrl-research/free-games
+              tag: v0.0.5@sha256:346ad591a0abd45cc8722f241d69fa995171483bb45130c44ef26bbdab3380f8
+            env:
+              TZ: America/Edmonton
+              EPIC_INCLUDE_UPCOMING: "false"
+              ENABLE_STEAM: "true"
+              ENABLE_TWITCH_DROPS: "true"
+              EPIC_SCHEDULE: "0 0 * * 4"
+              STEAM_SCHEDULE: "0 9 * * *"
+              TWITCH_DROPS_SCHEDULE: "0 12 * * *"
+              NOITIFICATION_STORE_PATH: /data/free-games-store.json
+            envFrom:
+              - secretRef:
+                  name: "{{ .Release.Name }}"
+    persistence:
+      data:
+        existingClaim: "{{ .Release.Name }}"

@@ -1,0 +1,30 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: llm
+components:
+  - ../../../components/namespace
+replacements:
+  - path: ../../../components/replacements/ks.yaml
+resources:
+  # - ./comfyui.yaml
+  - ./courier.yaml
+  - ./dispatch.yaml
+  - ./headroom.yaml
+  - ./hermes.yaml
+  - ./litellm-operator.yaml
+  - ./litellm.yaml
+  - ./llm-wake.yaml
+  - ./llmkube.yaml
+  - ./lemonade-tts.yaml
+  - ./memini.yaml
+  - ./miso-gallery.yaml
+  - ./open-webui.yaml
+  - ./openclaw.yaml
+  - ./opencode.yaml
+  - ./paseo.yaml
+  - ./repo-wiki.yaml
+  - ./searxng.yaml
+  - ./toolhive.yaml
+  - ./whisper.yaml

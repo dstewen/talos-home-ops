@@ -1,0 +1,16 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ./blackbox-exporter.yaml
+  - ./dcgm-exporter.yaml
+  - ./drm-exporter.yaml
+  - ./drm-exporter-amd.yaml
+  - ./blackbox-exporter-probes.yaml
+  - ./hoymiles-exporter.yaml
+  - ./nut-exporter.yaml
+  - ./amdgpu-exporter.yaml
+  - ./smartctl-exporter.yaml
+  - ./speedtest-exporter.yaml
+  - ./unpoller.yaml

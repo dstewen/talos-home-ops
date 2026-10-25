@@ -1,0 +1,244 @@
+---
+- name: Bootstrap Towonel VPS
+  hosts: all
+  become: true
+  gather_facts: true
+  vars:
+    towonel_hostname: columbina
+    towonel_data_dir: /opt/towonel/data
+    doco_cd_config_dir: /opt/doco-cd
+
+  tasks:
+    - name: Check host connectivity
+      ansible.builtin.ping:
+
+    - name: Set hostname
+      ansible.builtin.hostname:
+        name: "{{ towonel_hostname }}"
+
+    - name: Install base packages
+      ansible.builtin.apt:
+        name:
+          - ca-certificates
+          - curl
+          - ipset
+          - jq
+          - openssl
+          - ufw
+        state: present
+        update_cache: true
+
+    - name: Install Docker
+      ansible.builtin.shell: curl -fsSL https://get.docker.com | sh
+      args:
+        executable: /bin/bash
+        creates: /usr/bin/docker
+
+    - name: Create Towonel directories
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: directory
+        owner: "{{ item.owner }}"
+        group: "{{ item.group }}"
+        mode: "{{ item.mode }}"
+      loop:
+        - path: /opt/towonel
+          owner: root
+          group: root
+          mode: "0755"
+        - path: "{{ towonel_data_dir }}"
+          owner: "10001"
+          group: "10001"
+          mode: "0750"
+        - path: "{{ doco_cd_config_dir }}"
+          owner: root
+          group: root
+          mode: "0700"
+
+    - name: Create coturn directory
+      ansible.builtin.file:
+        path: /opt/coturn
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Template coturn config
+      ansible.builtin.template:
+        src: templates/turnserver.conf.j2
+        dest: /opt/coturn/turnserver.conf
+        owner: "65534"
+        group: "65534"
+        mode: "0400"
+      vars:
+        turn_static_auth_secret: "{{ lookup('community.general.onepassword', 'workadventure', field='WORKADVENTURE_TURN_AUTH_SECRET', vault='kubernetes') }}"
+      no_log: true
+      register: coturn_conf
+
+    - name: Restart coturn after config change
+      ansible.builtin.command:
+        cmd: docker restart coturn
+      when: coturn_conf.changed
+      changed_when: coturn_conf.changed
+      failed_when: false
+
+    - name: Create gatus directory
+      ansible.builtin.file:
+        path: /opt/gatus
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Template gatus secrets config
+      ansible.builtin.template:
+        src: templates/gatus-secrets.yaml.j2
+        dest: /opt/gatus/secrets.yaml
+        owner: root
+        group: root
+        mode: "0400"
+      vars:
+        gatus_discord_webhook_url: "{{ lookup('community.general.onepassword', 'discord', field='DISCORD_WEBHOOK_URL', vault='kubernetes') }}"
+        gatus_heartbeat_token: "{{ lookup('community.general.onepassword', 'alertmanager', field='GATUS_HEARTBEAT_TOKEN', vault='kubernetes') }}"
+      no_log: true
+      register: gatus_conf
+
+    - name: Restart gatus after config change
+      ansible.builtin.command:
+        cmd: docker restart gatus
+      when: gatus_conf.changed
+      changed_when: gatus_conf.changed
+      failed_when: false
+
+    - name: Create Docker edge network
+      community.docker.docker_network:
+        name: edge
+        driver: bridge
+        state: present
+
+    - name: Check for previous one-shot compose file
+      ansible.builtin.stat:
+        path: /opt/towonel/docker-compose.yaml
+      register: previous_compose_file
+
+    - name: Stop previous one-shot compose stack
+      ansible.builtin.command:
+        cmd: docker compose -f /opt/towonel/docker-compose.yaml down --remove-orphans
+      when: previous_compose_file.stat.exists
+      changed_when: true
+
+    - name: Copy doco-cd Compose file
+      ansible.builtin.copy:
+        src: ../../docker/columbina/.doco-cd/docker-compose.app.yaml
+        dest: "{{ doco_cd_config_dir }}/docker-compose.yaml"
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Create doco-cd secret files
+      ansible.builtin.shell: |
+        set -euo pipefail
+        umask 077
+        openssl rand -base64 48 > "{{ item }}"
+      args:
+        executable: /bin/bash
+        creates: "{{ item }}"
+      loop:
+        - "{{ doco_cd_config_dir }}/api_secret"
+        - "{{ doco_cd_config_dir }}/webhook_secret"
+
+    - name: Remove previous one-shot compose file
+      ansible.builtin.file:
+        path: /opt/towonel/docker-compose.yaml
+        state: absent
+
+    - name: Allow SSH
+      community.general.ufw:
+        rule: allow
+        port: "22"
+        proto: tcp
+
+    - name: Allow public edge ports
+      community.general.ufw:
+        rule: allow
+        port: "{{ item.port }}"
+        proto: "{{ item.proto }}"
+      loop:
+        - port: "80"
+          proto: tcp
+        - port: "443"
+          proto: tcp
+        - port: "51820"
+          proto: udp
+        - port: "25565"
+          proto: tcp
+        - port: "2456"
+          proto: udp
+        - port: "2457"
+          proto: udp
+        - port: "2458"
+          proto: udp
+        - port: "15637"
+          proto: udp
+        - port: "27015"
+          proto: udp
+        - port: "8211"
+          proto: udp
+        - port: "7881"
+          proto: tcp
+        - port: "7882"
+          proto: udp
+        - port: "3478"
+          proto: tcp
+        - port: "3478"
+          proto: udp
+        - port: "49160:49179"
+          proto: udp
+
+    - name: Enable UFW
+      community.general.ufw:
+        state: enabled
+        policy: deny
+
+    - name: Run doco-cd Compose
+      community.docker.docker_compose_v2:
+        project_src: "{{ doco_cd_config_dir }}"
+        files:
+          - docker-compose.yaml
+        pull: always
+        state: present
+
+    - name: Wait for doco-cd container to become healthy
+      community.docker.docker_container_info:
+        name: doco-cd
+      register: doco_cd_container
+      until: doco_cd_container.container.State.Health.Status == "healthy"
+      retries: 30
+      delay: 5
+
+    - name: Wait for GitOps-managed containers
+      community.docker.docker_container_info:
+        name: "{{ item }}"
+      register: gitops_container
+      until: gitops_container.exists and (gitops_container.container.State.Status | default("")) == "running"
+      retries: 30
+      delay: 5
+      loop:
+        - towonel-hub
+        - caddy-l4
+        - gatus
+        - coturn
+
+    - name: Wait for Towonel container to become healthy
+      community.docker.docker_container_info:
+        name: towonel-hub
+      register: towonel_container
+      until: towonel_container.container.State.Health.Status == "healthy"
+      retries: 30
+      delay: 5
+
+    - name: Show invite creation command
+      ansible.builtin.debug:
+        msg: >-
+          Create the Kubernetes agent invite after DNS resolves:
+          docker exec towonel-hub towonel invite create --name home-ops --hostnames '*.jory.dev'

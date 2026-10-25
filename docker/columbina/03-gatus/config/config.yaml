@@ -1,0 +1,77 @@
+---
+connectivity:
+  checker:
+    target: 1.1.1.1:53
+    interval: 1m
+
+endpoints:
+  - name: main
+    group: buddy
+    url: https://status.jory.dev
+    interval: 1m
+    conditions:
+      - "[STATUS] == 200"
+    alerts:
+      - type: discord
+
+  - name: utility
+    group: buddy
+    url: https://status-utility.jory.dev
+    interval: 1m
+    conditions:
+      - "[STATUS] == 200"
+    alerts:
+      - type: discord
+
+  - name: towonel-hub
+    group: columbina
+    url: http://towonel-hub:8443/v1/health
+    interval: 1m
+    conditions:
+      - "[STATUS] == 200"
+    alerts:
+      - type: discord
+
+  - name: coturn
+    group: columbina
+    url: tcp://turn.jory.dev:3478
+    interval: 1m
+    conditions:
+      - "[CONNECTED] == true"
+    alerts:
+      - type: discord
+
+  - name: cloudflare
+    group: connectivity
+    url: tcp://1.1.1.1:53
+    interval: 1m
+    conditions:
+      - "[CONNECTED] == true"
+
+  - name: quad9
+    group: connectivity
+    url: tcp://9.9.9.9:53
+    interval: 1m
+    conditions:
+      - "[CONNECTED] == true"
+
+metrics: true
+
+storage:
+  type: sqlite
+  caching: true
+  path: /config/gatus.db
+
+ui:
+  title: Columbina Status
+  header: Columbina Status
+  logo: https://avatars.githubusercontent.com/u/46251616
+  link: https://github.com/joryirving/home-ops
+  buttons:
+    - name: Main Status
+      link: https://status.jory.dev
+    - name: Utility Status
+      link: https://status-utility.jory.dev
+
+web:
+  port: 8080

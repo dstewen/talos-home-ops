@@ -1,0 +1,69 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/siderolabs/talos/refs/heads/release-1.14/website/content/v1.14/schemas/config.schema.json
+apiVersion: v1alpha1
+kind: KernelModuleConfig
+name: nvidia
+---
+apiVersion: v1alpha1
+kind: KernelModuleConfig
+name: nvidia_uvm
+---
+apiVersion: v1alpha1
+kind: KernelModuleConfig
+name: nvidia_drm
+---
+apiVersion: v1alpha1
+kind: KernelModuleConfig
+name: nvidia_modeset
+---
+apiVersion: v1alpha1
+kind: KubeNodeConfig
+labels:
+  topology.kubernetes.io: egpu
+---
+# OCuLink eGPU shifts the MS-01 PCI topology, which renames onboard NICs.
+apiVersion: v1alpha1
+kind: EthernetConfig
+name: enp3s0f0np0
+rings:
+  rx: 8160
+  tx: 8160
+---
+apiVersion: v1alpha1
+kind: EthernetConfig
+name: enp3s0f1np1
+rings:
+  rx: 8160
+  tx: 8160
+---
+apiVersion: v1alpha1
+kind: LinkConfig
+name: enp88s0
+up: true
+addresses: []
+---
+apiVersion: v1alpha1
+kind: LinkConfig
+name: enp91s0
+up: true
+addresses: []
+---
+apiVersion: v1alpha1
+kind: DHCPv4Config
+name: enp88s0
+ignoreRoutes: true
+---
+apiVersion: v1alpha1
+kind: DHCPv4Config
+name: enp91s0
+ignoreRoutes: true
+---
+apiVersion: v1alpha1
+kind: BondConfig
+name: bond0
+links:
+  - enp2s0f0np0
+  - enp3s0f0np0
+bondMode: active-backup
+miimon: 100
+mtu: 9000

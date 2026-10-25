@@ -1,0 +1,62 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: courier
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: courier
+  dependsOn: []
+  interval: 15m
+  values:
+    controllers:
+      main:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          main:
+            args:
+              - --leader-elect
+              - --git-remote-template=https://github.com/%s.git
+              - --git-credential-secret=courier-github
+              - --executor-environment-secret=courier-executor
+    dispatch:
+      agentName: courier
+      baseURL: http://dispatch.llm.svc.cluster.local:3000
+      enabled: true
+      lanes:
+        - agentName: courier-local
+          laneProfile: local
+          queueLane: local
+        - agentName: courier-cloud
+          laneProfile: minimax
+          queueLane: local
+        - agentName: courier-hyper
+          laneProfile: hyper
+          queueLane: local
+        - agentName: courier-frontier
+          laneProfile: frontier
+          queueLane: escalated
+      pollInterval: 30s
+      prFixExclusions: true
+      tokenSecret:
+        key: token
+        name: courier-dispatch
+    # Reap terminal CoderRuns after 3h: retained runs block their work item
+    # from rediscovery for as long as they exist, which turned into a
+    # recurring manual unstrand. NeedsHuman blocks identically to Failed
+    # (the discovery barrier has no release path except deletion), and its
+    # reason is preserved in VictoriaLogs and the Dispatch item history
+    # after the run is reaped. auditKeep -1 disables the most-recent-five
+    # floor so the windows are real for quiet repositories too.
+    retention:
+      done: 5m
+      failed: 3h
+      needsHuman: 3h
+      auditKeep: -1
+    executor:
+      mcp:
+        githubURL: https://api.githubcopilot.com/mcp/
+        context7URL: https://mcp.context7.com/mcp

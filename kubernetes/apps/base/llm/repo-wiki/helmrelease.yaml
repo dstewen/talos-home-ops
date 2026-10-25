@@ -1,0 +1,112 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: repo-wiki
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: repo-wiki
+  interval: 15m
+  dependsOn: []
+  values:
+    defaultPodOptions:
+      securityContext:
+        fsGroup: 33
+        fsGroupChangePolicy: OnRootMismatch
+    controllers:
+      mkdocs:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: squidfunk/mkdocs-material
+              tag: 9.8.0@sha256:dc3b5de76c6e30d18dc0922d4c4a7bed817e5e155f9ff0e594a53eb56e537e64
+            command: ["mkdocs"]
+            args:
+              [
+                "serve",
+                "--dirty",
+                "-f",
+                "/config/mkdocs.yml",
+                "-a",
+                "0.0.0.0:8000",
+              ]
+            resources:
+              requests:
+                cpu: 50m
+              limits:
+                memory: 512Mi
+      repo-wiki-gen:
+        type: cronjob
+        pod:
+          affinity:
+            podAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchExpressions:
+                      - key: app.kubernetes.io/name
+                        operator: In
+                        values: ["repo-wiki"]
+                  topologyKey: kubernetes.io/hostname
+        cronjob:
+          schedule: "0 */12 * * *"
+          timeZone: America/Edmonton
+          concurrencyPolicy: Forbid
+          successfulJobsHistory: 1
+          failedJobsHistory: 1
+        containers:
+          app:
+            image:
+              repository: python
+              tag: "3.15@sha256:67ee282bdbe5ece1e38ea94fa68f1420e969e6176e6c826b9acc931055011bfb"
+            command: ["python3", "/config/generate.py"]
+            env:
+              OPENAI_BASE_URL: http://litellm.llm:4000/v1
+              OPENAI_API_KEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: litellm-key-repo-wiki
+                    key: api-key
+              WIKI_MODEL: local-strix
+              MAX_REPOS_PER_RUN: "1"
+              MAX_PAGES_PER_REPO: "20"
+              LLM_TIMEOUT: "1800"
+              WIKI_REPO: /app-data/repository
+            envFrom:
+              - secretRef:
+                  name: "{{ .Release.Name }}"
+            resources:
+              requests:
+                cpu: 100m
+              limits:
+                memory: 2Gi
+    persistence:
+      data:
+        existingClaim: "{{ .Release.Name }}"
+        advancedMounts:
+          mkdocs:
+            app:
+              - path: /app-data
+          repo-wiki-gen:
+            app:
+              - path: /app-data
+      config:
+        type: configMap
+        name: repo-wiki
+        globalMounts:
+          - path: /config
+    route:
+      app:
+        hostnames: ["wikis.jory.dev"]
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+    service:
+      app:
+        controller: mkdocs
+        ports:
+          http:
+            port: 8000

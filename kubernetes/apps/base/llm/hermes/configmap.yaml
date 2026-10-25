@@ -1,0 +1,123 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hermes-config
+data:
+  config.yaml: |
+    model:
+      default: reasoning-pool
+      provider: litellm
+    fallback_providers:
+      - provider: litellm
+        model: kimi-k3
+      - provider: litellm
+        model: muse-glimmer
+      - provider: litellm
+        model: qwen3.8-flash-next
+      - provider: litellm
+        model: glm-5.3
+      - provider: litellm
+        model: dsv4.1f
+    providers:
+      litellm:
+        base_url: http://litellm.llm:4000/v1
+        api_key: $${LITELLM_API_KEY}
+      litellm-anthropic:
+        base_url: http://litellm.llm:4000/
+        api_mode: anthropic_messages
+        api_key: $${LITELLM_API_KEY}
+    toolsets:
+      - hermes-cli
+    terminal:
+      backend: local
+      cwd: /opt/data/workspace
+      timeout: 180
+      persistent_shell: true
+    memory:
+      provider: memini
+      auto_migrate: true
+    compression:
+      enabled: true
+      threshold: 0.50
+      target_ratio: 0.20
+      protect_last_n: 20
+    agent:
+      max_turns: 90
+      gateway_timeout: 1800
+      restart_drain_timeout: 60
+      api_max_retries: 2
+      reasoning_effort: medium
+    approvals:
+      mode: smart
+    display:
+      platforms:
+        discord:
+          tool_progress: "off"
+    streaming:
+      enabled: false
+    delegation:
+      roles:
+        explorer:
+          provider: litellm-anthropic
+          model: MiniMax-M3.1-Flash
+          max_concurrent_children: 4
+        coder-local:
+          provider: litellm
+          model: qwen3.8-27b
+        agentic-local:
+          provider: litellm
+          model: qwen3.8-flash-next
+          max_concurrent_children: 1
+        implementer:
+          provider: litellm
+          model: implementation-pool
+        reviewer:
+          provider: litellm-anthropic
+          model: MiniMax-M3.1-Flash
+        oracle:
+          provider: litellm
+          model: glm-5.3-flash
+        vision-local:
+          provider: litellm
+          model: qwen3.8-flash-next-chat
+          max_concurrent_children: 1
+      max_iterations: 250
+    gateway:
+      multiplex_profiles: false
+    security:
+      redact_secrets: true
+    privacy:
+      redact_pii: true
+    platform_toolsets:
+      cli:
+        - hermes-cli
+      telegram:
+        - hermes-telegram
+    mcp_servers:
+      toolhive:
+        url: http://vmcp-mcp-gateway-internal.llm:4483/mcp
+      composio:
+        url: https://connect.composio.dev/mcp
+        enabled: true
+        auth: oauth
+    auxiliary:
+      vision:
+        provider: litellm
+        model: qwen3.8-flash-next-chat
+      compression:
+        provider: litellm
+        model: qwen3.8-flash-next
+        timeout: 180
+      web_extract:
+        provider: litellm
+        model: qwen3.8-flash-next
+        timeout: 120
+      approval:
+        provider: litellm
+        model: qwen3.8-flash-next
+        timeout: 60
+      session_search:
+        provider: litellm
+        model: qwen3.8-flash-next
+        timeout: 120

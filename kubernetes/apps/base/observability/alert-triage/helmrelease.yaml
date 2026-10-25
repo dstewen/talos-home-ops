@@ -1,0 +1,118 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: alert-triage
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: alert-triage
+  interval: 15m
+  dependsOn:
+    - name: kube-prometheus-stack
+  values:
+    defaultPodOptions:
+      # app-template defaults this off; triage needs the SA token to read pod,
+      # event and Flux state from the in-cluster kube API.
+      automountServiceAccountToken: true
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+        fsGroup: 65534
+        fsGroupChangePolicy: OnRootMismatch
+    controllers:
+      alert-triage:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        strategy: Recreate
+        serviceAccount:
+          identifier: alert-triage
+        containers:
+          app:
+            image:
+              repository: ghcr.io/misospace/alert-triage
+              tag: 0.2.0@sha256:a593e09492e25ff217d8a99348d0f80063ec7e69ef1b72aff3846afab09c87a3
+            env:
+              CLUSTER: ${CLUSTER}
+              LITELLM_API_KEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: litellm-key-alert-triage
+                    key: api-key
+              LITELLM_URL: ${LITELLM_URL:=http://litellm.llm:4000/v1}
+              MODEL: qwen3.8-flash-next
+              HISTORY_PATH: /data/history.jsonl
+              METRICS_URL: http://kube-prometheus-stack-prometheus.observability.svc.cluster.local:9090
+              LOGS_URL: ${LOGS_URL:=}
+              LOGS_FLAVOR: ${LOGS_FLAVOR:=}
+              GRAFANA_URL: ${GRAFANA_URL:=}
+              GRAFANA_METRICS_DS: ${GRAFANA_METRICS_DS:=}
+            envFrom:
+              - secretRef:
+                  name: "{{ .Release.Name }}"
+            probes:
+              liveness: &probe
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /healthz
+                    port: 8080
+                  initialDelaySeconds: 5
+                  periodSeconds: 30
+              readiness: *probe
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+            resources:
+              requests:
+                cpu: 10m
+                memory: 32Mi
+              limits:
+                memory: 128Mi
+    serviceAccount:
+      alert-triage: {}
+    rbac:
+      roles:
+        alert-triage:
+          type: ClusterRole
+          rules:
+            - apiGroups: [""]
+              resources: ["pods", "events", "nodes"]
+              verbs: ["get", "list"]
+            - apiGroups: [""]
+              resources: ["pods/log"]
+              verbs: ["get"]
+            - apiGroups: ["helm.toolkit.fluxcd.io"]
+              resources: ["helmreleases"]
+              verbs: ["get", "list"]
+            - apiGroups: ["kustomize.toolkit.fluxcd.io"]
+              resources: ["kustomizations"]
+              verbs: ["get", "list"]
+      bindings:
+        alert-triage:
+          type: ClusterRoleBinding
+          roleRef:
+            identifier: alert-triage
+          subjects:
+            - identifier: alert-triage
+              serviceAccount: alert-triage
+    service:
+      app:
+        controller: alert-triage
+        annotations:
+          gatus.home-operations.com/endpoint: |-
+            group: services
+            url: http://alert-triage.observability.svc.cluster.local:8080/healthz
+            conditions: ["[STATUS] == 200"]
+        ports:
+          http:
+            port: 8080
+    persistence:
+      data:
+        existingClaim: "{{ .Release.Name }}"
+        globalMounts:
+          - path: /data

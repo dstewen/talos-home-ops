@@ -1,0 +1,57 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: archiveteam
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: archiveteam
+  interval: 15m
+  dependsOn: []
+  values:
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 100
+        fsGroup: 100
+        fsGroupChangePolicy: OnRootMismatch
+    controllers:
+      archiveteam:
+        pod:
+          annotations:
+            kubernetes.io/egress-bandwidth: "50M"
+            kubernetes.io/ingress-bandwidth: "50M"
+        containers:
+          app:
+            image:
+              repository: atdr.meo.ws/archiveteam/warrior-dockerfile
+              tag: latest
+            resources:
+              requests:
+                cpu: 20m
+                memory: 300Mi
+              limits:
+                memory: 2Gi
+            env:
+              DOWNLOADER: LilDrunkenSmurf
+              SELECTED_PROJECT: auto
+              CONCURRENT_ITEMS: 6
+    persistence:
+      config:
+        existingClaim: "{{ .Release.Name }}"
+        globalMounts:
+          - path: /projects
+    route:
+      app:
+        hostnames: ["{{ .Release.Name }}.jory.dev"]
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+    service:
+      app:
+        ports:
+          http:
+            port: 8001

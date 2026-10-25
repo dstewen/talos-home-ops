@@ -1,0 +1,63 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app minecraft-create
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: minecraft
+  interval: 15m
+  dependsOn: []
+  values:
+    extraEnv:
+      TZ: America/Edmonton
+    fullnameOverride: *app
+    image:
+      repository: ghcr.io/itzg/minecraft-server
+      tag: 2026.10.1@sha256:d12aed7e35981dfe259b60fbfee77d23a19b5898a7a31dca298d18b47b7b5776
+    livenessProbe:
+      initialDelaySeconds: 30
+    minecraftServer:
+      eula: true
+      version: 1.21.1
+      type: FORGE
+      overrideServerProperties: true
+      jvmXXOpts: "-XX:MaxRAMPercentage=75"
+      difficulty: normal
+      spawnProtection: 0
+      gameMode: survival
+      pvp: false
+      onlineMode: true
+      #whitelist: "LilDrunkenSmurf"
+      ops: "LilDrunkenSmurf"
+      motd: "Create Server test"
+      worldSaveName: create
+      viewDistance: 12
+      modUrls:
+        - "https://cdn.modrinth.com/data/LNytGWDc/versions/5LpL274U/create-1.21.1-6.0.4.jar"
+      # spigetResources:
+      # - 36618 #Prom Exporter
+      rcon:
+        enabled: true
+        existingSecret: *app
+    persistence:
+      dataDir:
+        enabled: true
+        existingClaim: *app
+    readinessProbe:
+      initialDelaySeconds: 30
+    resources:
+      requests:
+        cpu: 200m
+      limits:
+        cpu: 2000m
+        memory: 4Gi
+    securityContext:
+      runAsUser: 1000
+      fsGroup: 100
+    serviceAnnotations:
+      mc-router.itzg.me/externalServerName: create.jory.dev
+    startupProbe:
+      enabled: true

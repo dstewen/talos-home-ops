@@ -1,0 +1,84 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/siderolabs/talos/refs/heads/release-1.14/website/content/v1.14/schemas/config.schema.json
+apiVersion: v1alpha1
+kind: UnattendedInstallConfig
+provisioning:
+  diskSelector:
+    match: disk.model == "WDS500G3X0C-00SJG0"
+---
+apiVersion: v1alpha1
+kind: KubeNodeConfig
+labels:
+  topology.kubernetes.io/gpus: amd
+  node-role.kubernetes.io/rocm-worker: "true"
+---
+apiVersion: v1alpha1
+kind: KubeletConfig
+extraArgs:
+  max-pods: "50"
+config:
+  registerWithTaints:
+    - key: llm-workload
+      value: "true"
+      effect: NoSchedule
+---
+# OS disk - 500GB WD Black
+apiVersion: v1alpha1
+kind: UserVolumeConfig
+name: local-hostpath
+provisioning:
+  diskSelector:
+    match: disk.model == "YMTC PC41Q-2TB-B"
+  minSize: 1800GB
+---
+apiVersion: v1alpha1
+kind: WatchdogTimerConfig
+device: /dev/watchdog0
+timeout: 5m
+---
+apiVersion: v1alpha1
+kind: OOMConfig
+# Userspace OOM manager (enabled by default; was disabled here as the 1.13.0-3
+# api-server-eviction workaround — but that was a control-plane symptom and
+# skirk is a worker). On this UMA node the amdgpu GTT pins system RAM the kernel
+# OOM-killer can't reclaim, so review+self-hosted+comfyui together deadlock the
+# node (Talos stays up, so the 5m hardware watchdog never fires). This kills the
+# heaviest user pod under sustained memory PSI pressure instead. Raised 12.0 -> 20.0
+# (was culling comfyui with ~14Gi still free); raise further if it still fires under
+# normal load, but keep a margin -- unreclaimable GTT means too-high risks the deadlock.
+# Ranking drops the default `memory_max.hasValue() ? 0.0 : ...` guard: all three
+# GPU pods here have memory limits and would otherwise score 0.0 (no victim).
+# System/Podruntime stay 0.0 so kubelet/containerd are never killed.
+triggerExpression: 'memory_full_avg10 > 20.0 && d_memory_full_avg10 > 0.0 && time_since_trigger > duration("500ms")'
+cgroupRankingExpression: "{Besteffort: 1.0, Burstable: 0.5, Guaranteed: 0.0, Podruntime: 0.0, System: 0.0}[class] * double(memory_current.orValue(0u))"
+sampleInterval: 100ms
+---
+apiVersion: v1alpha1
+kind: BondConfig
+name: bond0
+links:
+  - eno1
+bondMode: active-backup
+miimon: 100
+---
+apiVersion: v1alpha1
+kind: VLANConfig
+name: bond0.70
+vlanID: 70
+parent: bond0
+mtu: 1500
+---
+apiVersion: v1alpha1
+kind: VLANConfig
+name: bond0.90
+vlanID: 90
+parent: bond0
+mtu: 1500
+---
+apiVersion: v1alpha1
+kind: DHCPv4Config
+name: bond0
+clientIdentifier: mac
+---
+apiVersion: v1alpha1
+kind: HostnameConfig
+hostname: skirk

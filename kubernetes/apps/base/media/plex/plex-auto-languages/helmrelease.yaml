@@ -1,0 +1,34 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: plex-auto-languages
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: plex-auto-languages
+  interval: 15m
+  dependsOn: []
+  values:
+    controllers:
+      plex-auto-languages:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: ghcr.io/journeydocker/plex-auto-languages
+              tag: 1.6.1@sha256:51224217f7a036e93ba0153d1c03d54b174d0fd9099f3e8873ee702b28bac23f
+            env:
+              TZ: America/Edmonton
+              PLEX_URL: "http://plex.media.svc.cluster.local:32400"
+            envFrom:
+              - secretRef:
+                  name: plex-secret
+            resources:
+              requests:
+                cpu: 75m
+                memory: 300M
+              limits:
+                memory: 600M

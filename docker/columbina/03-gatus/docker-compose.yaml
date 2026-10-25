@@ -1,0 +1,40 @@
+---
+name: gatus
+
+services:
+  gatus:
+    container_name: gatus
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+    environment:
+      GATUS_CONFIG_PATH: /config
+      TZ: America/Edmonton
+    # renovate: datasource=docker depName=ghcr.io/twin/gatus
+    image: ghcr.io/twin/gatus:v5.37.0@sha256:094eb186e55235db367e90e9d56140e5897b7044c41de23cde4cc18e6da1242e
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+    restart: unless-stopped
+    volumes:
+      - gatus-config:/config
+      - /opt/gatus/secrets.yaml:/config/secrets.yaml:ro
+    configs:
+      - source: gatus_config
+        target: /config/config.yaml
+
+volumes:
+  gatus-config:
+
+configs:
+  gatus_config:
+    file: ./config/config.yaml
+
+networks:
+  default:
+    name: edge
+    external: true

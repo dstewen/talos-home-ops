@@ -1,0 +1,45 @@
+---
+apiVersion: litellm.home-operations.com/v1alpha1
+kind: LiteLLMVirtualKey
+metadata:
+  name: courier
+spec:
+  proxyRef: litellm
+  keyAlias: Courier
+  secretName: litellm-key-courier
+  secretKey: api-key
+  models:
+  - free-pool
+  - local-pool
+  - local-pool-chat
+  - qwen3.8-27b
+  - qwen3.8-27b-chat
+  - qwen3.8-flash-next
+  - qwen3.8-flash-next-chat
+  # Frontier lane
+  - reasoning-pool
+  - implementation-pool
+  - dsv4.1f
+  - glm-5.3-flash
+  - glm-5.3-flash-hyper
+  # Minimax lane (solo M3.1)
+  - MiniMax-M3
+  - MiniMax-M3.1-Flash
+---
+apiVersion: external-secrets.io/v1alpha1
+kind: PushSecret
+metadata:
+  name: courier
+spec:
+  secretStoreRefs:
+  - name: onepassword
+    kind: ClusterSecretStore
+  selector:
+    secret:
+      name: litellm-key-courier
+  data:
+  - match:
+      secretKey: api-key
+      remoteRef:
+        remoteKey: litellm
+        property: LITELLM_COURIER_API_KEY

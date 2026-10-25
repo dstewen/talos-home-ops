@@ -1,0 +1,34 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: nvidia-device-plugin
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: nvidia-device-plugin
+  interval: 1h
+  values:
+    runtimeClassName: nvidia
+    failOnInitError: false
+    # config:
+    #   default: timeslice
+    #   map:
+    #     timeslice: |-
+    #       version: v1
+    #       flags:
+    #         migStrategy: none
+    #       sharing:
+    #         timeSlicing:
+    #           resources:
+    #             - name: nvidia.com/gpu
+    #               replicas: 2
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: topology.kubernetes.io
+                  operator: In
+                  values: ["egpu"]

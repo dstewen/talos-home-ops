@@ -1,0 +1,79 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: scanservjs
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: scanservjs
+  interval: 15m
+  dependsOn: []
+  values:
+    defaultPodOptions:
+      annotations:
+        k8s.v1.cni.cncf.io/networks: |
+          [{
+            "name": "multus-iot",
+            "namespace": "network",
+            "ips": ["192.168.10.124/24"]
+          }]
+    controllers:
+      scanservjs:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: sbs20/scanservjs
+              tag: 3.3.0@sha256:7a0c0dfd546f483c2fe8c5ccdcd8fc96301a41fb0d4309747fc8268108defb6a
+            command: /bin/sh
+            args: [-c, service dbus start && /entrypoint.sh]
+            env:
+              AIRSCAN_DEVICES: '"C460" = http://samsung-printer.internal/eSCL'
+              TZ: America/Edmonton
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+              startup:
+                enabled: true
+            resources:
+              requests:
+                cpu: 10m
+                memory: 250Mi
+    persistence:
+      config:
+        existingClaim: "{{ .Release.Name }}"
+        globalMounts:
+          - path: /var/lib/scanservjs
+      output:
+        type: nfs
+        server: voyager.internal
+        path: /mnt/akademiya/scans/consume
+        globalMounts:
+          - path: /var/lib/scanservjs/output
+      scan-temp:
+        type: emptyDir
+        globalMounts:
+          - path: /var/lib/scanservjs/temp
+      dbus:
+        type: hostPath
+        hostPath: /var/run/dbus
+        advancedMounts:
+          scanservjs:
+            app:
+              - path: /var/run/dbus
+    route:
+      app:
+        hostnames: ["scan.jory.dev"]
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+    service:
+      app:
+        ports:
+          http:
+            port: 8080

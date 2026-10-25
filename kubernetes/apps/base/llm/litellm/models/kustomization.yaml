@@ -1,0 +1,29 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ./auto.yaml
+  - ./chatgpt-gpt-6-astra.yaml
+  - ./chatgpt-gpt-6-luna.yaml
+  - ./chatgpt-gpt-6.1-sol.yaml
+  - ./dsv4.1f.yaml
+  - ./dsv4f-local.yaml
+  - ./free-pool.yaml
+  - ./frontier-pool.yaml
+  - ./glm-5.3.yaml
+  - ./glm-5.3-flash-hyper.yaml
+  - ./grooming-pool.yaml
+  - ./glm-5.3-flash.yaml
+  - ./implementation-pool.yaml
+  - ./kimi-k2.7.yaml
+  - ./kimi-k3.yaml
+  - ./local-pool.yaml
+  - ./minimax-m3.yaml
+  - ./minimax-m3.1-flash.yaml
+  - ./muse-glimmer.yaml
+  - ./qwen3.8-27b.yaml
+  - ./qwen3.8-flash-next-chat.yaml
+  - ./reasoning-pool.yaml
+  - ./rerank.yaml
+  - ./embed.yaml

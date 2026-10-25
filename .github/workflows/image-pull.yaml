@@ -1,0 +1,74 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: Image Pull
+
+"on":
+  pull_request:
+    branches: ["main"]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  filter:
+    name: Image Pull - Filter
+    runs-on: ubuntu-latest
+    outputs:
+      changed-files: ${{ steps.changed-files.outputs.changed_files }}
+    steps:
+      - name: Get Changed Files
+        id: changed-files
+        uses: bjw-s-labs/action-changed-files@147be9638332cf68fd60714a610509d7a9360d60 # v0.7.0
+        with:
+          patterns: kubernetes/**/*
+
+  pull:
+    if: ${{ needs.filter.outputs.changed-files != '[]' }}
+    needs: filter
+    name: Image Pull - Pull Images
+    runs-on: ${{ format('{0}-runner-{1}', github.event.repository.name, matrix.cluster) }}
+    strategy:
+      fail-fast: false
+      matrix:
+        cluster: ["main", "utility"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup Mise
+        uses: jdx/mise-action@8418fedb1110381a0d3ba51a7a415d7c1b884550 # v5.2.2
+        with:
+          cache: false
+          tool_versions: |
+            github:home-operations/flate 0.4.12
+            aqua:siderolabs/talos 1.13.7
+
+      - name: Extract Images
+        run: flate diff images -p ./kubernetes/clusters/${{ matrix.cluster }} -o json > images.json
+
+      - name: Pull Images
+        run: jq -r '.[]' images.json | xargs -r -n1 talosctl --nodes "$NODE" image pull
+
+  success:
+    if: ${{ always() }}
+    needs: [filter, pull]
+    name: Image Pull - Success
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail on filter not success or skipped
+        if: ${{ !(needs.filter.result == 'success' || needs.filter.result == 'skipped') }}
+        run: exit 1
+
+      - name: Fail on pull not success or skipped
+        if: ${{ !(needs.pull.result == 'success' || needs.pull.result == 'skipped') }}
+        run: exit 1
+
+      - name: All jobs passed or skipped
+        run: echo "All jobs passed or skipped"

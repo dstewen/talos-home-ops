@@ -1,0 +1,311 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: openclaw
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: openclaw
+  interval: 15m
+  dependsOn: []
+  values:
+    defaultPodOptions:
+      hostname: openclaw
+      automountServiceAccountToken: true
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 100
+        fsGroup: 100
+        fsGroupChangePolicy: OnRootMismatch
+    controllers:
+      openclaw:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        initContainers:
+          init:
+            image:
+              repository: docker.io/library/alpine
+              tag: 3.24@sha256:be2656061b536c1883c4034790e21d0a09c5aaaf51968b89368a3c0371ea2c9a
+            command:
+              - sh
+              - -c
+              - |
+                set -euo pipefail
+                chmod u+w /home/node/.openclaw || true
+                rm -f /home/node/.openclaw/openclaw.json
+                cp /tmp/openclaw.json /home/node/.openclaw/openclaw.json
+                chown 1000:100 /home/node/.openclaw/openclaw.json
+                chmod 400 /home/node/.openclaw/openclaw.json
+        containers:
+          app:
+            image:
+              repository: ghcr.io/openclaw/openclaw
+              tag: 2026.10.7@sha256:fb26f0841659dc757f23feec9adeab51f11d76779a409db5d22e191b43841afa
+            command:
+              - /bin/sh
+              - -c
+              - |
+                PLUGIN_FLAGS="--accept-capabilities --acknowledge-install-policy-warning"
+                # Memini ships via ClawHub; pin to the latest published artifact, git tags can lead it.
+                MEMINI_PLUGIN_VERSION=0.7.29
+                if [ "$(cat "$HOME/.openclaw/extensions/memini/.clawver" 2>/dev/null)" != "$MEMINI_PLUGIN_VERSION" ]; then
+                  if node dist/index.js plugins install "clawhub:@eleboucher/memini@$MEMINI_PLUGIN_VERSION" --force $PLUGIN_FLAGS; then
+                    printf '%s' "$MEMINI_PLUGIN_VERSION" > "$HOME/.openclaw/extensions/memini/.clawver"
+                  else
+                    echo "WARN: memini plugin install failed; starting with whatever is present"
+                  fi
+                fi
+                # Official npm plugins (not bundled in the image) must track the gateway version.
+                OPENCLAW_VERSION="$(node dist/index.js --version | awk '{print $2}')"
+                OFFICIAL_MARKER="$HOME/.openclaw/extensions/.official-plugins-version"
+                if [ -n "$OPENCLAW_VERSION" ] && [ "$(cat "$OFFICIAL_MARKER" 2>/dev/null)" != "$OPENCLAW_VERSION" ]; then
+                  if node dist/index.js plugins update comfy $PLUGIN_FLAGS \
+                    && node dist/index.js plugins update "@openclaw/discord@$OPENCLAW_VERSION" $PLUGIN_FLAGS \
+                    && node dist/index.js plugins update searxng $PLUGIN_FLAGS; then
+                    printf '%s' "$OPENCLAW_VERSION" > "$OFFICIAL_MARKER"
+                  else
+                    echo "WARN: official plugin update failed; starting with installed versions"
+                  fi
+                fi
+                if [ -f "$HOME/.openclaw/workspace/image-ui/app.py" ]; then
+                  cd "$HOME/.openclaw/workspace/image-ui" && python3 app.py &
+                fi
+                exec node dist/index.js gateway
+            env:
+              OPENCLAW_LOG_LEVEL: debug
+              MEMINI_INJECT_RECALL_MIN_SCORE: "0.85"
+              MEMINI_INJECT_LABELS: "tier,age"
+              COMFYUI_FAST_CLUSTER: comfy-fast-wake.llm:8080
+              COMFYUI_FAST: smurf-pc.internal:8188
+              BROWSER_WS_ENDPOINT: "ws://localhost:9222"
+              GOPATH: /home/node/go
+              HOME: &homepath /home/node
+              HOMEBREW_CELLAR: /home/node/.local/homebrew/Cellar
+              HOMEBREW_PREFIX: /home/node/.local/homebrew
+              HOMEBREW_REPOSITORY: /home/node/.local/homebrew
+              LITELLM_API_KEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: litellm-key-openclaw
+                    key: api-key
+              OPENCLAW_GATEWAY_PORT: &port 18789
+              PATH: /home/node/.local/bin:/home/node/.local/go/bin:/home/node/.local/homebrew/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+              PIP_BREAK_SYSTEM_PACKAGES: "1"
+              TERM: xterm-256color
+              TZ: &tz America/Edmonton
+            envFrom:
+              - secretRef:
+                  name: openclaw
+            resources:
+              requests:
+                cpu: 1
+                memory: 2Gi
+              limits:
+                cpu: 10
+                memory: 16Gi
+          codeserver:
+            image:
+              repository: ghcr.io/coder/code-server
+              tag: 4.143.1@sha256:377b66bec5645510ed52549bb00e648c273edc604d230a3f90fd2b2433afcb97
+            env:
+              TZ: *tz
+            args:
+              [
+                "--auth",
+                "none",
+                "--user-data-dir",
+                "/home/node/.vscode",
+                "--extensions-dir",
+                "/home/node/.vscode",
+                "--port",
+                "12321",
+                "/home/node/.openclaw/workspace",
+              ]
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 1Gi
+    rawResources:
+      openclaw-imageui-oidc:
+        enabled: true
+        forceRename: openclaw-imageui-oidc
+        manifest:
+          apiVersion: gateway.envoyproxy.io/v1alpha1
+          kind: SecurityPolicy
+          metadata:
+            name: openclaw-imageui-oidc
+          spec:
+            targetRefs:
+              - group: gateway.networking.k8s.io
+                kind: HTTPRoute
+                name: openclaw-imageui
+            oidc:
+              provider:
+                issuer: https://sso.jory.dev/application/o/opencode/
+              clientIDRef:
+                group: ""
+                kind: Secret
+                name: opencode-oidc
+              clientSecret:
+                group: ""
+                kind: Secret
+                name: opencode-oidc
+              redirectURL: https://generate.jory.dev/oauth2/callback
+              logoutPath: /logout
+              scopes: ["openid", "email", "profile"]
+      openclaw-codeserver-oidc:
+        enabled: true
+        forceRename: openclaw-codeserver-oidc
+        manifest:
+          apiVersion: gateway.envoyproxy.io/v1alpha1
+          kind: SecurityPolicy
+          metadata:
+            name: openclaw-codeserver-oidc
+          spec:
+            targetRefs:
+              - group: gateway.networking.k8s.io
+                kind: HTTPRoute
+                name: openclaw-codeserver
+            oidc:
+              provider:
+                issuer: https://sso.jory.dev/application/o/opencode/
+              clientIDRef:
+                group: ""
+                kind: Secret
+                name: opencode-oidc
+              clientSecret:
+                group: ""
+                kind: Secret
+                name: opencode-oidc
+              redirectURL: https://miso-code.jory.dev/oauth2/callback
+              logoutPath: /logout
+              scopes: ["openid", "email", "profile"]
+    persistence:
+      config:
+        existingClaim: "{{ .Release.Name }}"
+        globalMounts:
+          - path: *homepath
+      data:
+        type: nfs
+        server: voyager.internal
+        path: /mnt/delta/miso
+        globalMounts:
+          - path: /data
+      downloads:
+        type: nfs
+        server: voyager.internal
+        path: /mnt/akademiya/data
+        globalMounts:
+          - path: /downloads
+            subPath: metube
+      images:
+        type: nfs
+        server: voyager.internal
+        path: /mnt/daena/comfyui/output
+        globalMounts:
+          - path: /home/node/.openclaw/workspace/images
+      ffmpeg:
+        existingClaim: "{{ .Release.Name }}"
+        advancedMounts:
+          openclaw:
+            app:
+              - path: /usr/local/bin/ffmpeg
+                subPath: .openclaw/workspace/bin/ffmpeg
+                readOnly: true
+              - path: /usr/local/bin/ffprobe
+                subPath: .openclaw/workspace/bin/ffprobe
+                readOnly: true
+      configmap:
+        type: configMap
+        name: "{{ .Release.Name }}-config"
+        defaultMode: 0755
+        globalMounts:
+          - path: /tmp/openclaw.json
+            subPath: openclaw.json
+    rbac:
+      roles:
+        openclaw-pod-delete-cluster-wide:
+          type: ClusterRole
+          rules:
+            - apiGroups: [""]
+              resources: ["pods"]
+              verbs: ["delete"]
+        openclaw-exec-deploy-llm:
+          type: Role
+          rules:
+            - apiGroups: [""]
+              resources: ["pods/exec"]
+              verbs: ["create"]
+            - apiGroups: ["apps"]
+              resources: ["deployments"]
+              verbs: ["patch", "update"]
+      bindings:
+        openclaw-pod-delete-cluster-wide:
+          type: ClusterRoleBinding
+          roleRef:
+            identifier: openclaw-pod-delete-cluster-wide
+          subjects:
+            - identifier: openclaw
+              serviceAccount: openclaw
+        openclaw-exec-deploy-llm:
+          type: RoleBinding
+          roleRef:
+            identifier: openclaw-exec-deploy-llm
+          subjects:
+            - identifier: openclaw
+              serviceAccount: openclaw
+              namespace: llm
+    route:
+      app:
+        hostnames: ["miso.jory.dev"]
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+        rules:
+          - backendRefs:
+              - name: "{{ .Release.Name }}"
+                port: *port
+      codeserver:
+        hostnames: ["miso-code.jory.dev"]
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+        rules:
+          - backendRefs:
+              - name: "{{ .Release.Name }}"
+                port: &codeserverPort 12321
+      imageui:
+        hostnames: ["generate.jory.dev"]
+        parentRefs:
+          - name: envoy-external
+            namespace: network
+        rules:
+          - backendRefs:
+              - name: "{{ .Release.Name }}"
+                port: &imageuiPort 8848
+      widgets:
+        hostnames: ["miso-widgets.jory.dev"]
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+        rules:
+          - backendRefs:
+              - name: "{{ .Release.Name }}"
+                port: &widgetPort 18790
+    service:
+      openclaw:
+        primary: true
+        ports:
+          http:
+            port: *port
+          codeserver:
+            port: *codeserverPort
+          imageui:
+            port: *imageuiPort
+          widgets:
+            port: *widgetPort
+    serviceAccount:
+      openclaw: {}

@@ -1,0 +1,87 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: vrising
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: vrising
+  interval: 15m
+  dependsOn: []
+  values:
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: &uid 1000
+        runAsGroup:
+          &gid 100
+          # envFrom:
+          # - secretRef:
+          #     name: "{{ .Release.Name }}-secret"
+        fsGroup: *gid
+        fsGroupChangePolicy: OnRootMismatch
+    controllers:
+      vrising:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: trueosiris/vrising
+              tag: 3.0@sha256:a58cb84e3d69acf2d965ec752ee3a13ce5d10eea1808b536762fbd7048af71c2
+            env:
+              ## Container Settings
+              TZ: America/Edmonton
+              SERVERNAME: "Smurf-Rising"
+              GAMEPORT: &game 9876
+              QUERYPORT: &query 9877
+              MAX_USERS: 4
+              MAX_ADMIN: 2
+              UID: *uid
+              GID: *gid
+            probes:
+              liveness:
+                enabled: false
+              readiness:
+                enabled: false
+              startup:
+                enabled: false
+            resources:
+              requests:
+                cpu: 1
+              limits:
+                memory: 10Gi
+    persistence:
+      config:
+        existingClaim: "{{ .Release.Name }}"
+        globalMounts:
+          - path: /mnt/vrising/persistentdata
+      server:
+        existingClaim: vrising-server-files
+        globalMounts:
+          - path: /mnt/vrising/server
+    service:
+      app:
+        type: LoadBalancer
+        annotations:
+          lbipam.cilium.io/ips: 10.69.10.33
+          external-dns.kubernetes.io/hostname: vrising.jory.dev
+          external-dns.kubernetes.io/target: towonel.jory.dev
+          external-dns.kubernetes.io/cloudflare-proxied: "false"
+          towonel.io/game.public-port: "9876"
+          towonel.io/game.udp: "true"
+          towonel.io/query.public-port: "9877"
+          towonel.io/query.udp: "true"
+          towonel.io/tunnel: enable
+          towonel.io/tunnel-ref: network/towonel-main
+        ports:
+          game:
+            enabled: true
+            port: *game
+            protocol: UDP
+          query:
+            enabled: true
+            port: *query
+            protocol: UDP

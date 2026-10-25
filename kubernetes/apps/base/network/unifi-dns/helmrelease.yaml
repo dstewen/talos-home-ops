@@ -1,0 +1,51 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app unifi-dns
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: unifi-dns
+  interval: 15m
+  dependsOn: []
+  values:
+    domainFilters: ["jory.dev"]
+    fullnameOverride: *app
+    logLevel: info
+    podAnnotations:
+      secret.reloader.stakater.com/reload: *app
+    policy: sync
+    provider:
+      name: webhook
+      webhook:
+        image:
+          repository: ghcr.io/home-operations/external-dns-unifi-webhook
+          tag: 0.10.14@sha256:2d56637e230de7eaeda83388a79ec633c94910e77503141bc6a1a5492eecdd7e
+        env:
+          - name: UNIFI_HOST
+            value: https://unifi.internal
+          - name: UNIFI_API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: *app
+                key: EXTERNAL_DNS_UNIFI_API_KEY
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: http-webhook
+          initialDelaySeconds: 15
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: http-webhook
+          initialDelaySeconds: 15
+          timeoutSeconds: 5
+    serviceMonitor:
+      enabled: true
+    sources: ["gateway-httproute", "service"]
+    triggerLoopOnEvent: true
+    txtOwnerId: ${CLUSTER}
+    txtPrefix: k8s.${CLUSTER}.%{record_type}-

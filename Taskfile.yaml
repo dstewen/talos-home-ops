@@ -1,0 +1,41 @@
+---
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: "3"
+
+set: [pipefail]
+shopt: [globstar]
+
+vars:
+  BOOSTRAP_DIR: "{{.ROOT_DIR}}/bootstrap"
+  CLUSTER: '{{.CLUSTER | default "main"}}'
+  CLUSTER_APPS: "{{.ROOT_DIR}}/kubernetes/apps/{{.CLUSTER}}"
+  CLUSTER_DIR: "{{.ROOT_DIR}}/kubernetes/clusters/{{.CLUSTER}}"
+  SHARED_APPS: "{{.ROOT_DIR}}/kubernetes/apps/base"
+  TALOS_DIR: "{{.ROOT_DIR}}/talos/{{.CLUSTER}}"
+
+dotenv: []
+  # - '{{.ROOT_DIR}}/onepassword.env'
+
+env:
+  KUBECONFIG: "{{.CLUSTER_DIR}}/kubeconfig"
+  MINIJINJA_CONFIG_FILE: "{{.ROOT_DIR}}/.minijinja.toml"
+  TALOSCONFIG: "{{.TALOS_DIR}}/clusterconfig/talosconfig"
+
+includes:
+  bootstrap: .taskfiles/bootstrap
+  kopiur: .taskfiles/kopiur
+  kubernetes: .taskfiles/kubernetes
+  op: .taskfiles/onepassword
+  talos: .taskfiles/talos
+  workstation: .taskfiles/workstation
+
+tasks:
+  default:
+    cmd: task --list
+    silent: true
+
+  # Ref: https://github.com/go-task/task/issues/608
+  noop:
+    internal: true
+    silent: true
+    cmd: noop() { :; }

@@ -1,0 +1,103 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: "Terraform Diff"
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: ["main"]
+    paths: ["terraform/**"]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  changed-terraform:
+    name: Changed Terraform
+    runs-on: ubuntu-latest
+    outputs:
+      changed-files: ${{ steps.changed-terraform.outputs.changed_files }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Get Changed Terraform
+        id: changed-terraform
+        uses: bjw-s-labs/action-changed-files@147be9638332cf68fd60714a610509d7a9360d60 # v0.7.0
+        with:
+          patterns: terraform/**/*
+          include_only_directories: true
+          max_depth: 2
+
+      - name: List All Changed Terraform
+        run: echo ${{ steps.changed-terraform.outputs.changed_files }}
+
+  sync:
+    name: Terraform Diff
+    runs-on: [home-ops-runner-utility] #Backend is stored on NAS with no external ingress
+    needs: ["changed-terraform"]
+    strategy:
+      matrix:
+        paths: ${{ fromJSON(needs.changed-terraform.outputs.changed-files) }}
+      max-parallel: 4
+      fail-fast: false
+    steps:
+      - name: Generate Token
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        id: app-token
+        with:
+          client-id: ${{ secrets.BOT_CLIENT_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          token: ${{ steps.app-token.outputs.token }}
+
+      - name: Install Opentofu
+        uses: opentofu/setup-opentofu@a1320f892987e89d278cc92dc5adc984fb93aca4 # v2.0.2
+        with:
+          tofu_wrapper: false
+
+      - name: Tofu fmt
+        id: fmt
+        working-directory: ${{ matrix.paths }}
+        run: tofu fmt -check
+        continue-on-error: true
+
+      - name: Tofu Init
+        id: init
+        working-directory: ${{ matrix.paths }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.TERRAFORM_STATE_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.TERRAFORM_STATE_SECRET_KEY }}
+        run: |
+          tofu init \
+            -backend-config="access_key=$AWS_ACCESS_KEY_ID" \
+            -backend-config="secret_key=$AWS_SECRET_ACCESS_KEY"
+
+      - name: Tofu Validate
+        id: validate
+        working-directory: ${{ matrix.paths }}
+        run: tofu validate -no-color
+
+      - name: Tofu Plan
+        working-directory: ${{ matrix.paths }}
+        run: tofu plan -lock=false -var "OP_CONNECT_TOKEN=${{ secrets.OP_CONNECT_TOKEN }}" -var "OP_CONNECT_HOST=http://onepassword-connect.external-secrets.svc.cluster.local" -out .planfile | grep -v "Refreshing state...\|Reading...\|Read complete after"
+
+      - name: Post PR comment
+        continue-on-error: true
+        uses: borchero/terraform-plan-comment@f585438eda2fa77c6f275994b92aeccd86ef3542 # v3.2.0
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          planfile: .planfile
+          terraform-cmd: tofu
+          header: "📝 Terraform Plan for ${{ matrix.paths }}"
+          working-directory: ${{ matrix.paths }}

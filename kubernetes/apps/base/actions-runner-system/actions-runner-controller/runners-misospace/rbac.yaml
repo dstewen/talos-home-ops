@@ -1,0 +1,10 @@
+---
+# No ClusterRole. This ServiceAccount deliberately has no cluster-wide grants:
+# the misospace repos are public, so anything a job on this runner can reach is
+# reachable from an approved fork PR. Its only permissions come from a
+# namespaced RoleBinding in the misospace-ci namespace (see
+# kubernetes/apps/base/misospace-ci/rbac).
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: misospace-runner-${CLUSTER}
