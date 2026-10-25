@@ -1,0 +1,13 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  #  - ./container-runner.yaml
+  #  - ./externalsecret.yaml
+  #  - ./home-ops-arm64-runner.yaml
+  - ./ocirepository.yaml
+  - ./rbac.yaml
+  #  - ./secret.sops.yaml
+  - ./talos-mixed-amd64-runner.yaml
+  - ./talos-mixed-arm64-runner.yaml

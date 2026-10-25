@@ -1,0 +1,44 @@
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/monitoring.coreos.com/probe_v1.json
+---
+kind: Probe
+apiVersion: monitoring.coreos.com/v1
+metadata:
+  name: devices
+spec:
+  module: icmp
+  prober:
+    url: blackbox-exporter.monitoring.svc.cluster.local:9115
+  targets:
+    staticConfig:
+      static:
+        - 192.168.10.15 #nas.davidstewen.com
+        #        - garage-door.internal
+        - 172.16.20.99 #hdhomerun.davidstewen.com
+        #        - idrac.internal
+        #        - kiosk.internal
+        #        - kvm.internal
+        #        - pikvm.internal
+        - 192.168.10.23 #pi3b.davidstewen.com
+        #        - receiver.internal
+        - 192.168.10.21 #ups.davidstewen.com
+#        - vacuum.davidstewen.com
+#        - zigbee-controller.internal
+#        - zwave-controller.internal
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/monitoring.coreos.com/probe_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: Probe
+metadata:
+  name: lan-tcp
+spec:
+  module: tcp_connect
+  prober:
+    url: blackbox-exporter.monitoring.svc.cluster.local:9115
+  targets:
+    staticConfig:
+      static:
+        - 192.168.10.15:2049
+  metricRelabelings:
+    - targetLabel: service
+      replacement: blackbox-exporter
+      action: replace

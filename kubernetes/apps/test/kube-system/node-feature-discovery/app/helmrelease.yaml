@@ -1,0 +1,28 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: node-feature-discovery
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: node-feature-discovery
+  interval: 1h
+  install:
+    crds: CreateReplace
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    crds: CreateReplace
+    remediation:
+      strategy: rollback
+      retries: 3
+  values:
+    worker:
+      config:
+        core:
+          labelSources: ["all"]
+    prometheus:
+      enable: true

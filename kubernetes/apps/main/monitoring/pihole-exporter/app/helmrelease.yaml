@@ -1,0 +1,74 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app pihole-exporter
+spec:
+  interval: 1h
+  chartRef:
+    kind: OCIRepository
+    name: pihole-exporter
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  values:
+    defaultPodOptions:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/arch
+                    operator: In
+                    values:
+                      - arm64
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 50
+              preference:
+                matchExpressions:
+                  - key: node-role.kubernetes.io/worker
+                    operator: In
+                    values:
+                      - worker
+    controllers:
+      pihole-exporter:
+        containers:
+          main:
+            image:
+              repository: ekofr/pihole-exporter
+              tag: v1.2.0@sha256:242c53ef3c24b88fcbe8184390b456d05604bd50de5732ca3fd3eb24395585b3
+            env:
+              PIHOLE_HOSTNAME: 192.168.10.195
+              PORT: 9617
+            envFrom:
+              - secretRef:
+                  name: pihole-exporter-secret
+            resources:
+              requests:
+                cpu: 15m
+                memory: 30M
+              limits:
+                memory: 64M
+    service:
+      app:
+        controller: *app
+        ports:
+          metrics:
+            enabled: true
+            protocol: TCP
+            port: 9617
+    serviceMonitor:
+      app:
+        serviceName: *app
+        enabled: true
+        endpoints:
+          - port: metrics
+            scheme: http
+            path: /metrics
+            interval: 5m
+            scrapeTimeout: 1m

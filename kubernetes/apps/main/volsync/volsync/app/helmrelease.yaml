@@ -1,0 +1,52 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: volsync
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: volsync
+  interval: 1h
+  values:
+    #    affinity:
+    #      nodeAffinity:
+    #        requiredDuringSchedulingIgnoredDuringExecution:
+    #          nodeSelectorTerms:
+    #          - matchExpressions:
+    #            - key: kubernetes.io/arch
+    #              operator: In
+    #              values:
+    #              - arm64
+    #        preferredDuringSchedulingIgnoredDuringExecution:
+    #        - weight: 50
+    #          preference:
+    #            matchExpressions:
+    #            - key: node-role.kubernetes.io/worker
+    #              operator: In
+    #              values:
+    #              - worker
+    fullnameOverride: volsync # Required for volsync-perfectra1n fork
+    manageCRDs: true
+    image: &image
+      repository: ghcr.io/perfectra1n/volsync
+      tag: v0.17.11
+    kopia: *image
+    rclone: *image
+    restic: *image
+    rsync: *image
+    rsync-tls: *image
+    syncthing: *image
+    metrics:
+      disableAuth: true
+    resources:
+      limits:
+        memory: 300M
+      requests:
+        cpu: 15m
+        memory: 64M
+    podSecurityContext:
+      runAsNonRoot: true
+      runAsUser: 1000
+      runAsGroup: 1000

@@ -1,0 +1,50 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: talos-mixed-amd64-runner
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: talos-mixed-amd64-runner
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+  - kind: ServiceAccount
+    name: talos-mixed-amd64-runner
+    namespace: talos-mixed-amd64-runner-system
+---
+apiVersion: talos.dev/v1alpha1
+kind: ServiceAccount
+metadata:
+  name: talos-mixed-amd64-runner
+spec:
+  roles: ["os:admin"]
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: talos-mixed-arm64-runner
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: talos-mixed-arm64-runner
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+  - kind: ServiceAccount
+    name: talos-mixed-arm64-runner
+    namespace: talos-mixed-arm64-runner-system
+---
+apiVersion: talos.dev/v1alpha1
+kind: ServiceAccount
+metadata:
+  name: talos-mixed-arm64-runner
+spec:
+  roles: ["os:admin"]

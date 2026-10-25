@@ -1,0 +1,313 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &name talos-mixed-amd64-runner
+spec:
+  interval: 30m
+  chartRef:
+    kind: OCIRepository
+    name: gha-runner-scale-set
+  driftDetection:
+    mode: enabled
+  dependsOn:
+    - name: actions-runner-controller
+      namespace: actions-runner-system
+    - name: openebs
+      namespace: openebs-system
+  values:
+    runnerScaleSetName: talos-mixed-amd64-runner
+    githubConfigUrl: https://github.com/dstewen/talos-mixed
+    githubConfigSecret: pre-defined-secret
+    minRunners: 1
+    maxRunners: 2
+    containerMode:
+      type: kubernetes
+      kubernetesModeWorkVolumeClaim:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: openebs-hostpath-1tb
+        resources:
+          requests:
+            storage: 25Gi
+
+    controllerServiceAccount:
+      name: actions-runner-controller
+      namespace: actions-runner-system
+
+    template:
+      spec:
+        #        affinity:
+        #          nodeAffinity:
+        #            requiredDuringSchedulingIgnoredDuringExecution:
+        #              nodeSelectorTerms:
+        #              - matchExpressions:
+        #                - key: node-role.kubernetes.io/worker
+        #                  operator: In
+        #                  values:
+        #                  - worker
+        #            preferredDuringSchedulingIgnoredDuringExecution:
+        #            - weight: 1
+        #              preference:
+        #                matchExpressions:
+        #                - key: kubernetes.io/arch
+        #                  operator: In
+        #                  values:
+        #                  - amd64
+        #          podAntiAffinity:
+        #            preferredDuringSchedulingIgnoredDuringExecution:
+        #              - weight: 100
+        #                podAffinityTerm:
+        #                  labelSelector:
+        #                    matchExpressions:
+        #                      - key: actions.github.com/scale-set-name
+        #                        operator: In
+        #                        values:
+        #                          - talos-homecluster-amd64-runner
+        #                  topologyKey: kubernetes.io/hostname
+        containers:
+          - name: runner
+            image: ghcr.io/joryirving/actions-runner:2.338.1@sha256:1d2ccfb0343759ddcd0a963524b04205a87f944bffb20b9cb5f26013d4294358
+            command: ["/home/runner/run.sh"]
+            env:
+              - name: ACTIONS_RUNNER_REQUIRE_JOB_CONTAINER
+                value: "false"
+              - name: NODE
+                valueFrom:
+                  fieldRef:
+                    fieldPath: status.hostIP
+            volumeMounts:
+              - mountPath: /var/run/secrets/talos.dev
+                name: talos
+                readOnly: true
+        serviceAccountName: *name
+        volumes:
+          - name: talos
+            secret:
+              secretName: *name
+
+    # Required for arc metrics
+    #    listenerTemplate:
+    #      metadata:
+    #        annotations:
+    #          prometheus.io/scrape: "true"
+    #          prometheus.io/path: "/metrics"
+    #          prometheus.io/port: "8080"
+    #    listenerTemplate:
+    #      spec:
+    #        containers:
+    #        affinity:
+    #          nodeAffinity:
+    #            requiredDuringSchedulingIgnoredDuringExecution:
+    #              nodeSelectorTerms:
+    #              - matchExpressions:
+    #                - key: node-role.kubernetes.io/worker
+    #                  operator: In
+    #                  values:
+    #                  - worker
+    #            preferredDuringSchedulingIgnoredDuringExecution:
+    #            - weight: 1
+    #              preference:
+    #                matchExpressions:
+    #                - key: kubernetes.io/arch
+    #                  operator: In
+    #                  values:
+    #                  - arm64
+
+    listenerMetrics:
+      counters:
+        gha_started_jobs_total:
+          labels:
+            [
+              "repository",
+              "organization",
+              "enterprise",
+              "job_name",
+              "event_name",
+              "job_workflow_ref",
+              "job_workflow_name",
+              "job_workflow_target",
+            ]
+        gha_completed_jobs_total:
+          labels:
+            [
+              "repository",
+              "organization",
+              "enterprise",
+              "job_name",
+              "event_name",
+              "job_result",
+              "job_workflow_ref",
+              "job_workflow_name",
+              "job_workflow_target",
+            ]
+      gauges:
+        gha_assigned_jobs:
+          labels: ["name", "namespace", "repository", "organization", "enterprise"]
+        gha_running_jobs:
+          labels: ["name", "namespace", "repository", "organization", "enterprise"]
+        gha_registered_runners:
+          labels: ["name", "namespace", "repository", "organization", "enterprise"]
+        gha_busy_runners:
+          labels: ["name", "namespace", "repository", "organization", "enterprise"]
+        gha_min_runners:
+          labels: ["name", "namespace", "repository", "organization", "enterprise"]
+        gha_max_runners:
+          labels: ["name", "namespace", "repository", "organization", "enterprise"]
+        gha_desired_runners:
+          labels: ["name", "namespace", "repository", "organization", "enterprise"]
+        gha_idle_runners:
+          labels: ["name", "namespace", "repository", "organization", "enterprise"]
+      histograms:
+        gha_job_startup_duration_seconds:
+          labels:
+            [
+              "repository",
+              "organization",
+              "enterprise",
+              "job_name",
+              "event_name",
+              "job_workflow_ref",
+              "job_workflow_name",
+              "job_workflow_target",
+            ]
+          buckets:
+            [
+              0.01,
+              0.05,
+              0.1,
+              0.5,
+              1.0,
+              2.0,
+              3.0,
+              4.0,
+              5.0,
+              6.0,
+              7.0,
+              8.0,
+              9.0,
+              10.0,
+              12.0,
+              15.0,
+              18.0,
+              20.0,
+              25.0,
+              30.0,
+              40.0,
+              50.0,
+              60.0,
+              70.0,
+              80.0,
+              90.0,
+              100.0,
+              110.0,
+              120.0,
+              150.0,
+              180.0,
+              210.0,
+              240.0,
+              300.0,
+              360.0,
+              420.0,
+              480.0,
+              540.0,
+              600.0,
+              900.0,
+              1200.0,
+              1800.0,
+              2400.0,
+              3000.0,
+              3600.0,
+            ]
+        gha_job_execution_duration_seconds:
+          labels:
+            [
+              "repository",
+              "organization",
+              "enterprise",
+              "job_name",
+              "event_name",
+              "job_result",
+              "job_workflow_ref",
+              "job_workflow_name",
+              "job_workflow_target",
+            ]
+          buckets:
+            [
+              0.01,
+              0.05,
+              0.1,
+              0.5,
+              1.0,
+              2.0,
+              3.0,
+              4.0,
+              5.0,
+              6.0,
+              7.0,
+              8.0,
+              9.0,
+              10.0,
+              12.0,
+              15.0,
+              18.0,
+              20.0,
+              25.0,
+              30.0,
+              40.0,
+              50.0,
+              60.0,
+              70.0,
+              80.0,
+              90.0,
+              100.0,
+              110.0,
+              120.0,
+              150.0,
+              180.0,
+              210.0,
+              240.0,
+              300.0,
+              360.0,
+              420.0,
+              480.0,
+              540.0,
+              600.0,
+              900.0,
+              1200.0,
+              1800.0,
+              2400.0,
+              3000.0,
+              3600.0,
+            ]
+
+#    nodeSelector:
+#      node-role.kubernetes.io/worker: worker
+#  valuesFrom:
+#    - kind: Secret
+#      name: actions-runner-controller-auth-secret
+#      valuesKey: github_app_id
+#      targetPath: githubConfigSecret.github_app_id
+#    - kind: Secret
+#      name: actions-runner-controller-auth-secret
+#      valuesKey: github_app_installation_id
+#      targetPath: githubConfigSecret.github_app_installation_id
+#    - kind: Secret
+#      name: actions-runner-controller-auth-secret
+#      valuesKey: github_app_private_key
+#      targetPath: githubConfigSecret.github_app_private_key
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: &app talos-mixed-amd64-runner
+spec:
+  selector:
+    matchLabels:
+      helm.toolkit.fluxcd.io/name: *app
+  podMetricsEndpoints:
+    - port: metrics
+      path: /metrics
+      interval: 15s
+      scrapeTimeout: 5s

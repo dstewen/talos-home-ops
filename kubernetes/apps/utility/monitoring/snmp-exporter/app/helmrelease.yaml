@@ -1,0 +1,78 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app snmp-exporter-opnsense
+spec:
+  interval: 1h
+  chartRef:
+    kind: OCIRepository
+    name: snmp-exporter
+  values:
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: node-role.kubernetes.io/worker
+                  operator: In
+                  values:
+                    - worker
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 50
+            preference:
+              matchExpressions:
+                - key: kubernetes.io/arch
+                  operator: In
+                  values:
+                    - arm64
+    fullnameOverride: *app
+    image:
+      repository: quay.io/prometheus/snmp-exporter
+    extraArgs: ["--config.file=/config/snmp.yaml"]
+    extraConfigmapMounts:
+      - name: *app
+        mountPath: /config/snmp.yaml
+        subPath: snmp.yaml
+        configMap: *app
+        readOnly: true
+        defaultMode: 420
+    resources:
+      limits:
+        memory: 64Mi
+      requests:
+        memory: 32Mi
+    service:
+      ipDualStack:
+        enabled: false
+        #ipFamilies: ["IPv6", "IPv4"]
+        #ipFamilyPolicy: PreferDualStack
+    serviceMonitor:
+      enabled: true
+      params:
+        - name: opnsense
+          auth: [public_v2]
+          module: [if_mib]
+          target: 192.168.10.1
+        - name: s340048t6sp
+          auth: [public_v2]
+          module: [if_mib]
+          target: 192.168.10.3
+        - name: u6lite
+          auth: [public_v2]
+          module: [if_mib]
+          target: 192.168.10.92
+        - name: synology
+          auth: [public_v2]
+          module: [if_mib]
+          target: 192.168.10.15
+      #        - name: t1500g10mps
+      #          auth: [public_v2]
+      #          module: [if_mib]
+      #          target: 192.168.10.20
+      scrapeTimeout: 10s
+      relabelings:
+        - { sourceLabels: ["__param_target"], targetLabel: instance }
+      additionalMetricsRelabelConfigs:
+        - { regex: (pod), action: labeldrop }

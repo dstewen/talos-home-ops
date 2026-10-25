@@ -1,0 +1,44 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: konflate
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: konflate
+  interval: 1h
+  values:
+    config:
+      repo: github://dstewen/talos-mixed
+      statusChecks: true
+      prComments: true
+      publicUrl: https://{{ .Release.Name }}.davidstewen.com
+      mcp: true
+      verifyImages: true
+    secret:
+      existingSecret: konflate-webhook-token-secret
+    httpRoute:
+      enabled: true
+      annotations:
+        gethomepage.dev/enabled: "true"
+        gethomepage.dev/group: Monitoring
+        gethomepage.dev/name: Konflate
+        gethomepage.dev/href: https://konflate.davidstewen.com
+        gethomepage.dev/icon: https://raw.githubusercontent.com/home-operations/konflate/refs/heads/main/internal/web/public/favicon.svg
+        external-dns.alpha.kubernetes.io/hostname: "{{ .Release.Name }}.davidstewen.com"
+        external-dns.kubernetes.io/hostname: "{{ .Release.Name }}.davidstewen.com"
+      parentRefs:
+        - name: envoy-external
+          namespace: network
+      hostnames:
+        - "{{ .Release.Name }}.davidstewen.com"
+    monitoring:
+      serviceMonitor:
+        enabled: true
+    resources:
+      requests:
+        cpu: 2000m
+      limits:
+        memory: 4Gi

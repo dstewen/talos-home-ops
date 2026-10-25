@@ -1,0 +1,13 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/monitoring.coreos.com/scrapeconfig_v1alpha1.json
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: ScrapeConfig
+metadata:
+  name: arc-controller-metrics
+spec:
+  staticConfigs:
+    - targets:
+        [
+          "actions-runner-controller-gha-rs-controller-f68dbdb86-hrc7r.actions-runner-system.svc.cluster.local:8080",
+        ]
+  metricsPath: /metrics

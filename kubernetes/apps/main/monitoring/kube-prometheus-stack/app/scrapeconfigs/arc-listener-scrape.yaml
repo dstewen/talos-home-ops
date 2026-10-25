@@ -1,0 +1,16 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/monitoring.coreos.com/scrapeconfig_v1alpha1.json
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: ScrapeConfig
+metadata:
+  name: arc-listener-metrics
+spec:
+  staticConfigs:
+    - targets:
+        [
+          "arc-runner-set-containers-arm64-884475f5-listener.actions-runner-system.svc.cluster.local:8080",
+          "arc-runner-set-home-ops-884475f5-listener.actions-runner-system.svc.cluster.local:8080",
+          "arc-runner-set-home-ops-amd64-runner-884475f5-listener.actions-runner-system.svc.cluster.local:8080",
+        ]
+  #    - targets: ["arc-runner-set-containers-arm64-884475f5-listener.actions-runner-system.svc.cluster.local:8080"]
+  metricsPath: /metrics

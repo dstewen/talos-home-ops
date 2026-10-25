@@ -1,0 +1,39 @@
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/monitoring.coreos.com/probe_v1.json
+---
+kind: Probe
+apiVersion: monitoring.coreos.com/v1
+metadata:
+  name: lan-icmp
+spec:
+  module: icmp
+  prober:
+    url: blackbox-exporter-lan.monitoring.svc.cluster.local:9115
+  targets:
+    staticConfig:
+      static:
+        - 192.168.10.15
+        - 172.16.20.99
+        - 192.168.10.23
+        - 192.168.10.21
+  metricRelabelings:
+    - targetLabel: service
+      replacement: blackbox-exporter-lan
+      action: replace
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/monitoring.coreos.com/probe_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: Probe
+metadata:
+  name: lan-tcp
+spec:
+  module: tcp_connect
+  prober:
+    url: blackbox-exporter-lan.monitoring.svc.cluster.local:9115
+  targets:
+    staticConfig:
+      static:
+        - 192.168.10.15:2049
+  metricRelabelings:
+    - targetLabel: service
+      replacement: blackbox-exporter-lan
+      action: replace
