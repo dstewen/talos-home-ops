@@ -48,7 +48,7 @@ spec:
       barmanObjectStore: &barman
         destinationPath: s3://postgresql/${APP}
         serverName: ${APP}
-        endpointURL: https://s3.jory.dev
+        endpointURL: https://s3.davidstewen.com
         s3Credentials:
           accessKeyId:
             name: ${APP}-postgres

@@ -48,7 +48,7 @@ spec:
                 subPath: tmp
     route:
       app:
-        hostnames: ["tools.jory.dev"]
+        hostnames: ["tools.davidstewen.com"]
         parentRefs:
           - name: envoy-external
             namespace: network

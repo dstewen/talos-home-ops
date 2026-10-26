@@ -176,7 +176,7 @@ spec:
                 subPath: shim.py
     route:
       app:
-        hostnames: ["{{ .Release.Name }}.jory.dev"]
+        hostnames: ["{{ .Release.Name }}.davidstewen.com"]
         parentRefs:
           - name: envoy-external
             namespace: network

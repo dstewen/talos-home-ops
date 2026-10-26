@@ -123,7 +123,7 @@ spec:
           - path: /romm/library
     route:
       app:
-        hostnames: ["{{ .Release.Name }}.jory.dev"]
+        hostnames: ["{{ .Release.Name }}.davidstewen.com"]
         parentRefs:
           - name: envoy-external
             namespace: network

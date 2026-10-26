@@ -15,7 +15,7 @@ spec:
         - name: Sec-Fetch-Mode
           value: cors
     provider:
-      issuer: https://sso.jory.dev/application/o/opencode/
+      issuer: https://sso.davidstewen.com/application/o/opencode/
     clientIDRef:
       group: ""
       kind: Secret
@@ -24,7 +24,7 @@ spec:
       group: ""
       kind: Secret
       name: opencode-oidc
-    redirectURL: https://opencode.jory.dev/oauth2/callback
+    redirectURL: https://opencode.davidstewen.com/oauth2/callback
     logoutPath: /logout
     scopes: ["openid", "email", "profile", "offline_access"]
 ---

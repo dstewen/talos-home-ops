@@ -11,7 +11,7 @@ spec:
   interval: 15m
   dependsOn: []
   values:
-    domainFilters: ["jory.dev"]
+    domainFilters: ["davidstewen.com"]
     fullnameOverride: *app
     logLevel: info
     podAnnotations:

@@ -20,10 +20,10 @@ spec:
         type: LoadBalancer
         annotations:
           lbipam.cilium.io/ips: 10.69.10.40
-          external-dns.kubernetes.io/hostname: mc.jory.dev,
-            takocraft.jory.dev, create.jory.dev, vibecraft.jory.dev,
-            jellycraft.jory.dev, cobbleverse.jory.dev
-          external-dns.kubernetes.io/target: towonel.jory.dev
+          external-dns.kubernetes.io/hostname: mc.davidstewen.com,
+            takocraft.davidstewen.com, create.davidstewen.com, vibecraft.davidstewen.com,
+            jellycraft.davidstewen.com, cobbleverse.davidstewen.com
+          external-dns.kubernetes.io/target: towonel.davidstewen.com
           external-dns.kubernetes.io/cloudflare-proxied: "false"
           towonel.io/minecraft.public-port: "25565"
           towonel.io/minecraft.tcp: "true"

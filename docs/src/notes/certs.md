@@ -7,27 +7,27 @@ MS-01, i5-12600H, 96GB DDR5. Dell LSI 9300-e. Lenovo SA120. ZFS Raidz2.
 ## Caddyfile
 
 ```caddyfile
-garage-api.jory.dev {
+garage-api.davidstewen.com {
 reverse_proxy voyager.internal:3903
 tls /data/certificates/wildcard.crt /data/certificates/wildcard.key
 }
 
-garage.jory.dev {
+garage.davidstewen.com {
 reverse_proxy voyager.internal:3909
 tls /data/certificates/wildcard.crt /data/certificates/wildcard.key
 }
 
-nas.jory.dev {
+nas.davidstewen.com {
 reverse_proxy voyager.internal:5000
 tls /data/certificates/wildcard.crt /data/certificates/wildcard.key
 }
 
-portainer.jory.dev {
+portainer.davidstewen.com {
 reverse_proxy voyager.internal:9090
 tls /data/certificates/wildcard.crt /data/certificates/wildcard.key
 }
 
-s3.jory.dev {
+s3.davidstewen.com {
 reverse_proxy voyager.internal:3900
 tls /data/certificates/wildcard.crt /data/certificates/wildcard.key
 }

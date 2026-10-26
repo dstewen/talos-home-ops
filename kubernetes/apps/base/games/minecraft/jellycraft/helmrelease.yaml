@@ -57,6 +57,6 @@ spec:
       runAsUser: 1000
       fsGroup: 100
     serviceAnnotations:
-      mc-router.itzg.me/externalServerName: jellycraft.jory.dev
+      mc-router.itzg.me/externalServerName: jellycraft.davidstewen.com
     startupProbe:
       enabled: true

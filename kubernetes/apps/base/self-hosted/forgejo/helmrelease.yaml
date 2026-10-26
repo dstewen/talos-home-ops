@@ -30,10 +30,10 @@ spec:
         security:
           REVERSE_PROXY_TRUSTED_PROXIES: 10.42.0.0/16
         server:
-          DOMAIN: forgejo.jory.dev
+          DOMAIN: forgejo.davidstewen.com
           PROTOCOL: http
-          ROOT_URL: https://forgejo.jory.dev
-          SSH_DOMAIN: forgejo-ssh.jory.dev
+          ROOT_URL: https://forgejo.davidstewen.com
+          SSH_DOMAIN: forgejo-ssh.davidstewen.com
           SSH_LISTEN_PORT: 2222
           SSH_PORT: 22
           START_SSH_SERVER: true
@@ -64,7 +64,7 @@ spec:
       ssh:
         type: LoadBalancer
         annotations:
-          external-dns.kubernetes.io/hostname: forgejo-ssh.jory.dev
+          external-dns.kubernetes.io/hostname: forgejo-ssh.davidstewen.com
           lbipam.cilium.io/ips: 10.69.10.46
         externalTrafficPolicy: Local
         port: 22

@@ -42,7 +42,7 @@ spec:
             subPath: media
     route:
       app:
-        hostnames: ["comics.jory.dev"]
+        hostnames: ["comics.davidstewen.com"]
         parentRefs:
           - name: envoy-external
             namespace: network

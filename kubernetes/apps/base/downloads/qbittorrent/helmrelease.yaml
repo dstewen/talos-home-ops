@@ -93,7 +93,7 @@ spec:
       #       protocol: TCP
     route:
       app:
-        hostnames: ["qb.jory.dev"]
+        hostnames: ["qb.davidstewen.com"]
         parentRefs:
           - name: envoy-internal
             namespace: network

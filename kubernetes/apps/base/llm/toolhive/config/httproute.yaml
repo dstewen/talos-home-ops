@@ -9,7 +9,7 @@ metadata:
       conditions: ["[STATUS] == 401"]
 spec:
   hostnames:
-    - mcp.jory.dev
+    - mcp.davidstewen.com
   parentRefs:
     - name: envoy-external
       namespace: network

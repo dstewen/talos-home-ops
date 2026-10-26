@@ -53,7 +53,7 @@ spec:
     route:
       app:
         hostnames:
-          - "{{ .Release.Name }}.jory.dev"
+          - "{{ .Release.Name }}.davidstewen.com"
         parentRefs:
           - name: envoy-internal
             namespace: network

@@ -182,7 +182,7 @@ data:
 
     def commit(msg):
         subprocess.run(["git", "-C", str(REPO), "add", "-A"], check=False)
-        subprocess.run(["git", "-C", str(REPO), "-c", "user.email=repo-wiki@jory.dev",
+        subprocess.run(["git", "-C", str(REPO), "-c", "user.email=repo-wiki@davidstewen.com",
                         "-c", "user.name=repo-wiki", "commit", "-q", "-m", msg], check=False)
 
     def slugify(s):

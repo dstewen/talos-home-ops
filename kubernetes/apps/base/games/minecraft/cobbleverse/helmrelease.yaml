@@ -63,6 +63,6 @@ spec:
       runAsUser: 1000
       fsGroup: 100
     serviceAnnotations:
-      mc-router.itzg.me/externalServerName: cobbleverse.jory.dev
+      mc-router.itzg.me/externalServerName: cobbleverse.davidstewen.com
     startupProbe:
       enabled: true

@@ -69,8 +69,8 @@ spec:
         type: LoadBalancer
         annotations:
           lbipam.cilium.io/ips: 10.69.10.42
-          external-dns.kubernetes.io/hostname: valheim.jory.dev
-          external-dns.kubernetes.io/target: towonel.jory.dev
+          external-dns.kubernetes.io/hostname: valheim.davidstewen.com
+          external-dns.kubernetes.io/target: towonel.davidstewen.com
           external-dns.kubernetes.io/cloudflare-proxied: "false"
           towonel.io/auth.public-port: "2457"
           towonel.io/auth.udp: "true"

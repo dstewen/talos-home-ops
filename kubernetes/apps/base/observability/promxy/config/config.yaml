@@ -16,7 +16,7 @@ promxy:
     # Prometheus access without requiring both clusters to be online.
     - static_configs:
         - targets:
-            - prometheus-utility.jory.dev
+            - prometheus-utility.davidstewen.com
       labels:
         cluster: utility
       scheme: https

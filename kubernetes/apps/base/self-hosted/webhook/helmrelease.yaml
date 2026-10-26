@@ -71,7 +71,7 @@ spec:
     route:
       app:
         hostnames:
-          - webhook.jory.dev
+          - webhook.davidstewen.com
         parentRefs:
           - name: envoy-external
             namespace: network

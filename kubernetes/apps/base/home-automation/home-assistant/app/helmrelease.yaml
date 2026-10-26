@@ -87,7 +87,7 @@ spec:
         type: emptyDir
     route:
       app:
-        hostnames: ["hass.jory.dev"]
+        hostnames: ["hass.davidstewen.com"]
         parentRefs:
           - name: envoy-external
             namespace: network
@@ -96,7 +96,7 @@ spec:
               - name: "{{ .Release.Name }}"
                 port: &port 8123
       codeserver:
-        hostnames: ["hass-code.jory.dev"]
+        hostnames: ["hass-code.davidstewen.com"]
         parentRefs:
           - name: envoy-internal
             namespace: network

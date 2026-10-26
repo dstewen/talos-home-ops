@@ -51,7 +51,7 @@ spec:
               - path: /.cache
     route:
       app:
-        hostnames: ["join.jory.dev"]
+        hostnames: ["join.davidstewen.com"]
         parentRefs:
           - name: envoy-external
             namespace: network

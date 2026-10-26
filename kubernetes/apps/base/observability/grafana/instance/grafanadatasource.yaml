@@ -44,7 +44,7 @@ spec:
     type: prometheus
     name: *name
     access: proxy
-    url: https://prometheus-utility.jory.dev
+    url: https://prometheus-utility.davidstewen.com
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanadatasource_v1beta1.json
 apiVersion: grafana.integreatly.org/v1beta1
@@ -61,7 +61,7 @@ spec:
     access: proxy
     jsonData:
       implementation: prometheus
-    url: https://alertmanager-utility.jory.dev
+    url: https://alertmanager-utility.davidstewen.com
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanadatasource_v1beta1.json
 apiVersion: grafana.integreatly.org/v1beta1

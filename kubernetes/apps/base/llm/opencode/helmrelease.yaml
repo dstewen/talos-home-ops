@@ -72,7 +72,7 @@ spec:
             port: *port
     route:
       app:
-        hostnames: ["opencode.jory.dev"]
+        hostnames: ["opencode.davidstewen.com"]
         parentRefs:
           - name: envoy-external
             namespace: network
@@ -81,7 +81,7 @@ spec:
               - name: "{{ .Release.Name }}"
                 port: *port
       api:
-        hostnames: ["opencode-api.jory.dev"]
+        hostnames: ["opencode-api.davidstewen.com"]
         parentRefs:
           - name: envoy-internal
             namespace: network

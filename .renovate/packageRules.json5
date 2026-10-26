@@ -25,37 +25,37 @@
     // need the upstream repo named explicitly.
     {
       description: "Release notes for metrics-server via ocharted",
-      matchPackageNames: ["ocharted.jory.dev/kubernetes-sigs.github.io/metrics-server/**"],
+      matchPackageNames: ["ocharted.davidstewen.com/kubernetes-sigs.github.io/metrics-server/**"],
       sourceUrl: "https://github.com/kubernetes-sigs/metrics-server",
     },
     {
       description: "Release notes for external-dns via ocharted",
-      matchPackageNames: ["ocharted.jory.dev/kubernetes-sigs.github.io/external-dns/**"],
+      matchPackageNames: ["ocharted.davidstewen.com/kubernetes-sigs.github.io/external-dns/**"],
       sourceUrl: "https://github.com/kubernetes-sigs/external-dns",
     },
     {
       description: "Release notes for descheduler via ocharted",
-      matchPackageNames: ["ocharted.jory.dev/kubernetes-sigs.github.io/descheduler/**"],
+      matchPackageNames: ["ocharted.davidstewen.com/kubernetes-sigs.github.io/descheduler/**"],
       sourceUrl: "https://github.com/kubernetes-sigs/descheduler",
     },
     {
       description: "Release notes for headlamp via ocharted",
-      matchPackageNames: ["ocharted.jory.dev/kubernetes-sigs.github.io/headlamp/**"],
+      matchPackageNames: ["ocharted.davidstewen.com/kubernetes-sigs.github.io/headlamp/**"],
       sourceUrl: "https://github.com/kubernetes-sigs/headlamp",
     },
     {
       description: "Release notes for nvidia-device-plugin via ocharted",
-      matchPackageNames: ["ocharted.jory.dev/nvidia.github.io/k8s-device-plugin/**"],
+      matchPackageNames: ["ocharted.davidstewen.com/nvidia.github.io/k8s-device-plugin/**"],
       sourceUrl: "https://github.com/NVIDIA/k8s-device-plugin",
     },
     {
       description: "Release notes for ceph-csi-drivers via ocharted",
-      matchPackageNames: ["ocharted.jory.dev/ceph.github.io/ceph-csi-operator/**"],
+      matchPackageNames: ["ocharted.davidstewen.com/ceph.github.io/ceph-csi-operator/**"],
       sourceUrl: "https://github.com/ceph/ceph-csi-operator",
     },
     {
       description: "Release notes for k8s-gpu-dra-driver via ocharted",
-      matchPackageNames: ["ocharted.jory.dev/rocm.github.io/k8s-gpu-dra-driver/**"],
+      matchPackageNames: ["ocharted.davidstewen.com/rocm.github.io/k8s-gpu-dra-driver/**"],
       sourceUrl: "https://github.com/ROCm/k8s-gpu-dra-driver",
     },
   ],

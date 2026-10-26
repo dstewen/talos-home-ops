@@ -46,7 +46,7 @@ spec:
           - path: /projects
     route:
       app:
-        hostnames: ["{{ .Release.Name }}.jory.dev"]
+        hostnames: ["{{ .Release.Name }}.davidstewen.com"]
         parentRefs:
           - name: envoy-internal
             namespace: network
