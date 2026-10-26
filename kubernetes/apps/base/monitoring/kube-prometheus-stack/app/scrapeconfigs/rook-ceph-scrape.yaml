@@ -1,0 +1,10 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/monitoring.coreos.com/scrapeconfig_v1alpha1.json
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: ScrapeConfig
+metadata:
+  name: ceph
+spec:
+  staticConfigs:
+    - targets: ["rook-ceph-mgr.rook-ceph.svc.cluster.local:9283"]
+  metricsPath: /http-metrics

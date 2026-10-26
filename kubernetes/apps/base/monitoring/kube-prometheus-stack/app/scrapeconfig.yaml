@@ -1,0 +1,33 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/monitoring.coreos.com/scrapeconfig_v1alpha1.json
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: ScrapeConfig
+metadata:
+  name: opensense-node-exporter
+spec:
+  staticConfigs:
+    - targets:
+        - "192.168.10.1:9100"
+  metricsPath: /metrics
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/monitoring.coreos.com/scrapeconfig_v1alpha1.json
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: ScrapeConfig
+metadata:
+  name: minecraft
+spec:
+  staticConfigs:
+    - targets:
+        - "minecraft-ftb-metrics.gameserver.svc.cluster.local:19565"
+        - "ftb-2-minecraft-metrics.gameserver.svc.cluster.local:19565"
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/monitoring.coreos.com/scrapeconfig_v1alpha1.json
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: ScrapeConfig
+metadata:
+  name: n8n
+spec:
+  staticConfigs:
+    - targets:
+        - "n8n.selfhosted.svc.cluster.local:8080"
+  metricsPath: /metrics

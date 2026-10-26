@@ -1,0 +1,79 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app speedtest-exporter
+spec:
+  interval: 1h
+  chartRef:
+    kind: OCIRepository
+    name: speedtest-exporter
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  values:
+    #    defaultPodOptions:
+    #      affinity:
+    #        nodeAffinity:
+    #          requiredDuringSchedulingIgnoredDuringExecution:
+    #            nodeSelectorTerms:
+    #            - matchExpressions:
+    #              - key: kubernetes.io/arch
+    #                operator: In
+    #                values:
+    #                - arm64
+    #          preferredDuringSchedulingIgnoredDuringExecution:
+    #          - weight: 50
+    #            preference:
+    #              matchExpressions:
+    #              - key: node-role.kubernetes.io/worker
+    #                operator: In
+    #                values:
+    #                - worker
+    controllers:
+      speedtest-exporter:
+        strategy: RollingUpdate
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: ghcr.io/miguelndecarvalho/speedtest-exporter
+              tag: v3.5.4@sha256:f1064d49124c7fc45faabb87c6c876a2fd04e92b3dc14d4b871301217ba30fed
+            env:
+              SPEEDTEST_PORT: &port 9798
+              TZ: Australia/Melbourne
+            resources:
+              requests:
+                cpu: 5m
+                memory: 36M
+              limits:
+                memory: 64M
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+        pod:
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 568
+            runAsNonRoot: true
+    persistence:
+      config:
+        enabled: true
+        type: emptyDir
+        globalMounts:
+          - path: /.config
+    service:
+      metrics:
+        controller: *app
+        ports:
+          metrics:
+            port: *port

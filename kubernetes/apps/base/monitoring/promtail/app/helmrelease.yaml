@@ -1,0 +1,101 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app promtail
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: promtail
+      version: 6.17.1
+      sourceRef:
+        kind: HelmRepository
+        name: grafana
+        namespace: flux-system
+  values:
+    nameOverride: *app
+    #    extraArgs:
+    #      - -client.external-labels=hostname=$(HOSTNAME),cluster=${SETTING_CLUSTERNAME}
+    #      - -config.expand-env
+
+    config:
+      clients:
+        - url: http://loki-headless.monitoring.svc.cluster.local:3100/loki/api/v1/push
+      #          external_labels:
+      #            cluster: "k3s-vms-flux"
+      #        - url: "https://${SECRET_GRAFANA_CLOUD_INSTANCE_ID}:${SECRET_GRAFANA_CLOUD_API_KEY}@logs-prod-us-central1.grafana.net/loki/api/v1/push"
+      snippets:
+        extraScrapeConfigs: |
+          # Add an additional scrape config for syslog
+          - job_name: syslog
+            syslog:
+              listen_address: 0.0.0.0:514
+              idle_timeout: 60s
+              label_structured_data: yes
+              labels:
+                job: "syslog"
+            relabel_configs:
+              - source_labels: ['__syslog_message_hostname']
+                target_label: 'host'
+          # Add an additional scrape config for OPNsense IDS alerts shipped over syslog
+          - job_name: syslog-ids
+            syslog:
+              listen_address: 0.0.0.0:1514
+              idle_timeout: 60s
+              label_structured_data: yes
+              labels:
+                job: "syslog-ids"
+            relabel_configs:
+              - source_labels: ['__syslog_message_hostname']
+                target_label: 'host'
+
+    extraPorts:
+      # Add an additional port for syslog
+      # serviceType "LoadBalancer" only works if you have deployed an Loadbalancer for example MetalLB
+      syslog:
+        name: tcp-syslog
+        containerPort: 514
+        protocol: TCP
+        service:
+          type: LoadBalancer
+          #clusterIP: null
+          port: 514
+          #          externalIPs: 10.200.15.243 # SVC_SYSLOG_ADDR
+          #nodePort: 32682
+          annotations:
+            lbipam.cilium.io/ips: 10.200.15.243
+          #labels: {}
+          #loadBalancerIP: null
+          #loadBalancerSourceRanges: []
+          #externalTrafficPolicy: null
+      # Add an additional port for OPNsense IDS alerts shipped over syslog
+      # serviceType "LoadBalancer" only works if you have deployed an Loadbalancer for example MetalLB
+      syslog-ids:
+        name: tcp-syslog-ids
+        containerPort: 1514
+        protocol: TCP
+        service:
+          type: LoadBalancer
+          #clusterIP: null
+          port: 1514
+          #          externalIPs: 10.200.15.244 # SVC_SYSLOG_IDS_ADDR
+          #nodePort: 32682
+          annotations:
+            lbipam.cilium.io/ips: 10.200.15.244
+          #labels: {}
+          #loadBalancerIP: null
+          #loadBalancerSourceRanges: []
+          #externalTrafficPolicy: null
+    serviceMonitor:
+      enabled: true
+    tolerations:
+      - effect: NoSchedule
+        operator: Exists
+    resources:
+      requests:
+        cpu: 15m
+        memory: 128Mi
+      limits:
+        memory: 256Mi
