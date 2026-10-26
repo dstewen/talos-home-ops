@@ -1,0 +1,19 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/litellm.home-operations.com/litellmmodel_v1alpha1.json
+apiVersion: litellm.home-operations.com/v1alpha1
+kind: LiteLLMModel
+metadata:
+  name: gemma-4-26b-a4b-it
+spec:
+  # This is the name your client apps (Agents/OpenClaw) will use in their API calls
+  modelName: gemma-4-26b-a4b-it
+
+  params:
+    model: gemma/gemma-4-26b-a4b-it
+    # We reference the secret key via environment variable mapping in the proxy
+    apiKeyRef:
+      name: litellm-secret
+      key: GEMINI_API_KEY
+
+  # Explicitly link this model to your main proxy
+  proxyRef: litellm

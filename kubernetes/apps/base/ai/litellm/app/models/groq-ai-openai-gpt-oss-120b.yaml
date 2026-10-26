@@ -1,0 +1,26 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/litellm.home-operations.com/litellmmodel_v1alpha1.json
+apiVersion: litellm.home-operations.com/v1alpha1
+kind: LiteLLMModel
+metadata:
+  name: groq-openai-gpt-oss-120b
+spec:
+  # This is the name your client apps (Agents/OpenClaw) will use in their API calls
+  modelName: openai-gpt-oss-120b
+
+  info:
+    maxTokens: 131072 # Total Context Window
+    maxInputTokens: 131072 # Max context for input
+    maxOutputTokens: 65536 # Max completion length from Groq
+    supportsFunctionCalling: true
+
+  params:
+    model: groq/openai/gpt-oss-120b
+    # We reference the secret key via environment variable mapping in the proxy
+    apiKeyRef:
+      name: litellm-secret
+      key: GROQ_API_KEY
+    rpm: 25 # Groq free tier limits tp 30 rpm. Keep it lower
+    tpm: 400 # Groq free tier limits to 500 tpm. Keep it lower
+  # Explicitly link this model to your main proxy
+  proxyRef: litellm

@@ -1,0 +1,19 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/litellm.home-operations.com/litellmmodel_v1alpha1.json
+apiVersion: litellm.home-operations.com/v1alpha1
+kind: LiteLLMModel
+metadata:
+  name: groq-whisper-large-v3
+spec:
+  # This is the name your client apps (Agents/OpenClaw) will use in their API calls
+  modelName: groq/whisper-large-v3
+
+  params:
+    model: groq/whisper-large-v3
+    # We reference the secret key via environment variable mapping in the proxy
+    apiKeyRef:
+      name: litellm-secret
+      key: GROQ_API_KEY
+
+  # Explicitly link this model to your main proxy
+  proxyRef: litellm

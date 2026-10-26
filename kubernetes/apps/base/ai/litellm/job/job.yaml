@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: litellm-db-initializer
+  namespace: database
+spec:
+  template:
+    spec:
+      containers:
+        - name: psql-init
+          image: postgres:18-alpine
+          command: ["sh", "-c"]
+          args:
+            - |
+              psql -h postgres18-rw.database.svc.cluster.local -U postgres -d postgres -f /scripts/init.sql
+          env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cloudnative-pg-secret # Update this to your actual superuser secret name
+                  key: password
+          volumeMounts:
+            - name: scripts
+              mountPath: /scripts
+      restartPolicy: OnFailure
+      volumes:
+        - name: scripts
+          configMap:
+            name: litellm-db-init-config
+      terminationGracePeriodSeconds: 30
+  backoffLimit: 4
