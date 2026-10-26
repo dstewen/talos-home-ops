@@ -1,0 +1,168 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app paperless
+spec:
+  interval: 1h
+  chartRef:
+    kind: OCIRepository
+    name: paperless
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  #  dependsOn:
+  #    - name: local-path-provisioner
+  #      namespace: storage
+  #    - name: volsync
+  #      namespace: volsync
+  values:
+    #    defaultPodOptions:
+    #      affinity:
+    #        nodeAffinity:
+    #          requiredDuringSchedulingIgnoredDuringExecution:
+    #            nodeSelectorTerms:
+    #            - matchExpressions:
+    #              - key: node-role.kubernetes.io/worker
+    #                operator: In
+    #                values:
+    #                - worker
+    #          preferredDuringSchedulingIgnoredDuringExecution:
+    #          - weight: 50
+    #            preference:
+    #              matchExpressions:
+    #              - key: node-role.kubernetes.io/worker
+    #                operator: In
+    #                values:
+    #                - worker
+    controllers:
+      paperless:
+        annotations:
+          reloader.stakater.com/auto: "true"
+
+        initContainers:
+          init-db:
+            image:
+              repository: ghcr.io/home-operations/postgres-init
+              tag: 18.6.0@sha256:87627baaddb0cabed4ebe033e75038e5c7b6b081c18e86514c99067179a90719
+            envFrom:
+              - secretRef:
+                  name: paperless-dbinit-secret
+
+        containers:
+          app:
+            image:
+              repository: ghcr.io/paperless-ngx/paperless-ngx
+              tag: 3.3.4
+            env:
+              # Configure application
+              PAPERLESS_APPS: allauth.socialaccount.providers.openid_connect
+              PAPERLESS_REDIS_PREFIX: pngx
+              PAPERLESS_URL: https://paperless.davidstewen.com
+              PAPERLESS_PORT: "8000"
+              PAPERLESS_TIME_ZONE: Australia/Melbourne
+              PAPERLESS_WEBSERVER_WORKERS: "2"
+              PAPERLESS_TASK_WORKERS: "2"
+              PAPERLESS_TIKA_ENABLED: 1
+              PAPERLESS_TIKA_ENDPOINT: http://localhost:9998
+              PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://localhost:3000
+              # Configure Remote User auth
+              PAPERLESS_ACCOUNT_ALLOW_SIGNUPS: "false"
+              PAPERLESS_SOCIALACCOUNT_ALLOW_SIGNUPS: "false"
+              # Configure folders
+              PAPERLESS_CONSUMPTION_DIR: /data/nas/consume
+              PAPERLESS_DATA_DIR: /data/local/data
+              PAPERLESS_EXPORT_DIR: /data/nas/export
+              PAPERLESS_MEDIA_ROOT: /data/local/media
+              # Configure folder importer
+              PAPERLESS_CONSUMER_POLLING: "60"
+              PAPERLESS_CONSUMER_RECURSIVE: "true"
+              PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS: "true"
+              # Configure OCR
+              PAPERLESS_OCR_LANGUAGES: eng
+              PAPERLESS_OCR_LANGUAGE: eng
+              # Configure redis integration
+              PAPERLESS_REDIS: redis://paperless-valkey:6379
+              # Configure user permissions
+              USERMAP_GID: "65542"
+              # Configure DB
+              PAPERLESS_DBENGINE: postgresql
+            envFrom:
+              - secretRef:
+                  name: paperless-secret
+              - secretRef:
+                  name: cluster-secrets
+            resources:
+              requests:
+                cpu: 15m
+              limits:
+                memory: 2048Mi
+
+          tika:
+            image:
+              repository: docker.io/apache/tika
+              tag: 3.3.3.0-full@sha256:6ef30abd65df4b6c478907904099d0245bdb0e0686f94fb9bc7493558442bb74
+            resources:
+              limits:
+                memory: 220Mi
+              requests:
+                cpu: 10m
+                memory: 220Mi
+
+          gotenburg:
+            env:
+              DISABLE_GOOGLE_CHROME: "1"
+            image:
+              repository: gotenberg/gotenberg
+              tag: 8.38.1@sha256:aa552cc115db488e0f0bcb07446aac13071ad51505b642c84bb894500907b42b
+            resources:
+              limits:
+                memory: 128Mi
+              requests:
+                cpu: 10m
+                memory: 30Mi
+
+    service:
+      app:
+        controller: *app
+        ports:
+          http:
+            port: &port 8000
+
+    route:
+      app:
+        annotations:
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/icon: paperless-ngx.png
+          gethomepage.dev/name: Paperless
+          gethomepage.dev/group: Media
+          gethomepage.dev/description: Paperless
+          gethomepage.dev/pod-selector: app.kubernetes.io/name=paperless
+          gethomepage.dev/widget.type: paperlessngx
+          gethomepage.dev/widget.url: http://paperless.media.svc.cluster.local:8000
+          gethomepage.dev/widget.key: "{{`{{HOMEPAGE_VAR_PAPERLESS_TOKEN}}`}}"
+        hostnames: ["{{ .Release.Name }}.davidstewen.com"]
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+            sectionName: https
+        rules:
+          - backendRefs:
+              - name: *app
+                port: *port
+
+    persistence:
+      config:
+        existingClaim: ${VOLSYNC_CLAIM}
+        globalMounts:
+          - path: /data/local
+      nas:
+        type: nfs
+        server: 192.168.10.15
+        path: /volume2/piNFS01/flux-cluster/media/paperless
+        globalMounts:
+          - path: /data/nas

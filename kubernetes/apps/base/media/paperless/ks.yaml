@@ -1,0 +1,46 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: &app paperless
+  namespace: &namespace media
+spec:
+  targetNamespace: *namespace
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *app
+  components:
+    - ../../../../components/valkey
+    - ../../../../components/volsync
+  dependsOn:
+    - name: cloudnative-pg-cluster18
+      namespace: database
+    - name: external-secrets-stores
+      namespace: external-secrets
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
+    - name: valkey
+      namespace: database
+    - name: volsync
+      namespace: volsync
+  path: ./kubernetes/apps/media/paperless/app
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  interval: 30m
+  retryInterval: 1m
+  timeout: 5m
+  wait: true
+  postBuild:
+    substitute:
+      APP: *app
+      APP_UID: "1000"
+      APP_GID: "1000"
+      VOLSYNC_CLAIM: paperless-config
+      VOLSYNC_CAPACITY: 5Gi
+      DRAGONFLY_REPLICAS: "1"
+    substituteFrom:
+      - name: cluster-secrets
+        kind: Secret
