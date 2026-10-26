@@ -8,11 +8,4 @@ components:
 replacements:
   - path: ../../../components/replacements/ks.yaml
 resources:
-  # - ./core-keeper.yaml
-  # - ./enshrouded.yaml
-  - ./games-on-whales.yaml
   - ./minecraft.yaml
-  - ./palworld.yaml
-  - ./romm.yaml
-  # - ./valheim.yaml
-  # - ./vrising.yaml
