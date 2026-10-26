@@ -1,0 +1,68 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: wyoming-piper
+spec:
+  interval: 1h
+  chartRef:
+    kind: OCIRepository
+    name: wyoming-piper
+  values:
+    controllers:
+      wyoming-piper:
+        containers:
+          app:
+            image:
+              repository: rhasspy/wyoming-piper
+              tag: 2.5.2
+              pullPolicy: Always
+            env:
+              TZ: Australia/Melbourne
+            args:
+              - --voice
+              - en-gb-alan-low
+
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 5
+
+            resources:
+              requests:
+                cpu: 10m
+                memory: 500Mi
+              limits:
+                memory: 2Gi
+
+        strategy: Recreate
+    service:
+      app:
+        controller: wyoming-piper
+        ports:
+          tcp:
+            port: 10200
+            protocol: TCP
+    persistence:
+      config:
+        type: emptyDir
+        globalMounts:
+          - path: /data
+    defaultPodOptions:
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              preference:
+                matchExpressions:
+                  - key: kubernetes.io/arch
+                    operator: In
+                    values:
+                      - amd64
