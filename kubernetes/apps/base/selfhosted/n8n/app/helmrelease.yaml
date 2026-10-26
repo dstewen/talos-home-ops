@@ -1,0 +1,159 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app n8n
+spec:
+  interval: 1h
+  chartRef:
+    kind: OCIRepository
+    name: n8n
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+    timeout: 15m
+  dependsOn:
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
+  values:
+    controllers:
+      n8n:
+        annotations:
+          reloader.stakater.com/auto: "true"
+
+        pod:
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+            fsGroupChangePolicy: "OnRootMismatch"
+
+        containers:
+          app:
+            image:
+              repository: ghcr.io/n8n-io/n8n
+              tag: stable@sha256:d02752c6ab446ae9db8deec2f9cc887c378f77cdcad31650814df936b7386dfb
+            env:
+              DB_SQLITE_VACUUM_ON_STARTUP: true
+              DB_SQLITE_POOL_SIZE: 2
+              EXECUTIONS_DATA_PRUNE: true
+              EXECUTIONS_DATA_MAX_AGE: "168" # hours - 7 days
+              EXECUTIONS_DATA_PRUNE_MAX_COUNT: 50000
+              GENERIC_TIMEZONE: "$${TIMEZONE}"
+              N8N_BLOCK_ENV_ACCESS_IN_NODE: true
+              N8N_DIAGNOSTICS_ENABLED: false # Opt out of diagnostic telemetry
+              N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS: true
+              N8N_GIT_NODE_DISABLE_BARE_REPOS: true
+              N8N_PROTOCOL: "https"
+              N8N_PORT: &port 8080
+              N8N_HOST: &hostName "n8n.${SECRET_DOMAIN}"
+              N8N_LOG_LEVEL: info
+              N8N_LOG_OUTPUT: console
+              N8N_METRICS: true
+              N8N_TEMPLATES_ENABLED: false
+              N8N_VERSION_NOTIFICATIONS_ENABLED: false # Opt out of version notifications - managed via flux
+              N8N_ENCRYPTION_KEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: n8n-secret
+                    key: N8N_ENCRYPTION_KEY
+              N8N_RUNNERS_ENABLED: true
+            envFrom:
+              - secretRef:
+                  name: cluster-secrets
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec: &spec
+                  httpGet:
+                    path: /healthz
+                    port: *port
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 5
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /healthz/readiness
+                    port: *port
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 5
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 10
+            resources:
+              requests:
+                cpu: 5m
+                memory: 512Mi
+              limits:
+                cpu: 500m
+                memory: 4Gi
+    defaultPodOptions:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: node-role.kubernetes.io/worker
+                    operator: In
+                    values:
+                      - worker
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              preference:
+                matchExpressions:
+                  - key: kubernetes.io/arch
+                    operator: In
+                    values:
+                      - arm64
+    service:
+      app:
+        ports:
+          http:
+            port: *port
+
+    persistence:
+      data:
+        existingClaim: n8n
+        advancedMounts:
+          n8n:
+            app:
+              - path: /home/node/.n8n
+
+    route:
+      app:
+        annotations:
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/icon: n8n.png
+          gethomepage.dev/name: n8n
+          gethomepage.dev/group: Infrastructure
+          gethomepage.dev/description: N8N Workflow Automation
+          gethomepage.dev/pod-selector: app.kubernetes.io/name=n8n
+        hostnames: ["n8n.${SECRET_DOMAIN}"]
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+            sectionName: https
+
+      webhooks:
+        hostnames: ["n8n-webhook.${SECRET_DOMAIN}"]
+        parentRefs:
+          - name: envoy-external
+            namespace: network
+            sectionName: https
+        rules:
+          - matches:
+              - path:
+                  value: /webhook
+            backendRefs: [{}]

@@ -1,0 +1,43 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: &app searxng
+  namespace: &namespace selfhosted
+spec:
+  dependsOn:
+    - name: dragonfly-operator
+      namespace: database
+    - name: external-secrets-stores
+      namespace: external-secrets
+    - name: onepassword-connect
+      namespace: external-secrets
+    - name: valkey
+      namespace: database
+  components:
+    - ../../../../components/valkey
+  targetNamespace: *namespace
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *app
+  #  decryption:
+  #    provider: sops
+  #    secretRef:
+  #      name: sops-age
+  path: ./kubernetes/apps/selfhosted/searxng/app
+  postBuild:
+    substitute:
+      APP: *app
+    substituteFrom:
+      - name: cluster-secrets
+        kind: Secret
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  wait: false
+  interval: 30m
+  retryInterval: 1m
+  timeout: 5m
