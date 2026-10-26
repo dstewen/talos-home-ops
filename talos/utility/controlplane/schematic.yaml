@@ -1,19 +1,13 @@
----
+# Used for Intel NUC2 control plane node
 customization:
   extraKernelArgs:
-    - apparmor=0 # Less security, faster puter
-    - init_on_alloc=0 # Less security, faster puter
-    - init_on_free=0 # Less security, faster puter
-    - amd_iommu=on # PCI Passthrough
-    - amd_pstate=active # AMD P-State Driver
-    - iommu=pt # PCI Passthrough
-    - pcie_aspm=off # Disable PCIe ASPM
-    - mitigations=off # Less security, faster puter
-    - security=none # Less security, faster puter
-    - talos.auditd.disabled=1 # Less security, faster puter
+    - console=ttyS0,115200 # Intel vPro serial
 
   systemExtensions:
     officialExtensions:
-      - siderolabs/amdgpu # AMD GPU
-      - siderolabs/amd-ucode # AMD CPU
-      - siderolabs/nfsrahead # NFS Performance
+      - siderolabs/i915 # Intel iGPU (i915)
+      - siderolabs/intel-ucode # Intel iGPU
+      - siderolabs/lldpd # lldp
+      - siderolabs/mei # Intel iGPU
+      - siderolabs/nut-client
+      - siderolabs/util-linux-tools # Linux Utils

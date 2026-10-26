@@ -1,0 +1,23 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/siderolabs/talos/refs/heads/release-1.14/website/content/v1.14/schemas/config.schema.json
+apiVersion: v1alpha1
+kind: UnattendedInstallConfig
+installer:
+    image: factory.talos.dev/metal-installer/a2645a18c249a86ac47646445709014f6e6f5086ee674f77277f79869fee2e7b:v1.14.4
+provisioning:
+    diskSelector:
+        match: disk.serial == "BTHH81000E09512D"
+    wipe: false
+---
+apiVersion: v1alpha1
+kind: KubeNodeConfig
+nodeIP:
+    validSubnets:
+        - 10.200.15.0/24
+labels:
+    node.kubernetes.io/gpu: "true"
+---
+apiVersion: v1alpha1
+kind: HostnameConfig
+auto: 'off'
+hostname: nuc2
