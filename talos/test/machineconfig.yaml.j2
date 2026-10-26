@@ -139,7 +139,7 @@ content: |
 apiVersion: v1alpha1
 kind: KubeNodeConfig
 nodeIP:
-  validSubnets: ["10.69.1.0/24"]
+  validSubnets: ["10.200.15.0/24"]
 labels:
   topology.kubernetes.io/region: k8s
   topology.kubernetes.io/zone: {{ 'm' if ENV.MACHINE_TYPE == 'controlplane' else 'w' }}
