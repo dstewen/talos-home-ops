@@ -36,7 +36,7 @@ tls /data/certificates/wildcard.crt /data/certificates/wildcard.key
 ## Cert sync
 
 The `caddy-cert-sync` CronJob (`kubernetes/apps/main/network/cert-sync.yaml`)
-copies the `jory-dev-tls` wildcard cert to voyager daily and restarts CaddyV2.
+copies the `davidstewen.com-tls` wildcard cert to voyager daily and restarts CaddyV2.
 Trigger it manually:
 
 ```sh

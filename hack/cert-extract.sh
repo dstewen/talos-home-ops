@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export TLS_CERT="jory-dev-tls"
+export TLS_CERT="davidstewen.com-tls"
 export TLS_NAMESPACE="network"
 CERT_DIR="/tmp/cert"
 CERT_TMP="$CERT_DIR/tmp"

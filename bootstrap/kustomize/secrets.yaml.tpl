@@ -43,7 +43,7 @@ stringData:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: jory-dev-tls
+  name: davidstewen.com-tls
   namespace: kube-system
   annotations:
     cert-manager.io/alt-names: '*.davidstewen.com,davidstewen.com'
