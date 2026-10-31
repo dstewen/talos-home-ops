@@ -10,4 +10,4 @@ spec:
     operation: copy
   ref:
     tag: v1.0.1
-  url: oci://ocharted.davidstewen.com/rocm.github.io/k8s-gpu-dra-driver/k8s-gpu-dra-driver
+  url: oci://ocharted.jory.dev/rocm.github.io/k8s-gpu-dra-driver/k8s-gpu-dra-driver

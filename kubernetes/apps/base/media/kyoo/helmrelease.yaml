@@ -49,7 +49,7 @@ spec:
               path: /api/health
               conditions: ["[STATUS] == 200"]
         spec:
-          hostnames: ["kyoo.davidstewen.com"]
+          hostnames: ["kyoo.jory.dev"]
           parentRefs:
             - name: envoy-external
               namespace: network
@@ -161,8 +161,8 @@ spec:
     ingress:
       enabled: false
     kyoo:
-      address: https://kyoo.davidstewen.com
-      middlewareRootURL: https://kyoo.davidstewen.com
+      address: https://kyoo.jory.dev
+      middlewareRootURL: https://kyoo.jory.dev
       transcoderAcceleration: vaapi # hardware acceleration profile (valid values: disabled, vaapi, qsv, nvidia)
       auth:
         apikeys:
@@ -174,10 +174,10 @@ spec:
           existingSecret: *secret
           clientIdKey: OIDC_AUTHENTIK_CLIENTID
           clientSecretKey: OIDC_AUTHENTIK_SECRET
-          logo: https://sso.davidstewen.com/static/dist/assets/icons/icon.png
-          authorizationAddress: https://sso.davidstewen.com/application/o/authorize/
-          tokenAddress: https://sso.davidstewen.com/application/o/token/
-          profileAddress: https://sso.davidstewen.com/application/o/userinfo/
+          logo: https://sso.jory.dev/static/dist/assets/icons/icon.png
+          authorizationAddress: https://sso.jory.dev/application/o/authorize/
+          tokenAddress: https://sso.jory.dev/application/o/token/
+          profileAddress: https://sso.jory.dev/application/o/userinfo/
           scope: "openid email profile"
           authMethod: ClientSecretBasic
     media:

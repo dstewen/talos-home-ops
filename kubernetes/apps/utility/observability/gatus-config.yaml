@@ -22,9 +22,9 @@ ui:
     - name: Homelab
       link: https://github.com/joryirving/home-ops
     - name: Main Status
-      link: https://status.davidstewen.com
+      link: https://status.jory.dev
     - name: Columbina Status
-      link: https://columbina-gatus.davidstewen.com
+      link: https://columbina-gatus.jory.dev
 
 web:
   port: ${GATUS_WEB_PORT}

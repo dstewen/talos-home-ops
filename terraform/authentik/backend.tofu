@@ -5,7 +5,7 @@ terraform {
     region = "ca-west-1"
 
     endpoints = {
-      s3 = "https://s3.davidstewen.com"
+      s3 = "https://s3.jory.dev"
     }
 
     skip_credentials_validation = true

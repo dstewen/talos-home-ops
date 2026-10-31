@@ -163,7 +163,7 @@ spec:
             port: *dashboard_port
     route:
       app:
-        hostnames: ["hermes.davidstewen.com"]
+        hostnames: ["hermes.jory.dev"]
         parentRefs:
           - name: envoy-internal
             namespace: network
@@ -172,7 +172,7 @@ spec:
               - identifier: dashboard
                 port: http
       codeserver:
-        hostnames: ["hermes-code.davidstewen.com"]
+        hostnames: ["hermes-code.jory.dev"]
         parentRefs:
           - name: envoy-internal
             namespace: network

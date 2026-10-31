@@ -66,7 +66,7 @@ spec:
                   - ALL
     route:
       app:
-        hostnames: ["grafana-mcp.davidstewen.com"]
+        hostnames: ["grafana-mcp.jory.dev"]
         parentRefs:
           - name: envoy-internal
             namespace: network

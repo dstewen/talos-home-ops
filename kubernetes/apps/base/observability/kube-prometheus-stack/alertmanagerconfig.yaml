@@ -61,7 +61,7 @@ spec:
         - urlSecret:
             name: alertmanager-secret
             key: ALERTMANAGER_HEARTBEAT_URL
-        - url: https://columbina-gatus.davidstewen.com/api/v1/endpoints/heartbeat_${CLUSTER}/external?success=true
+        - url: https://columbina-gatus.jory.dev/api/v1/endpoints/heartbeat_${CLUSTER}/external?success=true
           httpConfig:
             bearerTokenSecret:
               name: alertmanager-secret

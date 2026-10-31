@@ -86,7 +86,7 @@ spec:
           - path: /data
     route:
       app:
-        hostnames: ["matrix.davidstewen.com"]
+        hostnames: ["matrix.jory.dev"]
         parentRefs:
           - name: envoy-external
             namespace: network

@@ -6,7 +6,7 @@ metadata:
   name: forgejo
 spec:
   hostnames:
-    - forgejo.davidstewen.com
+    - forgejo.jory.dev
   parentRefs:
     - name: envoy-internal
       namespace: network

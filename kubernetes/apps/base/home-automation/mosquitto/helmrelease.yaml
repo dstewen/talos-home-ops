@@ -68,7 +68,7 @@ spec:
       app:
         type: LoadBalancer
         annotations:
-          external-dns.kubernetes.io/hostname: mqtt.davidstewen.com
+          external-dns.kubernetes.io/hostname: mqtt.jory.dev
           gatus.home-operations.com/endpoint: |-
             group: services
           lbipam.cilium.io/ips: 10.69.10.134

@@ -42,4 +42,4 @@ spec:
             protocol: TCP
             port: 9099
         annotations:
-          external-dns.kubernetes.io/hostname: exporters.davidstewen.com
+          external-dns.kubernetes.io/hostname: exporters.jory.dev

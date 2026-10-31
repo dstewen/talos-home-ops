@@ -7,7 +7,7 @@
   "editor.guides.bracketPairsHorizontal": true,
   "editor.guides.highlightActiveBracketPair": true,
   "editor.hover.delay": 1500,
-  "editor.rulers": [],
+  "editor.rulers": [100],
   "editor.stickyScroll.enabled": false,
   "explorer.autoReveal": true,
   "files.associations": {

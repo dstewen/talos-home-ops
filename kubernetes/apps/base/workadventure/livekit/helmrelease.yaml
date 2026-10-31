@@ -79,7 +79,7 @@ spec:
         annotations:
           gatus.home-operations.com/endpoint: |-
             conditions: ["[STATUS] == 200"]
-        hostnames: ["livekit.davidstewen.com"]
+        hostnames: ["livekit.jory.dev"]
         parentRefs:
           - name: envoy-external
             namespace: network

@@ -79,7 +79,7 @@ spec:
                 subPath: transcode
     route:
       app:
-        hostnames: ["tv.davidstewen.com"]
+        hostnames: ["tv.jory.dev"]
         parentRefs:
           - name: envoy-external
             namespace: network

@@ -241,4 +241,4 @@
       ansible.builtin.debug:
         msg: >-
           Create the Kubernetes agent invite after DNS resolves:
-          docker exec towonel-hub towonel invite create --name home-ops --hostnames '*.davidstewen.com'
+          docker exec towonel-hub towonel invite create --name home-ops --hostnames '*.jory.dev'

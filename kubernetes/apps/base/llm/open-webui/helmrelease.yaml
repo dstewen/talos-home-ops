@@ -61,7 +61,7 @@ spec:
           - path: /app/backend/data
     route:
       app:
-        hostnames: ["chat.davidstewen.com"]
+        hostnames: ["chat.jory.dev"]
         parentRefs:
           - name: envoy-external
             namespace: network

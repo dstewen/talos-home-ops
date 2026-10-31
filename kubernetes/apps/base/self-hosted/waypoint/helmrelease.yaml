@@ -28,7 +28,7 @@ spec:
               repository: ghcr.io/ctrl-research/waypoint
               tag: 0.0.20@sha256:a9eb140aa7962a1856c953bfe52a2f09bd3e803a7b6bcfc943d0f6f9c099f9eb
             env:
-              WAYPOINT_BASE_URL: https://travel.davidstewen.com
+              WAYPOINT_BASE_URL: https://travel.jory.dev
               WAYPOINT_DATABASE_URL:
                 valueFrom:
                   secretKeyRef:
@@ -61,7 +61,7 @@ spec:
         existingClaim: "{{ .Release.Name }}"
     route:
       app:
-        hostnames: ["travel.davidstewen.com"]
+        hostnames: ["travel.jory.dev"]
         parentRefs:
           - name: envoy-external
             namespace: network

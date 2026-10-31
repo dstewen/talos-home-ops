@@ -26,14 +26,14 @@ spec:
           app:
             image:
               repository: ghcr.io/joryirving/sonarr
-              tag: 5.0.0.2785@sha256:a36bd0f98a1c4db8848cc9309a041d05cd9ca9d91e338d77c7b3908af1cfc9cb
+              tag: 5.0.0.2800@sha256:230b66294efdb7960671e00fbd9ecbbec142439b735d977535a974ce104f80e4
             env:
               SONARR__APP__INSTANCENAME: Sonarr
               SONARR__APP__THEME: dark
               SONARR__AUTH__METHOD: Oidc
-              SONARR__AUTH__OIDCAUTHORITY: https://sso.davidstewen.com/application/o/sonarr/
+              SONARR__AUTH__OIDCAUTHORITY: https://sso.jory.dev/application/o/sonarr/
               SONARR__AUTH__OIDCSCOPES: "openid profile email"
-              SONARR__AUTH__OIDCUSERIDENTIFIER: jory@davidstewen.com
+              SONARR__AUTH__OIDCUSERIDENTIFIER: jory@jory.dev
               SONARR__AUTH__REQUIRED: Enabled
               SONARR__LOG__DBENABLED: "False"
               SONARR__LOG__LEVEL: info
@@ -98,7 +98,7 @@ spec:
         type: emptyDir
     route:
       app:
-        hostnames: ["{{ .Release.Name }}.davidstewen.com"]
+        hostnames: ["{{ .Release.Name }}.jory.dev"]
         parentRefs:
           - name: envoy-internal
             namespace: network

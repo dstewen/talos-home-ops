@@ -95,7 +95,7 @@ spec:
                 subPath: tmp
     route:
       app:
-        hostnames: ["stash.davidstewen.com"]
+        hostnames: ["stash.jory.dev"]
         parentRefs:
           - name: envoy-internal
             namespace: network

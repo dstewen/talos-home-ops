@@ -9,7 +9,7 @@ ansible-galaxy collection install -r ansible/columbina/requirements.yaml
 ansible-playbook -i ansible/columbina/inventory.yaml ansible/columbina/playbook.yaml
 ```
 
-After `towonel.davidstewen.com` resolves to the VPS and the hub is healthy, create a
+After `towonel.jory.dev` resolves to the VPS and the hub is healthy, create a
 hub API key for the towonel operator and store it in 1Password:
 
 - item: `towonel-tunnel`
@@ -34,7 +34,7 @@ these fields in the `kubernetes` vault:
 - item `discord`, field `DISCORD_WEBHOOK_URL`
 - item `alertmanager`, field `GATUS_HEARTBEAT_TOKEN` (shared with both
   clusters' Alertmanager, which pushes Watchdog heartbeats to
-  `https://columbina-gatus.davidstewen.com/api/v1/endpoints/heartbeat_<cluster>/external?success=true`)
+  `https://columbina-gatus.jory.dev/api/v1/endpoints/heartbeat_<cluster>/external?success=true`)
 
 Important state lives in `/opt/towonel/data`. Back up at least:
 

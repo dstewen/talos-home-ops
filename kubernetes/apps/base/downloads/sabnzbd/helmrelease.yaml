@@ -55,7 +55,7 @@ spec:
                 "{{ .Release.Name }}.downloads.svc",
                 "{{ .Release.Name }}.downloads.svc.cluster",
                 "{{ .Release.Name }}.downloads.svc.cluster.local",
-                sab.davidstewen.com
+                sab.jory.dev
             envFrom:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"
@@ -97,7 +97,7 @@ spec:
         type: emptyDir
     route:
       app:
-        hostnames: ["sab.davidstewen.com"]
+        hostnames: ["sab.jory.dev"]
         parentRefs:
           - name: envoy-internal
             namespace: network

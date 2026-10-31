@@ -100,7 +100,7 @@ spec:
           - path: /config
     route:
       app:
-        hostnames: ["wikis.davidstewen.com"]
+        hostnames: ["wikis.jory.dev"]
         parentRefs:
           - name: envoy-internal
             namespace: network

@@ -3,9 +3,9 @@
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: davidstewen.com
+  name: jory-dev
 spec:
-  dnsNames: ["davidstewen.com", "*.davidstewen.com"]
+  dnsNames: ["jory.dev", "*.jory.dev"]
   duration: 160h
   issuerRef:
     name: letsencrypt-production
@@ -14,6 +14,6 @@ spec:
     algorithm: ECDSA
     size: 256
     rotationPolicy: Always
-  secretName: davidstewen.com-tls
+  secretName: jory-dev-tls
   usages:
     - digital signature

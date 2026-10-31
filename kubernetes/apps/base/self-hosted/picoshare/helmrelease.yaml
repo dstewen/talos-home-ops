@@ -51,7 +51,7 @@ spec:
 
     route:
       app:
-        hostnames: ["share.davidstewen.com"]
+        hostnames: ["share.jory.dev"]
         parentRefs:
           - name: envoy-external
             namespace: network

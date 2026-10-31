@@ -25,7 +25,7 @@ spec:
               tag: v1.34.4
             env:
               WA_PROTO: https
-              WA_HOST: gather.davidstewen.com
+              WA_HOST: gather.jory.dev
               REDIS_HOST: "{{ .Release.Name }}-dragonfly"
               ENABLE_MAP_EDITOR: "true"
               MAX_PER_GROUP: "1000"
@@ -35,23 +35,23 @@ spec:
               UPLOAD_MAX_FILESIZE: "10485760"
               API_URL: "{{ .Release.Name }}-back:50051"
               ICON_URL: /icon
-              UPLOADER_URL: https://gather.davidstewen.com/uploader
-              PUSHER_URL: https://gather.davidstewen.com
-              FRONT_URL: https://gather.davidstewen.com
-              PUBLIC_MAP_STORAGE_URL: https://gather.davidstewen.com/map-storage
+              UPLOADER_URL: https://gather.jory.dev/uploader
+              PUSHER_URL: https://gather.jory.dev
+              FRONT_URL: https://gather.jory.dev
+              PUBLIC_MAP_STORAGE_URL: https://gather.jory.dev/map-storage
               INTERNAL_MAP_STORAGE_URL: "http://{{ .Release.Name }}-mapstorage:3000"
               ENABLE_OPENAPI_ENDPOINT: "true"
               ROOM_API_PORT: "50051"
               MAP_STORAGE_PATH_PREFIX: /map-storage
-              ALLOWED_CORS_ORIGIN: https://gather.davidstewen.com
+              ALLOWED_CORS_ORIGIN: https://gather.jory.dev
               DISABLE_ANONYMOUS: "true"
               START_ROOM_URL: /_/global/workadventure.github.io/map-starter-kit/office.tmj
               MATRIX_API_URI: http://synapse.workadventure.svc.cluster.local:8008/
-              MATRIX_PUBLIC_URI: https://matrix.davidstewen.com/
-              MATRIX_DOMAIN: matrix.davidstewen.com
+              MATRIX_PUBLIC_URI: https://matrix.jory.dev/
+              MATRIX_DOMAIN: matrix.jory.dev
               MATRIX_ADMIN_USER: workadventure
-              STUN_SERVER: stun:turn.davidstewen.com:3478
-              TURN_SERVER: turn:turn.davidstewen.com:3478
+              STUN_SERVER: stun:turn.jory.dev:3478
+              TURN_SERVER: turn:turn.jory.dev:3478
             envFrom:
               - secretRef:
                   name: "{{ .Release.Name }}"
@@ -92,19 +92,19 @@ spec:
               tag: v1.34.4
             env:
               WA_PROTO: https
-              WA_HOST: gather.davidstewen.com
+              WA_HOST: gather.jory.dev
               REDIS_HOST: "{{ .Release.Name }}-dragonfly"
               ENABLE_MAP_EDITOR: "true"
-              LIVEKIT_HOST: https://livekit.davidstewen.com
+              LIVEKIT_HOST: https://livekit.jory.dev
               MAX_PER_GROUP: "1000"
               ENABLE_CHAT: "true"
               ENABLE_CHAT_UPLOAD: "true"
               ENABLE_TUTORIAL: "true"
               UPLOAD_MAX_FILESIZE: "10485760"
-              PLAY_URL: https://gather.davidstewen.com
+              PLAY_URL: https://gather.jory.dev
               MAP_STORAGE_URL: "{{ .Release.Name }}-mapstorage:50053"
               INTERNAL_MAP_STORAGE_URL: "http://{{ .Release.Name }}-mapstorage:3000"
-              PUBLIC_MAP_STORAGE_URL: https://gather.davidstewen.com/map-storage
+              PUBLIC_MAP_STORAGE_URL: https://gather.jory.dev/map-storage
               STORE_VARIABLES_FOR_LOCAL_MAPS: "true"
               PLAYER_VARIABLES_MAX_TTL: "-1"
             envFrom:
@@ -139,7 +139,7 @@ spec:
               tag: v1.34.4
             env:
               WA_PROTO: https
-              WA_HOST: gather.davidstewen.com
+              WA_HOST: gather.jory.dev
               REDIS_HOST: "{{ .Release.Name }}-dragonfly"
               ENABLE_MAP_EDITOR: "true"
               MAX_PER_GROUP: "1000"
@@ -149,7 +149,7 @@ spec:
               UPLOAD_MAX_FILESIZE: "10485760"
               API_URL: "{{ .Release.Name }}-back:50051"
               PATH_PREFIX: /map-storage
-              ENTITY_COLLECTION_URLS: "https://gather.davidstewen.com/collections/FurnitureCollection.json,https://gather.davidstewen.com/collections/OfficeCollection.json"
+              ENTITY_COLLECTION_URLS: "https://gather.jory.dev/collections/FurnitureCollection.json,https://gather.jory.dev/collections/OfficeCollection.json"
               PUSHER_URL: /
               ENABLE_BASIC_AUTHENTICATION: "true"
               AUTHENTICATION_USER: admin
@@ -188,7 +188,7 @@ spec:
               tag: v1.34.4
             env:
               WA_PROTO: https
-              WA_HOST: gather.davidstewen.com
+              WA_HOST: gather.jory.dev
               REDIS_HOST: "{{ .Release.Name }}-dragonfly"
               ENABLE_MAP_EDITOR: "true"
               MAX_PER_GROUP: "1000"
@@ -196,7 +196,7 @@ spec:
               ENABLE_CHAT_UPLOAD: "true"
               ENABLE_TUTORIAL: "true"
               UPLOAD_MAX_FILESIZE: "10485760"
-              UPLOADER_URL: https://gather.davidstewen.com/uploader
+              UPLOADER_URL: https://gather.jory.dev/uploader
               REDIS_PORT: "6379"
               REDIS_DB_NUMBER: "1"
             envFrom:
@@ -250,7 +250,7 @@ spec:
         annotations:
           gatus.home-operations.com/endpoint: |-
             conditions: ["[STATUS] == 404"]
-        hostnames: ["gather.davidstewen.com"]
+        hostnames: ["gather.jory.dev"]
         parentRefs:
           - name: envoy-external
             namespace: network

@@ -391,7 +391,7 @@ data:
         allow: ["discord", "lossless-claw", "memini", "searxng", "comfy", "memory-wiki", "chart-renderer", "youtube-tldw", "reddit-thread", "facebook-listing", "sage-environment", "sage-reference-memory", "minimax", "litellm", "browser", "admin-http-rpc", "openai", "device-pair"],
         entries: {
           discord: { enabled: true },
-          "device-pair": { enabled: true, config: { publicUrl: "https://miso.davidstewen.com" } },
+          "device-pair": { enabled: true, config: { publicUrl: "https://miso.jory.dev" } },
           "chart-renderer": { enabled: true },
           "youtube-tldw": { enabled: true },
           "reddit-thread": { enabled: true },
@@ -564,11 +564,11 @@ data:
       gateway: {
         auth: { mode: "token", token: "$${OPENCLAW_GATEWAY_TOKEN}" },
         tools: { allow: ["sessions_send"] },
-        controlUi: { allowedOrigins: ["https://miso.davidstewen.com"],},
+        controlUi: { allowedOrigins: ["https://miso.jory.dev"],},
         mode: "local",
         bind: "lan",
         port: 18789,
-        publicOrigin: "https://miso.davidstewen.com",
+        publicOrigin: "https://miso.jory.dev",
         trustedProxies: ["10.42.0.0/16"]
       },
       messages: {
@@ -577,7 +577,7 @@ data:
       mcp: {
         apps: {
           enabled: true,
-          sandboxOrigin: "https://miso-widgets.davidstewen.com",
+          sandboxOrigin: "https://miso-widgets.jory.dev",
           sandboxPort: 18790,
         },
         servers: {
@@ -602,7 +602,7 @@ data:
             oauth: {
               identity: "per-requester",
               scope: "read content",
-              redirectUrl: "https://miso.davidstewen.com/oauth/mcp/callback",
+              redirectUrl: "https://miso.jory.dev/oauth/mcp/callback",
             },
           },
           waypoint: {

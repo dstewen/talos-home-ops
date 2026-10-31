@@ -22,7 +22,7 @@ kubernetes/apps/main/llm/toolhive.yaml   # every Flux Kustomization above
   `mcp-tools`. Tool name conflicts are resolved by a `{workload}_` prefix. Sessions are kept
   in the `toolhive-config` Dragonfly.
 - **In-cluster**: `vmcp-mcp-gateway-internal.llm:4483`, anonymous (no key).
-- **Public**: `mcp.davidstewen.com` through `envoy-external`. An Envoy `SecurityPolicy` enforces
+- **Public**: `mcp.jory.dev` through `envoy-external`. An Envoy `SecurityPolicy` enforces
   `apiKeyAuth` on the `x-api-key` header, with keys from the `mcp-gateway-api-keys` Secret
   (1Password `toolhive` item). Gatus expects a 401 without a key.
 - **Optimizer**: tool embeddings come from the LiteLLM `embed` model

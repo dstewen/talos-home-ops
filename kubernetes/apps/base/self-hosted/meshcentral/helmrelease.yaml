@@ -30,7 +30,7 @@ spec:
             env:
               TZ: America/Edmonton
               NODE_ENV: production
-              HOSTNAME: &host mesh.davidstewen.com
+              HOSTNAME: &host mesh.jory.dev
               ALLOW_NEW_ACCOUNTS: "false"
             securityContext:
               allowPrivilegeEscalation: false

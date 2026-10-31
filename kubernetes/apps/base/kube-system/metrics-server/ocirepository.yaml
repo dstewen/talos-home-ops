@@ -11,4 +11,4 @@ spec:
     operation: copy
   ref:
     tag: 3.14.0
-  url: oci://ocharted.davidstewen.com/kubernetes-sigs.github.io/metrics-server/metrics-server
+  url: oci://ocharted.jory.dev/kubernetes-sigs.github.io/metrics-server/metrics-server

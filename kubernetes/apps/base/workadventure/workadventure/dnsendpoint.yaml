@@ -6,9 +6,9 @@ metadata:
   name: coturn
 spec:
   endpoints:
-    - dnsName: "turn.davidstewen.com"
+    - dnsName: "turn.jory.dev"
       recordType: CNAME
-      targets: ["towonel.davidstewen.com"]
+      targets: ["towonel.jory.dev"]
       providerSpecific:
         - name: external-dns.kubernetes.io/cloudflare-proxied
           value: "false"

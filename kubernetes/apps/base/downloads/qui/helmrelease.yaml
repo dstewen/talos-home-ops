@@ -70,7 +70,7 @@ spec:
           - path: /media/Downloads
     route:
       app:
-        hostnames: ["{{ .Release.Name }}.davidstewen.com"]
+        hostnames: ["{{ .Release.Name }}.jory.dev"]
         parentRefs:
           - name: envoy-internal
             namespace: network

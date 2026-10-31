@@ -32,7 +32,7 @@ spec:
               tag: 1.43.5.11029@sha256:6204850ae6aba7639d97788a2693f941c52584cc6e47de346b40b0a076c56b9a
             env:
               TZ: America/Edmonton
-              PLEX_ADVERTISE_URL: "https://{{ .Release.Name }}.davidstewen.com:443,http://10.69.10.35:32400,http://plex.media.svc.cluster.local:32400"
+              PLEX_ADVERTISE_URL: "https://{{ .Release.Name }}.jory.dev:443,http://10.69.10.35:32400,http://plex.media.svc.cluster.local:32400"
               PLEX_NO_AUTH_NETWORKS: 10.42.0.0/16,192.168.30.0/24
             probes:
               liveness: &probes
@@ -84,7 +84,7 @@ spec:
           gatus.home-operations.com/endpoint: |-
             path: /identity
         hostnames:
-          - "{{ .Release.Name }}.davidstewen.com"
+          - "{{ .Release.Name }}.jory.dev"
         parentRefs:
           - name: envoy-external
             namespace: network

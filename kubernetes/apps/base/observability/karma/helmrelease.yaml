@@ -61,7 +61,7 @@ spec:
                 subPath: config
     route:
       app:
-        hostnames: ["{{ .Release.Name }}.davidstewen.com"]
+        hostnames: ["{{ .Release.Name }}.jory.dev"]
         parentRefs:
           - name: envoy-external
             namespace: network

@@ -11,7 +11,7 @@ spec:
     name: mcp-tools
   env:
     - name: HOMEASSISTANT_URL
-      value: https://hass.davidstewen.com
+      value: https://hass.jory.dev
   secrets:
     - name: toolhive-home-assistant
       key: HOMEASSISTANT_TOKEN

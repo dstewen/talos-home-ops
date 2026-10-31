@@ -59,7 +59,7 @@ spec:
         type: emptyDir
     route:
       app:
-        hostnames: ["requests.davidstewen.com"]
+        hostnames: ["requests.jory.dev"]
         parentRefs:
           - name: envoy-external
             namespace: network

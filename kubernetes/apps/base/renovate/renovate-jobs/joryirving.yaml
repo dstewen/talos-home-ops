@@ -74,7 +74,7 @@ spec:
           },
           {
             "hostType": "docker",
-            "matchHost": "ocharted.davidstewen.com",
+            "matchHost": "ocharted.jory.dev",
             "allowInternal": true
           }
         ]

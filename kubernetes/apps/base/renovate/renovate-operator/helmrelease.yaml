@@ -14,7 +14,7 @@ spec:
     route:
       enabled: true
       hostnames:
-        - renovate.davidstewen.com
+        - renovate.jory.dev
       parentRefs:
         - name: envoy-internal
           namespace: network

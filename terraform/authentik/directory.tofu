@@ -34,7 +34,7 @@ resource "authentik_policy_binding" "application_policy_binding" {
 resource "authentik_user" "Jory" {
   username = "LilDrunkenSmurf"
   name     = "Jory Irving"
-  email    = "jory@davidstewen.com"
+  email    = "jory@jory.dev"
   groups = concat(
     [data.authentik_group.admins.id],
     values(authentik_group.default)[*].id

@@ -191,7 +191,7 @@ spec:
         route:
           enabled: true
           host:
-            name: rgw.davidstewen.com
+            name: rgw.jory.dev
             path: /
             pathType: PathPrefix
           parentRefs:
@@ -213,7 +213,7 @@ spec:
     route:
       dashboard:
         host:
-          name: rook.davidstewen.com
+          name: rook.jory.dev
           path: /
           pathType: PathPrefix
         parentRefs:

@@ -16,7 +16,7 @@ spec:
               name: cloudflare
               key: CLOUDFLARE_DNS_TOKEN
         selector:
-          dnsZones: ["davidstewen.com"]
+          dnsZones: ["jory.dev"]
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cert-manager.io/clusterissuer_v1.json
 apiVersion: cert-manager.io/v1
@@ -36,4 +36,4 @@ spec:
               name: cloudflare
               key: CLOUDFLARE_DNS_TOKEN
         selector:
-          dnsZones: ["davidstewen.com"]
+          dnsZones: ["jory.dev"]

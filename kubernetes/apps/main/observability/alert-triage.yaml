@@ -11,7 +11,7 @@ spec:
     substitute:
       LOGS_URL: http://victoria-logs-server.observability.svc.cluster.local:9428
       LOGS_FLAVOR: victorialogs
-      GRAFANA_URL: https://grafana.davidstewen.com
+      GRAFANA_URL: https://grafana.jory.dev
       GRAFANA_METRICS_DS: df062450-90bc-4bee-a5e7-08371b2919b8
   wait: false
   prune: true

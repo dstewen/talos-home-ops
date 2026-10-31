@@ -23,7 +23,7 @@ spec:
               repository: ghcr.io/searxng/searxng
               tag: 2026.10.25-54ca1d9cf@sha256:23482d8ecf7ddf66029479468ea04c1bb11d2b65785a17a7e629e2ffd13296ca
             env:
-              SEARXNG_BASE_URL: https://search.davidstewen.com
+              SEARXNG_BASE_URL: https://search.jory.dev
               SEARXNG_PORT: &port 8080
               SEARXNG_REDIS_URL: "redis://{{ .Release.Name }}-dragonfly:6379"
             envFrom:
@@ -77,7 +77,7 @@ spec:
           - path: /tmp
     route:
       app:
-        hostnames: ["search.davidstewen.com"]
+        hostnames: ["search.jory.dev"]
         parentRefs:
           - name: envoy-external
             namespace: network

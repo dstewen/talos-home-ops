@@ -74,7 +74,7 @@ spec:
         type: emptyDir
     route:
       app:
-        hostnames: ["{{ .Release.Name }}.davidstewen.com"]
+        hostnames: ["{{ .Release.Name }}.jory.dev"]
         parentRefs:
           - name: envoy-internal
             namespace: network

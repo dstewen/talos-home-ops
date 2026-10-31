@@ -12,7 +12,7 @@ spec:
     type: ClusterIP
   route:
     hostnames:
-    - litellm.davidstewen.com
+    - litellm.jory.dev
     parentRefs:
     - name: envoy-external
       namespace: network
@@ -34,13 +34,13 @@ spec:
         key: uri
         name: litellm-app
   - name: GENERIC_AUTHORIZATION_ENDPOINT
-    value: https://sso.davidstewen.com/application/o/authorize/
+    value: https://sso.jory.dev/application/o/authorize/
   - name: GENERIC_SCOPE
     value: openid email profile litellm_role
   - name: GENERIC_TOKEN_ENDPOINT
-    value: https://sso.davidstewen.com/application/o/token/
+    value: https://sso.jory.dev/application/o/token/
   - name: GENERIC_USERINFO_ENDPOINT
-    value: https://sso.davidstewen.com/application/o/userinfo/
+    value: https://sso.jory.dev/application/o/userinfo/
   - name: GENERIC_USER_ROLE_ATTRIBUTE
     value: litellm_role
   - name: LITELLM_LOG
@@ -48,9 +48,9 @@ spec:
   - name: LITELLM_MODE
     value: PRODUCTION
   - name: PROXY_BASE_URL
-    value: https://litellm.davidstewen.com
+    value: https://litellm.jory.dev
   - name: PROXY_LOGOUT_URL
-    value: https://sso.davidstewen.com/application/o/litellm/end-session/
+    value: https://sso.jory.dev/application/o/litellm/end-session/
   - name: REDIS_HOST
     value: litellm-dragonfly
   - name: REDIS_PORT

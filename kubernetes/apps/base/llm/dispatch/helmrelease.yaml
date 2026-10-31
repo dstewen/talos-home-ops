@@ -54,7 +54,7 @@ spec:
                 memory: 512Mi
     route:
       main:
-        hostnames: ["dispatch.davidstewen.com"]
+        hostnames: ["dispatch.jory.dev"]
         parentRefs:
           - name: envoy-external
             namespace: network
