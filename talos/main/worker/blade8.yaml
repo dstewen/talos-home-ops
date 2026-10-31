@@ -1,0 +1,167 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/siderolabs/talos/refs/heads/release-1.14/website/content/v1.14/schemas/config.schema.json
+apiVersion: v1alpha1
+kind: UnattendedInstallConfig
+installer:
+  image: factory.talos.dev/metal-installer/de1619e16531ddff67ccb4ce636a5e3ba5197eb4fc0e8421f095ec50ce9d26a6:v1.14.5
+provisioning:
+  diskSelector:
+    match: disk.serial == "220628800737"
+  wipe: false
+---
+apiVersion: v1alpha1
+kind: KubeNodeConfig
+nodeIP:
+  validSubnets:
+    - 10.200.15.0/24
+labels:
+  node.kubernetes.io/gpu: "true"
+---
+apiVersion: v1alpha1
+kind: KubeletConfig
+extraArgs:
+  max-pods: "50"
+config:
+  crashLoopBackOff:
+    maxContainerRestartPeriod: 60s
+  imageMaximumGCAge: 168h
+  maxParallelImagePulls: 3
+  serializeImagePulls: false
+  shutdownGracePeriod: 90s
+  shutdownGracePeriodCriticalPods: 60s
+defaultRuntimeSeccompProfileEnabled: true
+---
+# OS disk - 500GB WD Blue
+apiVersion: v1alpha1
+kind: UserVolumeConfig
+name: local-hostpath-100gb
+volumeType: partition
+provisioning:
+  diskSelector:
+    match: disk.model == "WD Blue SN570 500GB"
+  minSize: 100GB
+  maxSize: 100GB
+---
+apiVersion: v1alpha1
+kind: WatchdogTimerConfig
+device: /dev/watchdog0
+timeout: 5m
+---
+apiVersion: v1alpha1
+kind: OOMConfig
+# Userspace OOM manager (enabled by default; was disabled here as the 1.13.0-3
+# api-server-eviction workaround — but that was a control-plane symptom and
+# skirk is a worker). On this UMA node the amdgpu GTT pins system RAM the kernel
+# OOM-killer can't reclaim, so review+self-hosted+comfyui together deadlock the
+# node (Talos stays up, so the 5m hardware watchdog never fires). This kills the
+# heaviest user pod under sustained memory PSI pressure instead. Raised 12.0 -> 20.0
+# (was culling comfyui with ~14Gi still free); raise further if it still fires under
+# normal load, but keep a margin -- unreclaimable GTT means too-high risks the deadlock.
+# Ranking drops the default `memory_max.hasValue() ? 0.0 : ...` guard: all three
+# GPU pods here have memory limits and would otherwise score 0.0 (no victim).
+# System/Podruntime stay 0.0 so kubelet/containerd are never killed.
+triggerExpression: 'memory_full_avg10 > 20.0 && d_memory_full_avg10 > 0.0 && time_since_trigger > duration("500ms")'
+cgroupRankingExpression: "{Besteffort: 1.0, Burstable: 0.5, Guaranteed: 0.0, Podruntime: 0.0, System: 0.0}[class] * double(memory_current.orValue(0u))"
+sampleInterval: 100ms
+---
+apiVersion: v1alpha1
+kind: LinkAliasConfig
+name: ethSel0
+selector:
+  match: glob("e4:5f:01:ec:16:5a", mac(link.hardware_addr))
+---
+apiVersion: v1alpha1
+kind: BondConfig
+name: bond0
+links:
+  - ethSel0
+bondMode: active-backup
+miimon: 100
+mtu: 1500
+addresses:
+  - address: 10.200.15.38/24
+routes:
+  - gateway: 10.200.15.1
+---
+apiVersion: v1alpha1
+kind: VLANConfig
+name: bond0.20
+vlanID: 20
+parent: bond0
+mtu: 1500
+---
+apiVersion: v1alpha1
+kind: VLANConfig
+name: bond0.30
+vlanID: 30
+parent: bond0
+mtu: 1500
+---
+apiVersion: v1alpha1
+kind: VLANConfig
+name: bond0.100
+vlanID: 100
+parent: bond0
+mtu: 1500
+---
+apiVersion: v1alpha1
+kind: VLANConfig
+name: bond0.110
+vlanID: 110
+parent: bond0
+mtu: 1500
+---
+apiVersion: v1alpha1
+kind: DHCPv4Config
+name: bond0
+clientIdentifier: mac
+---
+apiVersion: v1alpha1
+kind: HostnameConfig
+hostname: blade7
+---
+apiVersion: v1alpha1
+kind: TimeSyncConfig
+ntp:
+  servers:
+    - 162.159.200.1
+    - 162.159.200.123
+---
+apiVersion: v1alpha1
+kind: VolumeConfig
+name: EPHEMERAL
+provisioning:
+  diskSelector:
+    match: system_disk
+  grow: false
+  minSize: 200GiB
+  maxSize: 200GiB
+mount:
+  secure: true
+---
+apiVersion: v1alpha1
+kind: FilesystemTrimConfig
+interval: 168h0m0s
+---
+apiVersion: v1alpha1
+kind: SecurityProfileConfig
+workloadIsolation: false
+---
+apiVersion: v1alpha1
+kind: ExtensionServiceConfig
+name: nut-client
+configFiles:
+  - content: |-
+      MONITOR ups@192.168.10.23 1 upsmon_local mypassword secondary
+      SHUTDOWNCMD "/sbin/poweroff"
+    mountPath: /usr/local/etc/nut/upsmon.conf
+---
+apiVersion: v1alpha1
+kind: ExtensionServiceConfig
+name: lldpd
+configFiles:
+  - content: |-
+      configure lldp portidsubtype ifname
+      unconfigure lldp management-addresses-advertisements
+      unconfigure lldp capabilities-advertisements
+      configure system description "Talos Controller Node blade8"
+    mountPath: /usr/local/etc/lldpd/lldpd.conf

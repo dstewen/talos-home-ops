@@ -1,0 +1,14 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/siderolabs/talos/refs/heads/release-1.14/website/content/v1.14/schemas/config.schema.json
+apiVersion: v1alpha1
+kind: UnattendedInstallConfig
+installer:
+  image: factory.talos.dev/metal-installer/1dd2cbb33be2acbba7cdabb8a08d6b890592afca55e9456ef15b1e22e7003a2e:v1.14.5
+provisioning:
+  diskSelector:
+    match: disk.serial == "220628801124"
+  wipe: false
+---
+apiVersion: v1alpha1
+kind: HostnameConfig
+hostname: ms2

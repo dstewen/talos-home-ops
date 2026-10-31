@@ -26,7 +26,7 @@ cluster:
     crt: op://Kubernetes/talos-{{ ENV.CLUSTER }}/CLUSTER_AGGREGATORCA_CRT
     key: op://Kubernetes/talos-{{ ENV.CLUSTER }}/CLUSTER_AGGREGATORCA_KEY
   etcd:
-    advertisedSubnets: ["10.69.1.0/24"]
+    advertisedSubnets: ["10.200.15.0/24"]
     ca:
       crt: op://Kubernetes/talos-{{ ENV.CLUSTER }}/CLUSTER_ETCD_CA_CRT
       key: op://Kubernetes/talos-{{ ENV.CLUSTER }}/CLUSTER_ETCD_CA_KEY
@@ -62,7 +62,7 @@ clusterSecret: op://Kubernetes/talos-{{ ENV.CLUSTER }}/CLUSTER_SECRET
 apiVersion: v1alpha1
 kind: UnattendedInstallConfig
 installer:
-  image: factory.talos.dev/metal-installer/{{ ENV.SCHEMATIC }}:v1.14.4
+  image: factory.talos.dev/metal-installer/{{ ENV.SCHEMATIC }}:v1.14.5
 provisioning:
   wipe: false
 ---
@@ -89,7 +89,6 @@ kind: SysctlConfig
 params:
   fs.inotify.max_user_watches: "1048576"     # Watchdog
   fs.inotify.max_user_instances: "8192"      # Watchdog
-  net.core.default_qdisc: fq                 # 10Gb/s
   net.core.somaxconn: "8192"                # Raise listen backlog for burst handling
   net.core.netdev_max_backlog: "16384"      # Raise kernel ingress queue depth
   net.core.rmem_max: "67108864"              # 10Gb/s | Cloudflared / QUIC
@@ -100,15 +99,9 @@ params:
   net.ipv4.ping_group_range: 0 2147483647    # Allow Ping
   net.ipv4.tcp_congestion_control: bbr       # 10Gb/s
   net.ipv4.tcp_fastopen: "3"                 # Send and accept data in the opening SYN packet
-  net.ipv4.tcp_mtu_probing: "1"              # 10Gb/s | Jumbo frames
   net.ipv4.tcp_notsent_lowat: "131072"       # Allow Ping
-  net.ipv4.tcp_rmem: 4096 87380 33554432     # 10Gb/s
-  net.ipv4.tcp_wmem: 4096 65536 33554432     # 10Gb/s
   net.ipv4.tcp_slow_start_after_idle: "0"    # Allow Ping
-  net.ipv4.tcp_window_scaling: "1"           # 10Gb/s
   net.ipv4.tcp_max_syn_backlog: "8192"       # Larger SYN queue for bursty connection rates
-  sunrpc.tcp_slot_table_entries: "128"       # 10Gb/s | NFS
-  sunrpc.tcp_max_slot_table_entries: "128"   # 10Gb/s | NFS
   user.max_user_namespaces: "11255"          # User Namespaces
   vm.dirty_background_ratio: "5"            # Start writeback earlier
   vm.dirty_ratio: "20"                      # Cap dirty page buildup
@@ -121,11 +114,9 @@ name: nfsmount.conf
 mode: 0o644
 contents: |
   [ NFSMount_Global_Options ]
-  nfsvers=4.2
+  nfsvers=4.1
   hard=True
-  nconnect=16
   noatime=True
-  noresvport=True
 ---
 apiVersion: v1alpha1
 kind: CRICustomizationConfig
@@ -139,7 +130,7 @@ content: |
 apiVersion: v1alpha1
 kind: KubeNodeConfig
 nodeIP:
-  validSubnets: ["10.69.1.0/24"]
+  validSubnets: ["10.200.15.0/24"]
 labels:
   topology.kubernetes.io/region: k8s
   topology.kubernetes.io/zone: {{ 'm' if ENV.MACHINE_TYPE == 'controlplane' else 'w' }}
@@ -149,7 +140,6 @@ labels:
 ---
 apiVersion: v1alpha1
 kind: KubeletConfig
-image: ghcr.io/siderolabs/kubelet:v1.37.0
 defaultRuntimeSeccompProfileEnabled: true
 extraArgs:
   max-pods: "200"
@@ -175,7 +165,6 @@ allowedKubernetesNamespaces: ["actions-runner-system", "kube-tools"]
 ---
 apiVersion: v1alpha1
 kind: KubeAPIServerConfig
-image: registry.k8s.io/kube-apiserver:v1.37.0
 certExtraSANs: ["k8s.test.internal", "127.0.0.1"]
 extraArgs:
   enable-aggregator-routing: "true"
@@ -204,13 +193,11 @@ type: RBAC
 ---
 apiVersion: v1alpha1
 kind: KubeControllerManagerConfig
-image: registry.k8s.io/kube-controller-manager:v1.37.0
 extraArgs:
   bind-address: 0.0.0.0
 ---
 apiVersion: v1alpha1
 kind: KubeSchedulerConfig
-image: registry.k8s.io/kube-scheduler:v1.37.0
 extraArgs:
   bind-address: 0.0.0.0
 config:
@@ -232,7 +219,6 @@ config:
 apiVersion: v1alpha1
 kind: KubeProxyConfig
 enabled: false
-image: registry.k8s.io/kube-proxy:v1.37.0
 ---
 apiVersion: v1alpha1
 kind: KubeCoreDNSConfig
@@ -256,14 +242,35 @@ apiVersion: v1alpha1
 kind: BondConfig
 name: bond0
 links:
-  - enp2s0
+  - end0
 bondMode: active-backup
 miimon: 100
 ---
 apiVersion: v1alpha1
 kind: VLANConfig
-name: bond0.70
-vlanID: 70
+name: bond0.20
+vlanID: 20
+parent: bond0
+mtu: 1500
+---
+apiVersion: v1alpha1
+kind: VLANConfig
+name: bond0.30
+vlanID: 30
+parent: bond0
+mtu: 1500
+---
+apiVersion: v1alpha1
+kind: VLANConfig
+name: bond0.100
+vlanID: 100
+parent: bond0
+mtu: 1500
+---
+apiVersion: v1alpha1
+kind: VLANConfig
+name: bond0.110
+vlanID: 110
 parent: bond0
 mtu: 1500
 ---
@@ -274,11 +281,13 @@ clientIdentifier: mac
 ---
 apiVersion: v1alpha1
 kind: UserVolumeConfig
-name: local-hostpath
+name: local-hostpath-100gb
+volumeType: partition
 provisioning:
-  diskSelector:
-    match: disk.model == "KINGSTON SA400S3" && !system_disk
-  minSize: 480GB
+    diskSelector:
+        match: disk.model == "WD Blue SN570 500GB"
+    minSize: 100GB
+    maxSize: 100GB
 ---
 apiVersion: v1alpha1
 kind: WatchdogTimerConfig

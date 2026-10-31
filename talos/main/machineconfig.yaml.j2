@@ -26,7 +26,7 @@ cluster:
     crt: op://Kubernetes/talos-{{ ENV.CLUSTER }}/CLUSTER_AGGREGATORCA_CRT
     key: op://Kubernetes/talos-{{ ENV.CLUSTER }}/CLUSTER_AGGREGATORCA_KEY
   etcd:
-    advertisedSubnets: ["10.69.1.0/24"]
+    advertisedSubnets: ["10.200.15.0/24"]
     ca:
       crt: op://Kubernetes/talos-{{ ENV.CLUSTER }}/CLUSTER_ETCD_CA_CRT
       key: op://Kubernetes/talos-{{ ENV.CLUSTER }}/CLUSTER_ETCD_CA_KEY

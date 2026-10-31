@@ -1,34 +1,43 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/siderolabs/talos/refs/heads/release-1.14/website/content/v1.14/schemas/config.schema.json
 apiVersion: v1alpha1
 kind: UnattendedInstallConfig
+installer:
+  image: factory.talos.dev/metal-installer/a2645a18c249a86ac47646445709014f6e6f5086ee674f77277f79869fee2e7b:v1.14.5
 provisioning:
   diskSelector:
-    match: disk.model == "WDS500G3X0C-00SJG0"
+    match: disk.serial == "BTHH81000E09512D"
+  wipe: false
 ---
 apiVersion: v1alpha1
 kind: KubeNodeConfig
+nodeIP:
+  validSubnets:
+    - 10.200.15.0/24
 labels:
-  topology.kubernetes.io/gpus: amd
-  node-role.kubernetes.io/rocm-worker: "true"
+  node.kubernetes.io/gpu: "true"
 ---
 apiVersion: v1alpha1
 kind: KubeletConfig
 extraArgs:
   max-pods: "50"
 config:
-  registerWithTaints:
-    - key: llm-workload
-      value: "true"
-      effect: NoSchedule
+  crashLoopBackOff:
+    maxContainerRestartPeriod: 60s
+  imageMaximumGCAge: 168h
+  maxParallelImagePulls: 3
+  serializeImagePulls: false
+  shutdownGracePeriod: 90s
+  shutdownGracePeriodCriticalPods: 60s
+defaultRuntimeSeccompProfileEnabled: true
 ---
 # OS disk - 500GB WD Black
 apiVersion: v1alpha1
 kind: UserVolumeConfig
-name: local-hostpath
+name: local-hostpath-400gb
 provisioning:
   diskSelector:
-    match: disk.model == "YMTC PC41Q-2TB-B"
-  minSize: 1800GB
+    match: disk.model == "Samsung SSD 860" && !system_disk
+  minSize: 400GB
 ---
 apiVersion: v1alpha1
 kind: WatchdogTimerConfig
@@ -53,24 +62,49 @@ cgroupRankingExpression: "{Besteffort: 1.0, Burstable: 0.5, Guaranteed: 0.0, Pod
 sampleInterval: 100ms
 ---
 apiVersion: v1alpha1
+kind: LinkAliasConfig
+name: ethSel0
+selector:
+  match: glob("d4:5d:df:1a:28:c4", mac(link.hardware_addr))
+---
+apiVersion: v1alpha1
 kind: BondConfig
 name: bond0
 links:
-  - eno1
+  - ethSel0
 bondMode: active-backup
 miimon: 100
+mtu: 1500
+addresses:
+  - address: 10.200.15.62/24
+routes:
+  - gateway: 10.200.15.1
 ---
 apiVersion: v1alpha1
 kind: VLANConfig
-name: bond0.70
-vlanID: 70
+name: bond0.20
+vlanID: 20
 parent: bond0
 mtu: 1500
 ---
 apiVersion: v1alpha1
 kind: VLANConfig
-name: bond0.90
-vlanID: 90
+name: bond0.30
+vlanID: 30
+parent: bond0
+mtu: 1500
+---
+apiVersion: v1alpha1
+kind: VLANConfig
+name: bond0.100
+vlanID: 100
+parent: bond0
+mtu: 1500
+---
+apiVersion: v1alpha1
+kind: VLANConfig
+name: bond0.110
+vlanID: 110
 parent: bond0
 mtu: 1500
 ---
@@ -81,4 +115,17 @@ clientIdentifier: mac
 ---
 apiVersion: v1alpha1
 kind: HostnameConfig
-hostname: skirk
+hostname: nuc2
+---
+apiVersion: v1alpha1
+kind: TimeSyncConfig
+ntp:
+  servers:
+    - 162.159.200.1
+    - 162.159.200.123
+---
+apiVersion: v1alpha1
+kind: VolumeConfig
+name: EPHEMERAL
+mount:
+  secure: true

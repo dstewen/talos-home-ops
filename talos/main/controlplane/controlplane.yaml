@@ -67,7 +67,7 @@ clientIdentifier: mac
 # Shared across all MS-01s
 apiVersion: v1alpha1
 kind: UserVolumeConfig
-name: local-hostpath
+name: local-hostpath-1tb
 provisioning:
   diskSelector:
     match: disk.model == "WD_BLACK SN770 1TB" && !system_disk
