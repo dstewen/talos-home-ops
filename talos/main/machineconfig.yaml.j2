@@ -69,7 +69,7 @@ ntp:
 apiVersion: v1alpha1
 kind: UnattendedInstallConfig
 installer:
-  image: factory.talos.dev/metal-installer/{{ ENV.SCHEMATIC }}:v1.14.4
+  image: factory.talos.dev/metal-installer/{{ ENV.SCHEMATIC }}:v1.14.5
 provisioning:
   wipe: false
 ---
@@ -138,11 +138,9 @@ name: nfsmount.conf
 mode: 0o644
 contents: |
   [ NFSMount_Global_Options ]
-  nfsvers=4.2
+  nfsvers=4.1
   hard=True
-  nconnect=16
   noatime=True
-  noresvport=True
 ---
 apiVersion: v1alpha1
 kind: CRICustomizationConfig
@@ -156,7 +154,7 @@ content: |
 apiVersion: v1alpha1
 kind: KubeNodeConfig
 nodeIP:
-  validSubnets: ["10.69.1.0/24"]
+  validSubnets: ["10.200.15.0/24"]
 labels:
   topology.kubernetes.io/region: k8s
   topology.kubernetes.io/zone: {{ 'm' if ENV.MACHINE_TYPE == 'controlplane' else 'w' }}
@@ -166,7 +164,6 @@ labels:
 ---
 apiVersion: v1alpha1
 kind: KubeletConfig
-image: ghcr.io/siderolabs/kubelet:v1.37.0
 defaultRuntimeSeccompProfileEnabled: true
 extraArgs:
   max-pods: "200"
@@ -211,7 +208,6 @@ allowedKubernetesNamespaces: ["actions-runner-system", "kube-tools", "llm"]
 ---
 apiVersion: v1alpha1
 kind: KubeAPIServerConfig
-image: registry.k8s.io/kube-apiserver:v1.37.0
 certExtraSANs: ["k8s.main.internal", "127.0.0.1"]
 extraArgs:
   enable-aggregator-routing: "true"
@@ -240,13 +236,11 @@ type: RBAC
 ---
 apiVersion: v1alpha1
 kind: KubeControllerManagerConfig
-image: registry.k8s.io/kube-controller-manager:v1.37.0
 extraArgs:
   bind-address: 0.0.0.0
 ---
 apiVersion: v1alpha1
 kind: KubeSchedulerConfig
-image: registry.k8s.io/kube-scheduler:v1.37.0
 extraArgs:
   bind-address: 0.0.0.0
 config:
@@ -268,7 +262,6 @@ config:
 apiVersion: v1alpha1
 kind: KubeProxyConfig
 enabled: false
-image: registry.k8s.io/kube-proxy:v1.37.0
 ---
 apiVersion: v1alpha1
 kind: KubeCoreDNSConfig
