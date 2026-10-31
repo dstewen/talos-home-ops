@@ -43,12 +43,12 @@ stringData:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: jory-dev-tls
+  name: davidstewen-com-tls
   namespace: kube-system
   annotations:
-    cert-manager.io/alt-names: '*.jory.dev,jory.dev'
-    cert-manager.io/certificate-name: jory-dev
-    cert-manager.io/common-name: jory.dev
+    cert-manager.io/alt-names: '*.davidstewen.com,davidstewen.com'
+    cert-manager.io/certificate-name: davidstewen-com
+    cert-manager.io/common-name: davidstewen.com
     cert-manager.io/ip-sans: ""
     cert-manager.io/issuer-group: ""
     cert-manager.io/issuer-kind: ClusterIssuer
@@ -58,5 +58,5 @@ metadata:
     controller.cert-manager.io/fao: "true"
 type: kubernetes.io/tls
 data:
-  tls.crt: op://kubernetes/jory-dev-tls/tls.crt
-  tls.key: op://kubernetes/jory-dev-tls/tls.key
+  tls.crt: op://kubernetes/davidstewen-com-tls/tls.crt
+  tls.key: op://kubernetes/davidstewen-com-tls/tls.key

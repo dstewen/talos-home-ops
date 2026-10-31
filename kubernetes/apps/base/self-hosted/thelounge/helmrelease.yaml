@@ -48,7 +48,7 @@ spec:
         existingClaim: "{{ .Release.Name }}"
     route:
       app:
-        hostnames: ["tl.jory.dev"]
+        hostnames: ["tl.davidstewen.com"]
         parentRefs:
           - name: envoy-external
             namespace: network

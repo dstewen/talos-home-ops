@@ -27,7 +27,7 @@ spec:
               repository: ghcr.io/misospace/miso-gallery
               tag: 0.3.0@sha256:dfaebfeab270271700fb38f1c87c9457248a76116f0f228f79d7a03e4217031d
             env:
-              IMAGE_BASE_URL: https://miso-gallery.jory.dev
+              IMAGE_BASE_URL: https://miso-gallery.davidstewen.com
               GALLERY_SCAN_LIMIT: 50000
               # 0.3.0 fails closed (503) on rate-limited routes unless a shared
               # rate-limit backend is configured. This app is a single-replica,
@@ -55,7 +55,7 @@ spec:
         path: /mnt/daena/comfyui/output
     route:
       app:
-        hostnames: ["miso-gallery.jory.dev"]
+        hostnames: ["miso-gallery.davidstewen.com"]
         parentRefs:
           - name: envoy-external
             namespace: network

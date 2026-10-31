@@ -23,7 +23,7 @@ spec:
             env:
               # Application
               PAPERLESS_APPS: allauth.socialaccount.providers.openid_connect
-              PAPERLESS_URL: "https://{{ .Release.Name }}.jory.dev"
+              PAPERLESS_URL: "https://{{ .Release.Name }}.davidstewen.com"
               PAPERLESS_PORT: "8000"
               PAPERLESS_TIME_ZONE: America/Edmonton
               PAPERLESS_WEBSERVER_WORKERS: "2"
@@ -80,7 +80,7 @@ spec:
           - path: /data/nas
     route:
       app:
-        hostnames: ["{{ .Release.Name }}.jory.dev"]
+        hostnames: ["{{ .Release.Name }}.davidstewen.com"]
         parentRefs:
           - name: envoy-internal
             namespace: network

@@ -11,32 +11,31 @@ _... managed with Flux, Renovate, and GitHub Actions_ <img src="https://fonts.gs
 <div align="center">
 
 [![Discord](https://img.shields.io/discord/673534664354430999?label&logo=discord&logoColor=white&color=blue)](https://discord.gg/home-operations)&nbsp;&nbsp;
-[![Talos](https://kromgo.jory.dev/badges/talos_version)](https://talos.dev)&nbsp;&nbsp;
-[![Kubernetes](https://kromgo.jory.dev/badges/kubernetes_version)](https://kubernetes.io)&nbsp;&nbsp;
-[![Flux](https://kromgo.jory.dev/badges/flux_version)](https://fluxcd.io)&nbsp;&nbsp;
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/joryirving/home-ops)&nbsp;&nbsp;
+[![Talos](https://kromgo.davidstewen.com/badges/talos_version)](https://talos.dev)&nbsp;&nbsp;
+[![Kubernetes](https://kromgo.davidstewen.com/badges/kubernetes_version)](https://kubernetes.io)&nbsp;&nbsp;
+[![Flux](https://kromgo.davidstewen.com/badges/flux_version)](https://fluxcd.io)&nbsp;&nbsp;
 
 </div>
 
 <div align="center">
 
-[![Home-Internet](https://img.shields.io/endpoint?url=https%3A%2F%2Fhealthchecks.io%2Fbadge%2Ff0288b6a-305e-4084-b492-bb0a54%2FKkxSOeO1-2.shields&style=for-the-badge&logo=ubiquiti&logoColor=white&label=Home%20Internet)](https://status.jory.dev)&nbsp;&nbsp;
-[![Status-Page](https://img.shields.io/endpoint?url=https%3A%2F%2Fstatus.jory.dev%2Fapi%2Fv1%2Fendpoints%2Fmain-external_gatus-sidecar%2Fhealth%2Fbadge.shields&style=for-the-badge&logo=statuspage&logoColor=white&label=Status%20Page)](https://status.jory.dev/endpoints/main-external_gatus-sidecar)&nbsp;&nbsp;
-[![Columbina](https://img.shields.io/endpoint?url=https%3A%2F%2Fstatus.jory.dev%2Fapi%2Fv1%2Fendpoints%2Fbuddy_columbina%2Fhealth%2Fbadge.shields&style=for-the-badge&logo=statuspage&logoColor=white&label=Columbina)](https://status.jory.dev/endpoints/buddy_columbina)&nbsp;&nbsp;
-[![Plex](https://img.shields.io/endpoint?url=https%3A%2F%2Fstatus.jory.dev%2Fapi%2Fv1%2Fendpoints%2Fmain-external_plex%2Fhealth%2Fbadge.shields&style=for-the-badge&logo=plex&logoColor=white&label=Plex)](https://status.jory.dev/endpoints/main-external_plex)
+[![Home-Internet](https://img.shields.io/endpoint?url=https%3A%2F%2Fhealthchecks.io%2Fbadge%2Ff0288b6a-305e-4084-b492-bb0a54%2FKkxSOeO1-2.shields&style=for-the-badge&logo=ubiquiti&logoColor=white&label=Home%20Internet)](https://status.davidstewen.com)&nbsp;&nbsp;
+[![Status-Page](https://img.shields.io/endpoint?url=https%3A%2F%2Fstatus.davidstewen.com%2Fapi%2Fv1%2Fendpoints%2Fmain-external_gatus-sidecar%2Fhealth%2Fbadge.shields&style=for-the-badge&logo=statuspage&logoColor=white&label=Status%20Page)](https://status.davidstewen.com/endpoints/main-external_gatus-sidecar)&nbsp;&nbsp;
+[![Columbina](https://img.shields.io/endpoint?url=https%3A%2F%2Fstatus.davidstewen.com%2Fapi%2Fv1%2Fendpoints%2Fbuddy_columbina%2Fhealth%2Fbadge.shields&style=for-the-badge&logo=statuspage&logoColor=white&label=Columbina)](https://status.davidstewen.com/endpoints/buddy_columbina)&nbsp;&nbsp;
+[![Plex](https://img.shields.io/endpoint?url=https%3A%2F%2Fstatus.davidstewen.com%2Fapi%2Fv1%2Fendpoints%2Fmain-external_plex%2Fhealth%2Fbadge.shields&style=for-the-badge&logo=plex&logoColor=white&label=Plex)](https://status.davidstewen.com/endpoints/main-external_plex)
 
 </div>
 
 <div align="center">
 
-[![Age](https://kromgo.jory.dev/badges/cluster_birth_age)](https://github.com/home-operations/kromgo)&nbsp;&nbsp;
-[![Uptime](https://kromgo.jory.dev/badges/cluster_uptime_age)](https://github.com/home-operations/kromgo)&nbsp;&nbsp;
-[![Nodes](https://kromgo.jory.dev/badges/cluster_node_count)](https://github.com/home-operations/kromgo)&nbsp;&nbsp;
-[![Pods](https://kromgo.jory.dev/badges/cluster_pod_count)](https://github.com/home-operations/kromgo)&nbsp;&nbsp;
-[![CPU](https://kromgo.jory.dev/badges/cluster_cpu_usage)](https://github.com/home-operations/kromgo)&nbsp;&nbsp;
-[![Memory](https://kromgo.jory.dev/badges/cluster_memory_usage)](https://github.com/home-operations/kromgo)&nbsp;&nbsp;
-[![Power](https://kromgo.jory.dev/badges/cluster_power_usage)](https://github.com/home-operations/kromgo)&nbsp;&nbsp;
-[![Alerts](https://kromgo.jory.dev/badges/cluster_alert_count)](https://github.com/home-operations/kromgo)
+[![Age](https://kromgo.davidstewen.com/badges/cluster_birth_age)](https://github.com/home-operations/kromgo)&nbsp;&nbsp;
+[![Uptime](https://kromgo.davidstewen.com/badges/cluster_uptime_age)](https://github.com/home-operations/kromgo)&nbsp;&nbsp;
+[![Nodes](https://kromgo.davidstewen.com/badges/cluster_node_count)](https://github.com/home-operations/kromgo)&nbsp;&nbsp;
+[![Pods](https://kromgo.davidstewen.com/badges/cluster_pod_count)](https://github.com/home-operations/kromgo)&nbsp;&nbsp;
+[![CPU](https://kromgo.davidstewen.com/badges/cluster_cpu_usage)](https://github.com/home-operations/kromgo)&nbsp;&nbsp;
+[![Memory](https://kromgo.davidstewen.com/badges/cluster_memory_usage)](https://github.com/home-operations/kromgo)&nbsp;&nbsp;
+[![Power](https://kromgo.davidstewen.com/badges/cluster_power_usage)](https://github.com/home-operations/kromgo)&nbsp;&nbsp;
+[![Alerts](https://kromgo.davidstewen.com/badges/cluster_alert_count)](https://github.com/home-operations/kromgo)
 
 </div>
 
@@ -95,7 +94,7 @@ This Git repository contains the following directories under [Kubernetes](./kube
 <details>
   <summary>Click to see a high-level network diagram</summary>
 
-  <img src="https://raw.githubusercontent.com/joryirving/home-ops/main/docs/src/assets/network-topology.png" align="center" alt="dns"/>
+  <img src="https://raw.githubusercontent.com/dstewen/talos-home-ops/main/docs/src/assets/network-topology.png" align="center" alt="dns"/>
 </details>
 
 ---
@@ -196,24 +195,8 @@ Total RAM: 32GB
 
 ---
 
-## ⭐ Stargazers
-
-<div align="center">
-
-[![Star History Chart](https://api.star-history.com/svg?repos=joryirving/home-ops&type=Date)](https://star-history.com/#joryirving/home-ops&Date)
-
-</div>
-
----
-
 ## 🤝 Thanks
 
 Big shout out to the [cluster-template](https://github.com/onedr0p/cluster-template), and the [Home Operations](https://discord.gg/home-operations) Discord community. Be sure to check out [kubesearch.dev](https://kubesearch.dev/) for ideas on how to deploy applications or get ideas on what you may deploy.
 
 ---
-
-<div align="center">
-
-[![DeepWiki](https://img.shields.io/badge/deepwiki-purple?label=&logo=deepl&style=for-the-badge&logoColor=white)](https://deepwiki.com/joryirving/home-ops)
-
-</div>

@@ -23,7 +23,7 @@ spec:
       route:
         enabled: true
         hostnames:
-          - victoria-logs.jory.dev
+          - victoria-logs.davidstewen.com
         parentRefs:
           - name: envoy-internal
             namespace: network

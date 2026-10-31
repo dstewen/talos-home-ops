@@ -144,7 +144,7 @@ spec:
                 name: openclaw-imageui
             oidc:
               provider:
-                issuer: https://sso.jory.dev/application/o/opencode/
+                issuer: https://sso.davidstewen.com/application/o/opencode/
               clientIDRef:
                 group: ""
                 kind: Secret
@@ -153,7 +153,7 @@ spec:
                 group: ""
                 kind: Secret
                 name: opencode-oidc
-              redirectURL: https://generate.jory.dev/oauth2/callback
+              redirectURL: https://generate.davidstewen.com/oauth2/callback
               logoutPath: /logout
               scopes: ["openid", "email", "profile"]
       openclaw-codeserver-oidc:
@@ -171,7 +171,7 @@ spec:
                 name: openclaw-codeserver
             oidc:
               provider:
-                issuer: https://sso.jory.dev/application/o/opencode/
+                issuer: https://sso.davidstewen.com/application/o/opencode/
               clientIDRef:
                 group: ""
                 kind: Secret
@@ -180,7 +180,7 @@ spec:
                 group: ""
                 kind: Secret
                 name: opencode-oidc
-              redirectURL: https://miso-code.jory.dev/oauth2/callback
+              redirectURL: https://miso-code.davidstewen.com/oauth2/callback
               logoutPath: /logout
               scopes: ["openid", "email", "profile"]
     persistence:
@@ -260,7 +260,7 @@ spec:
               namespace: llm
     route:
       app:
-        hostnames: ["miso.jory.dev"]
+        hostnames: ["miso.davidstewen.com"]
         parentRefs:
           - name: envoy-internal
             namespace: network
@@ -269,7 +269,7 @@ spec:
               - name: "{{ .Release.Name }}"
                 port: *port
       codeserver:
-        hostnames: ["miso-code.jory.dev"]
+        hostnames: ["miso-code.davidstewen.com"]
         parentRefs:
           - name: envoy-internal
             namespace: network
@@ -278,7 +278,7 @@ spec:
               - name: "{{ .Release.Name }}"
                 port: &codeserverPort 12321
       imageui:
-        hostnames: ["generate.jory.dev"]
+        hostnames: ["generate.davidstewen.com"]
         parentRefs:
           - name: envoy-external
             namespace: network
@@ -287,7 +287,7 @@ spec:
               - name: "{{ .Release.Name }}"
                 port: &imageuiPort 8848
       widgets:
-        hostnames: ["miso-widgets.jory.dev"]
+        hostnames: ["miso-widgets.davidstewen.com"]
         parentRefs:
           - name: envoy-internal
             namespace: network

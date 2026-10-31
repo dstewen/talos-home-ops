@@ -82,7 +82,7 @@ jobs:
         id: analyze
         uses: misospace/pr-reviewer-action@0a2d2732f7358e509e6a85e11160eb25cc5b1b80 # v3.8.0
         env:
-          KONFLATE_MCP_URL: https://konflate.jory.dev/mcp
+          KONFLATE_MCP_URL: https://konflate.davidstewen.com/mcp
           PR_REVIEWER_GATE_HEAD_SHA: ${{ steps.prctx.outputs.head_sha }}
         with:
           github-token: ${{ steps.app-token.outputs.token }}
@@ -108,11 +108,11 @@ jobs:
           ai-smart-model: ${{ vars.SMART_MODEL }}
           smart-model-context-tokens: ${{ vars.SMART_CONTEXT_TOKENS }}
           ai-smart-api-key: ${{ secrets.LITELLM_API_KEY }}
-          allowed-source-hosts: "github.com,api.github.com,gitlab.com,registry.terraform.io,artifacthub.io,minecraft.net,www.minecraft.net,talos.dev,www.talos.dev,docs.siderolabs.com,search.jory.dev"
+          allowed-source-hosts: "github.com,api.github.com,gitlab.com,registry.terraform.io,artifacthub.io,minecraft.net,www.minecraft.net,talos.dev,www.talos.dev,docs.siderolabs.com,search.davidstewen.com"
           ci-timeout-sec: "600"
-          search-url: "https://search.jory.dev/search"
+          search-url: "https://search.davidstewen.com/search"
           tool-allowed-gh-api-repos: "*"
-          tool-mcp-servers: "konflate=https://konflate.jory.dev/mcp"
+          tool-mcp-servers: "konflate=https://konflate.davidstewen.com/mcp"
           # General conventions stay appended; focused Renovate/GitOps guidance
           # is discovered through the trusted-base repository-skill catalog.
           system-prompt-file: .agents/instructions/pr-review.instructions.md

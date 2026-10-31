@@ -63,7 +63,7 @@ spec:
               image: alpine:3.24
               env:
                 - name: TLS_CERT
-                  value: jory-dev-tls
+                  value: davidstewen-com-tls
                 - name: TLS_NAMESPACE
                   value: network
                 - name: SERVER

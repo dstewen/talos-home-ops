@@ -49,7 +49,7 @@ spec:
             port: 8188
     route:
       app:
-        hostnames: ["{{ .Release.Name }}.jory.dev"]
+        hostnames: ["{{ .Release.Name }}.davidstewen.com"]
         parentRefs:
           - name: envoy-internal
             namespace: network

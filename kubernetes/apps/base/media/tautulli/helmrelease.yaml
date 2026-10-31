@@ -29,7 +29,7 @@ spec:
               tag: 2.18.2@sha256:37fc964854b4fd40fc9cda22d7cc5caf1929171ee8b7993b8933bdffa1241734
             env:
               TZ: America/Edmonton
-              TAUTULLI_HTTP_BASE_URL: "https://{{ .Release.Name }}.jory.dev"
+              TAUTULLI_HTTP_BASE_URL: "https://{{ .Release.Name }}.davidstewen.com"
               TAUTULLI_HTTP_PORT: &port 80
             envFrom:
               - secretRef:
@@ -64,7 +64,7 @@ spec:
         type: emptyDir
     route:
       app:
-        hostnames: ["{{ .Release.Name }}.jory.dev"]
+        hostnames: ["{{ .Release.Name }}.davidstewen.com"]
         parentRefs:
           - name: envoy-external
             namespace: network

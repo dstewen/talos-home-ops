@@ -1,7 +1,7 @@
 resource "uptimerobot_monitor" "plex" {
   name = "Plex"
   type = "HTTP"
-  url  = "https://plex.jory.dev/web/index.html"
+  url  = "https://plex.davidstewen.com/web/index.html"
 
   check_ssl_errors    = true
   interval            = 300
@@ -12,7 +12,7 @@ resource "uptimerobot_monitor" "plex" {
 resource "uptimerobot_monitor" "seerr" {
   name = "Seerr"
   type = "HTTP"
-  url  = "https://requests.jory.dev"
+  url  = "https://requests.davidstewen.com"
 
   check_ssl_errors    = true
   interval            = 300
@@ -23,7 +23,7 @@ resource "uptimerobot_monitor" "seerr" {
 resource "uptimerobot_monitor" "gatus" {
   name = "Status Page"
   type = "HTTP"
-  url  = "https://status.jory.dev"
+  url  = "https://status.davidstewen.com"
 
   check_ssl_errors    = true
   interval            = 300

@@ -83,7 +83,7 @@ spec:
         - name: envoy-external
           namespace: network
       hostnames:
-        - "{{ .Release.Name }}.jory.dev"
+        - "{{ .Release.Name }}.davidstewen.com"
     resources:
       requests:
         cpu: 10m

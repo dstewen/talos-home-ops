@@ -13,5 +13,5 @@ variable "OP_CONNECT_TOKEN" {
 variable "GARAGE_URL" {
   type        = string
   description = "Garage Server URL"
-  default     = "garage-api.jory.dev"
+  default     = "garage-api.davidstewen.com"
 }

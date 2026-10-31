@@ -1,12 +1,12 @@
 {
-	email ops@jory.dev
+	email ops@davidstewen.com
 	http_port 8080
 	https_port 8443
 
 	layer4 {
 		:443 {
 			matching_timeout 15s
-			@local tls sni towonel.jory.dev columbina-gatus.jory.dev
+			@local tls sni towonel.davidstewen.com columbina-gatus.davidstewen.com
 			route @local {
 				proxy {
 					proxy_protocol v2
@@ -22,7 +22,7 @@
 			}
 		}
 		:80 {
-			@local_http http host towonel.jory.dev columbina-gatus.jory.dev
+			@local_http http host towonel.davidstewen.com columbina-gatus.davidstewen.com
 			route @local_http {
 				proxy {
 					proxy_protocol v2
@@ -56,10 +56,10 @@
 	}
 }
 
-towonel.jory.dev {
+towonel.davidstewen.com {
 	reverse_proxy towonel-hub:8443
 }
 
-columbina-gatus.jory.dev {
+columbina-gatus.davidstewen.com {
 	reverse_proxy gatus:8080
 }

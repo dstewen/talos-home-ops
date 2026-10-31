@@ -11,4 +11,4 @@ spec:
     operation: copy
   ref:
     tag: 0.20.1
-  url: oci://ocharted.jory.dev/nvidia.github.io/k8s-device-plugin/nvidia-device-plugin
+  url: oci://ocharted.davidstewen.com/nvidia.github.io/k8s-device-plugin/nvidia-device-plugin

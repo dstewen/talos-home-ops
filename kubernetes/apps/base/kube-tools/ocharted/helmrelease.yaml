@@ -34,7 +34,7 @@ spec:
           path: /healthz
           conditions: ["[STATUS] == 200"]
       hostnames:
-        - "{{ .Release.Name }}.jory.dev"
+        - "{{ .Release.Name }}.davidstewen.com"
       parentRefs:
         - name: envoy-external
           namespace: network

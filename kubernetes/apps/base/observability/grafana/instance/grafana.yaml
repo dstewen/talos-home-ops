@@ -14,7 +14,7 @@ spec:
       feedback_links_enabled: "false"
       reporting_enabled: "false"
     auth:
-      signout_redirect_url: https://sso.jory.dev/application/o/grafana/end-session/
+      signout_redirect_url: https://sso.davidstewen.com/application/o/grafana/end-session/
       oauth_auto_login: "false"
       oauth_allow_insecure_email_lookup: "true"
     auth.anonymous:
@@ -26,9 +26,9 @@ spec:
       name: authentik
       enabled: "true"
       scopes: openid email profile
-      auth_url: https://sso.jory.dev/application/o/authorize/
-      token_url: https://sso.jory.dev/application/o/token/
-      api_url: https://sso.jory.dev/application/o/userinfo/
+      auth_url: https://sso.davidstewen.com/application/o/authorize/
+      token_url: https://sso.davidstewen.com/application/o/token/
+      api_url: https://sso.davidstewen.com/application/o/userinfo/
       # Optionally map user groups to Grafana roles
       role_attribute_path: contains(groups[*], 'Grafana Admins') && 'Admin' || contains(groups[*], 'Grafana Editors') && 'Editor' || 'Viewer'
     log:
@@ -43,7 +43,7 @@ spec:
       angular_support_enabled: "true"
     server:
       enable_gzip: "true"
-      root_url: https://${SUBDOMAIN}${SUBDOMAIN_SUFFIX:=}.jory.dev
+      root_url: https://${SUBDOMAIN}${SUBDOMAIN_SUFFIX:=}.davidstewen.com
   deployment:
     spec:
       strategy:
@@ -85,7 +85,7 @@ spec:
   httpRoute:
     spec:
       hostnames:
-        - ${SUBDOMAIN}${SUBDOMAIN_SUFFIX:=}.jory.dev
+        - ${SUBDOMAIN}${SUBDOMAIN_SUFFIX:=}.davidstewen.com
       parentRefs:
         - name: envoy-external
           namespace: network

@@ -92,10 +92,10 @@ This script will grab a ZFS snapshot, rclone sync that to the remote bucket, and
 ## CNPG backups
 
 CNPG writes base backups and WAL to Garage at `s3://postgresql/<app>`
-(`https://s3.jory.dev`, see `kubernetes/components/postgres/cluster.yaml`).
+(`https://s3.davidstewen.com`, see `kubernetes/components/postgres/cluster.yaml`).
 Garage does not store a bucket as a plain directory, so a ZFS snapshot of a
 bucket "directory" is not a usable copy. Add a second rclone remote for Garage
-(e.g. `garage`, S3 endpoint `https://s3.jory.dev`) and sync bucket-to-bucket:
+(e.g. `garage`, S3 endpoint `https://s3.davidstewen.com`) and sync bucket-to-bucket:
 
 ```sh
 rclone sync garage:postgresql cloudflare-r2:postgresql \

@@ -68,7 +68,7 @@ spec:
               - path: /var/run/dbus
     route:
       app:
-        hostnames: ["scan.jory.dev"]
+        hostnames: ["scan.davidstewen.com"]
         parentRefs:
           - name: envoy-internal
             namespace: network

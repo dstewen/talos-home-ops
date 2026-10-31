@@ -7,7 +7,7 @@ connectivity:
 endpoints:
   - name: ping
     group: buddy
-    url: icmp://towonel.jory.dev
+    url: icmp://towonel.davidstewen.com
     interval: 1m
     conditions:
       - "[CONNECTED] == true"
@@ -16,7 +16,7 @@ endpoints:
 
   - name: columbina
     group: buddy
-    url: "https://columbina-gatus.jory.dev"
+    url: "https://columbina-gatus.davidstewen.com"
     interval: 1m
     conditions:
       - "[STATUS] == 200"
@@ -25,21 +25,21 @@ endpoints:
 
   - name: main-cert-expiration
     group: domain
-    url: "https://status.jory.dev"
+    url: "https://status.davidstewen.com"
     interval: 1h
     conditions:
       - "[CERTIFICATE_EXPIRATION] > 24h"
 
   - name: nas-cert-expiration
     group: domain
-    url: "https://nas.jory.dev"
+    url: "https://nas.davidstewen.com"
     interval: 1h
     conditions:
       - "[CERTIFICATE_EXPIRATION] > 24h"
 
   - name: utility-cert-expiration
     group: domain
-    url: "https://status-utility.jory.dev"
+    url: "https://status-utility.davidstewen.com"
     interval: 1h
     conditions:
       - "[CERTIFICATE_EXPIRATION] > 24h"
@@ -85,16 +85,16 @@ ui:
     - name: Homelab
       link: https://github.com/joryirving/home-ops
     - name: Utility Status
-      link: https://status-utility.jory.dev
+      link: https://status-utility.davidstewen.com
     - name: Columbina Status
-      link: https://columbina-gatus.jory.dev
+      link: https://columbina-gatus.davidstewen.com
 
 remote:
   instances:
     - endpoint-prefix: ""
-      url: "https://status-utility.jory.dev/api/v1/endpoints/statuses"
+      url: "https://status-utility.davidstewen.com/api/v1/endpoints/statuses"
     - endpoint-prefix: columbina-
-      url: "https://columbina-gatus.jory.dev/api/v1/endpoints/statuses"
+      url: "https://columbina-gatus.davidstewen.com/api/v1/endpoints/statuses"
 
 web:
   port: ${GATUS_WEB_PORT}

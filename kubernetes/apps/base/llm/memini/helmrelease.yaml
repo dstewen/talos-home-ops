@@ -120,7 +120,7 @@ spec:
     route:
       ui:
         enabled: true
-        hostnames: ["memini.jory.dev"]
+        hostnames: ["memini.davidstewen.com"]
         parentRefs:
           - name: envoy-external
             namespace: network

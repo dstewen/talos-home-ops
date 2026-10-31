@@ -7,7 +7,7 @@ connectivity:
 endpoints:
   - name: main
     group: buddy
-    url: https://status.jory.dev
+    url: https://status.davidstewen.com
     interval: 1m
     conditions:
       - "[STATUS] == 200"
@@ -16,7 +16,7 @@ endpoints:
 
   - name: utility
     group: buddy
-    url: https://status-utility.jory.dev
+    url: https://status-utility.davidstewen.com
     interval: 1m
     conditions:
       - "[STATUS] == 200"
@@ -34,7 +34,7 @@ endpoints:
 
   - name: coturn
     group: columbina
-    url: tcp://turn.jory.dev:3478
+    url: tcp://turn.davidstewen.com:3478
     interval: 1m
     conditions:
       - "[CONNECTED] == true"
@@ -69,9 +69,9 @@ ui:
   link: https://github.com/joryirving/home-ops
   buttons:
     - name: Main Status
-      link: https://status.jory.dev
+      link: https://status.davidstewen.com
     - name: Utility Status
-      link: https://status-utility.jory.dev
+      link: https://status-utility.davidstewen.com
 
 web:
   port: 8080

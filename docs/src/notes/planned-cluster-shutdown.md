@@ -12,7 +12,7 @@ All commands target the `main` cluster (`--context main`). `kubectl cnpg`
 needs the krew plugin (`task workstation:krew`).
 
 The cluster depends on voyager (the NAS) for the kopiur NFS repository, app NFS
-mounts, and CNPG backups to Garage (`https://s3.jory.dev`). Shut voyager down
+mounts, and CNPG backups to Garage (`https://s3.davidstewen.com`). Shut voyager down
 after the last Talos node, and bring it up first.
 
 ## Before starting
@@ -153,7 +153,7 @@ the UPS disconnect (see [rpi-nut](./rpi-nut.md)).
    params in
    `kubernetes/apps/base/observability/exporters/nut-exporter/servicemonitor.yaml`,
    then start `nut-monitor` again.
-2. Power on voyager first. Wait for its NFS exports and `https://s3.jory.dev` to
+2. Power on voyager first. Wait for its NFS exports and `https://s3.davidstewen.com` to
    respond before starting any Talos node.
 3. Start the three control-plane nodes, then the worker.
 4. Wait for the API and storage to recover:

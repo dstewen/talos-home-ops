@@ -9,7 +9,7 @@ spec:
   path: ./kubernetes/apps/base/observability/alert-triage
   postBuild:
     substitute:
-      LITELLM_URL: https://litellm.jory.dev/v1
+      LITELLM_URL: https://litellm.davidstewen.com/v1
   wait: false
   prune: true
   sourceRef:

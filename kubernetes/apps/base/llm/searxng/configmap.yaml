@@ -20,7 +20,7 @@ data:
       # driven by automated agents (open-webui RAG, openclaw) these
       # generate zero value and were the dominant source of DDG captcha/rate-limits.
       # Disabling them cuts most wasted upstream calls. Set back to "duckduckgo" if
-      # interactive UI usage on search.jory.dev wants them back.
+      # interactive UI usage on search.davidstewen.com wants them back.
       autocomplete: ""
       favicon_resolver: ""
       languages:
