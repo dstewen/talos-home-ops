@@ -31,7 +31,7 @@ spec:
           app:
             image:
               repository: ghcr.io/joryirving/amdgpu-exporter
-              tag: 0.2.0@sha256:6893bba76969bb72e87f8025143f88e56e0051f77f3c513298f1bc0a3f1e4c58
+              tag: 0.2.0@sha256:fa4783c02ee27f6332d3d979b382ea4277ff88793a68f6796aff96c2eb0db49a
             env:
               PROC_ROOT: /host/proc
               SYSFS_ROOT: /host/sys
