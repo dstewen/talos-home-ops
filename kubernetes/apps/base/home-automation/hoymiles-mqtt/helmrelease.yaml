@@ -25,7 +25,7 @@ spec:
           app:
             image:
               repository: ghcr.io/joryirving/hoymiles-mqtt
-              tag: 0.11.0@sha256:f696af270c4302515770843cdd6e5c99fd8799568c3c77820b8fc1bf6b1c9b74
+              tag: 0.11.0@sha256:86436dfd1fd4d6e9d9d8e5ec0034fd163558925a4b4227fbe09ff021428f6abf
             env:
               TZ: America/Edmonton
               DTU_HOST: solar.internal
