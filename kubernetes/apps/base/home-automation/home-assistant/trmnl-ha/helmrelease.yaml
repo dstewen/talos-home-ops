@@ -30,7 +30,7 @@ spec:
               tag: 0.11.1@sha256:5f978e60476ff8d1fda4df26fd0147f20083b032e17b58ba42f60890853534e1
             env:
               HOME_ASSISTANT_URL: http://home-assistant.home-automation.svc.cluster.local:8123
-              TZ: America/Edmonton
+              TZ: Australia/Melbourne
             envFrom:
               - secretRef:
                   name: "{{ .Release.Name }}"

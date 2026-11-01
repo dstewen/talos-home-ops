@@ -28,7 +28,7 @@ spec:
               repository: ghcr.io/misospace/pinchflat
               tag: 1.4.6@sha256:1d2bee93879db55df8162177cb4052ed41484bb0e81ece3b455e4c9402e27494
             env:
-              TZ: America/Edmonton
+              TZ: Australia/Melbourne
               TZ_DATA_DIR: /tmp/elixir_tz_data
               PORT: &port 80
             probes:

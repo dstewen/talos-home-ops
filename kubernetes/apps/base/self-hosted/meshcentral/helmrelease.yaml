@@ -28,7 +28,7 @@ spec:
               repository: ghcr.io/ylianst/meshcentral
               tag: 1.3.1@sha256:266b01942545829f11d53e6cecd5c2e48033d9edb48bbd3a9a569482ff1d050d
             env:
-              TZ: America/Edmonton
+              TZ: Australia/Melbourne
               NODE_ENV: production
               HOSTNAME: &host mesh.davidstewen.com
               ALLOW_NEW_ACCOUNTS: "false"

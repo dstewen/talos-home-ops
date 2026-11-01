@@ -18,7 +18,7 @@ services:
         - url: https://github.com/joryirving/home-ops.git
           reference: main
           interval: 3600
-      TZ: America/Edmonton
+      TZ: Australia/Melbourne
       WEBHOOK_SECRET_FILE: /run/secrets/webhook_secret
     healthcheck:
       test:

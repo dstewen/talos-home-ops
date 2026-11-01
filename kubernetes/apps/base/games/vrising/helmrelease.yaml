@@ -33,7 +33,7 @@ spec:
               tag: 3.0@sha256:a58cb84e3d69acf2d965ec752ee3a13ce5d10eea1808b536762fbd7048af71c2
             env:
               ## Container Settings
-              TZ: America/Edmonton
+              TZ: Australia/Melbourne
               SERVERNAME: "Smurf-Rising"
               GAMEPORT: &game 9876
               QUERYPORT: &query 9877

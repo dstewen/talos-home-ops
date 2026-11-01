@@ -25,7 +25,7 @@ spec:
               CLEANRR_MINIMUM_AGE: 5m
               CLEANRR_SERVERS__RADARR__URL: http://radarr.downloads
               CLEANRR_SERVERS__SONARR__URL: http://sonarr.downloads
-              TZ: America/Edmonton
+              TZ: Australia/Melbourne
             envFrom:
               - secretRef:
                   name: "{{ .Release.Name }}"

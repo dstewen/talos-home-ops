@@ -30,7 +30,7 @@ spec:
             env:
               RECYCLARR_CONFIG_DIR: /config
               RECYCLARR_DATA_DIR: /tmp
-              TZ: America/Edmonton
+              TZ: Australia/Melbourne
             envFrom:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"

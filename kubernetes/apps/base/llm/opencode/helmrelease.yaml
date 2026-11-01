@@ -36,7 +36,7 @@ spec:
                     name: litellm-key-opencode
                     key: api-key
               OPENCODE_CONFIG: /etc/opencode/opencode.json
-              TZ: America/Edmonton
+              TZ: Australia/Melbourne
             envFrom:
               - secretRef:
                   name: opencode

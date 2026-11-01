@@ -28,7 +28,7 @@ spec:
               repository: ghcr.io/joryirving/prowlarr
               tag: 2.7.0.5723@sha256:f03a16b69306b4bdb10744175e81bdb87834864d5ac5298ae74e957e828fefe9
             env:
-              TZ: America/Edmonton
+              TZ: Australia/Melbourne
               PROWLARR__APP__INSTANCENAME: "{{ .Release.Name }}"
               PROWLARR__APP__THEME: dark
               PROWLARR__AUTH__METHOD: External

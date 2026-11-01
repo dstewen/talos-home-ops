@@ -29,7 +29,7 @@ spec:
               tag: 1.6.2@sha256:f04f1f432dfbbe063f6708c3407c24d41d61a11b5de77e94df732311ee54d0d5
             env:
               BAZARR__PORT: &port 80
-              TZ: America/Edmonton
+              TZ: Australia/Melbourne
             probes:
               liveness: &probes
                 enabled: true

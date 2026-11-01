@@ -27,7 +27,7 @@ spec:
               tag: latest-build-441@sha256:227707e8aec336fb4dd9dc97f118ea7c5fa5520ed53992d116e767396d1258aa
             env:
               FEED_ID:  ${ACARSDRAMA_ACARS_FEED_ID}
-              TZ: America/Edmonton
+              TZ: Australia/Melbourne
               SOAPYSDR: driver=rtlsdr
               FREQUENCIES: 130.425;130.850;131.475;131.550;131.725
               # Enabling all frequencies to determine which are actually used
@@ -59,7 +59,7 @@ spec:
               tag: latest-build-377@sha256:5afafd9a1f6fc4d8575bdc9294e03dbbdb5590ae1f9152438483a8295c1e8a52
             env:
               FEED_ID: ${ACARSDRAMA_VDLM2_FEED_ID}
-              TZ: America/Edmonton
+              TZ: Australia/Melbourne
               SOAPYSDR: driver=rtlsdr
               FREQUENCIES: "136.975;136.650"
               ZMQ_MODE: server
@@ -83,7 +83,7 @@ spec:
               # renovate: datasource=docker depName=ghcr.io/sdr-enthusiasts/acars_router
               tag: latest-build-530@sha256:6791f0dc935ebd0ca129f1b9d991a69eafb22087c0c58cf51fd28f8eff10ddcc
             env:
-              TZ: America/Edmonton
+              TZ: Australia/Melbourne
               AR_SEND_UDP_ACARS: acars-hub:5550;${ACARSDRAMA_ACARS}
               AR_SEND_UDP_VDLM2: acars-hub:5555;${ACARSDRAMA_VDLM2}
               AR_RECV_ZMQ_VDLM2: acars-dumpvdl2:45555
@@ -132,7 +132,7 @@ spec:
               # renovate: datasource=docker depName=ghcr.io/sdr-enthusiasts/docker-acarshub
               tag: latest-build-1433@sha256:d2eb3cd35bed21f958e4b9da5155da04bb1c5e5a9ee8fa3df1a3e2508ce6d04f
             env:
-              TZ: America/Edmonton
+              TZ: Australia/Melbourne
               ENABLE_ADSB: "false"
               ENABLE_ACARS: external
               # ENABLE_VDLM: external

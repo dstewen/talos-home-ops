@@ -29,7 +29,7 @@ spec:
               repository: ghcr.io/koenkk/zigbee2mqtt
               tag: 2.14.3@sha256:fb4a6b0f6868ad1cd6a9996479802b2420e599c3463b62bbff8c8cd9a908f43a
             env:
-              TZ: America/Edmonton
+              TZ: Australia/Melbourne
               ZIGBEE2MQTT_DATA: /config
               ZIGBEE2MQTT_CONFIG_ADVANCED_LAST_SEEN: ISO_8601
               ZIGBEE2MQTT_CONFIG_ADVANCED_LOG_LEVEL: info # debug

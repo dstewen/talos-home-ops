@@ -35,7 +35,7 @@ spec:
             env:
               PROC_ROOT: /host/proc
               SYSFS_ROOT: /host/sys
-              TZ: America/Edmonton
+              TZ: Australia/Melbourne
             probes:
               liveness: &probes
                 enabled: true

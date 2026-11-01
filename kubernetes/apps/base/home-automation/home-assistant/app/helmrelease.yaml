@@ -36,7 +36,7 @@ spec:
               repository: ghcr.io/joryirving/home-assistant
               tag: 2026.10.4@sha256:f94b0d0825f66573097e87da95c2555b65f993dbd616ea21cb1fcec404387d27
             env:
-              TZ: America/Edmonton
+              TZ: Australia/Melbourne
               HASS_HTTP_TRUSTED_PROXY_1: 10.69.1.0/24
               HASS_HTTP_TRUSTED_PROXY_2: 10.42.0.0/16
             securityContext:
@@ -56,7 +56,7 @@ spec:
               repository: ghcr.io/coder/code-server
               tag: 4.144.0@sha256:b9e8056bb74bd0c4f90284c7559eddeccd38400cfedc28e64c9d3ca50fef1f83
             env:
-              TZ: America/Edmonton
+              TZ: Australia/Melbourne
             args:
               [
                 "--auth",

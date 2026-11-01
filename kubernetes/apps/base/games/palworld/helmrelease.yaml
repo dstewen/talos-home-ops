@@ -30,7 +30,7 @@ spec:
               RESTART_CRON_EXPRESSION: 0 5 * * * #5am daily
               RESTART_ENABLED: false #no one is playing right now.
               SERVER_SETTINGS_MODE: auto
-              TZ: America/Edmonton
+              TZ: Australia/Melbourne
               ## Server Gameplay Settings
               BASE_CAMP_WORKER_MAXNUM: 20
               DEATH_PENALTY: None
@@ -68,7 +68,7 @@ spec:
               tag: v1.3.1
             env:
               ## Container Settings
-              TZ: America/Edmonton
+              TZ: Australia/Melbourne
               RCON_HOST: localhost
               RCON_PORT: *rcon-port
               SAVE_DIRECTORY: /palworld

@@ -21,7 +21,7 @@ spec:
               repository: ghcr.io/joryirving/it-tools
               tag: 2026.10.25@sha256:af42b870c0d9a2e2c6aeaa3a20b11456186c107d34093b0bfc81998f7be444ac
             env:
-              TZ: America/Edmonton
+              TZ: Australia/Melbourne
             resources:
               requests:
                 cpu: 5m

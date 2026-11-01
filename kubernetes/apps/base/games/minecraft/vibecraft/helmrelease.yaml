@@ -12,7 +12,7 @@ spec:
   dependsOn: []
   values:
     extraEnv:
-      TZ: America/Edmonton
+      TZ: Australia/Melbourne
     fullnameOverride: *app
     image:
       repository: ghcr.io/itzg/minecraft-server

@@ -11,7 +11,7 @@ services:
           memory: 256M
     environment:
       GATUS_CONFIG_PATH: /config
-      TZ: America/Edmonton
+      TZ: Australia/Melbourne
     # renovate: datasource=docker depName=ghcr.io/twin/gatus
     image: ghcr.io/twin/gatus:v5.38.0@sha256:085ed63da963728965d00a3c78aa6167e3bf135218485b893201758e079e8415
     logging:

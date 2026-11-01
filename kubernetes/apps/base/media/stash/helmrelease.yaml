@@ -44,7 +44,7 @@ spec:
               STASH_NO_BROWSER: "true"
               USER: "1000"
               HOME: /config
-              TZ: America/Edmonton
+              TZ: Australia/Melbourne
             probes:
               liveness: &probe
                 enabled: true

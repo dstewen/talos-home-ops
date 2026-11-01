@@ -35,7 +35,7 @@ spec:
             env:
               NAME: "Tako Tuesday"
               WORLD: "Tako Tuesday"
-              TZ: America/Edmonton
+              TZ: Australia/Melbourne
               Type: BepInEx # Installs BepInEx mod loader for down the road
               PORT: &port 2456
               MODIFIERS: deathpenalty=casual,portals=casual

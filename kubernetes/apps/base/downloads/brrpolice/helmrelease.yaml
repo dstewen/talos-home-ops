@@ -31,7 +31,7 @@ spec:
               BRRPOLICE_HTTP__PORT: &port 80
               BRRPOLICE_LOGGING__LEVEL: info
               BRRPOLICE_QBITTORRENT__BASE_URL: http://qbittorrent.downloads.svc.cluster.local
-              TZ: America/Edmonton
+              TZ: Australia/Melbourne
             probes:
               liveness:
                 enabled: true

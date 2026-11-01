@@ -27,7 +27,7 @@ spec:
               tag: proton-v2.3.2@sha256:c410b742812cc55723cdaa97950f94cdef1b1f8a332bceedce13da9b681c98ee
             env:
               ## Container Settings
-              TZ: America/Edmonton
+              TZ: Australia/Melbourne
               SERVER_NAME: "Takoshrouded"
               GAME_PORT: &game_port 27015
               QUERY_PORT: &query_port 15637

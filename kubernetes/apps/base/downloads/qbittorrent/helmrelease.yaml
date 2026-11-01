@@ -37,7 +37,7 @@ spec:
             env:
               QBT_WEBUI_PORT: &port 80
               QBT_TORRENTING_PORT: &torrentPort 59936
-              TZ: America/Edmonton
+              TZ: Australia/Melbourne
             probes:
               liveness: &probes
                 enabled: true

@@ -36,7 +36,7 @@ spec:
               ATUIN_METRICS__PORT: &metricsPort 8081
               ATUIN_OPEN_REGISTRATION: true
               ATUIN_PORT: &port 80
-              TZ: America/Edmonton
+              TZ: Australia/Melbourne
             args:
               - start
             probes:

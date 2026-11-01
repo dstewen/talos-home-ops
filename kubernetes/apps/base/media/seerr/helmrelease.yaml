@@ -40,7 +40,7 @@ spec:
               DB_NAME: "{{ .Release.Name }}"
               LOG_LEVEL: "info"
               PORT: &port 80
-              TZ: America/Edmonton
+              TZ: Australia/Melbourne
             envFrom:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"

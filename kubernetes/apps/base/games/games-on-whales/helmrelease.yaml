@@ -187,7 +187,7 @@ spec:
               repository: ghcr.io/games-on-whales/wolf
               tag: sha-d6d41de
             env:
-              TZ: America/Edmonton
+              TZ: Australia/Melbourne
               WOLF_RENDER_NODE: /dev/dri/renderD128
               WOLF_SOCKET_PATH: /etc/wolf/wolf.sock
               XDG_RUNTIME_DIR: /run/wolf-sockets

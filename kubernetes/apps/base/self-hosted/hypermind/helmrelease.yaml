@@ -26,7 +26,7 @@ spec:
               MAX_CONNECTIONS: 100
               MAX_RELAY_HOPS: 30
               PORT: &port 3000
-              TZ: America/Edmonton
+              TZ: Australia/Melbourne
             probes:
               liveness: &probes
                 enabled: true

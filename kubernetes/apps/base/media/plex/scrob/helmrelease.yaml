@@ -41,7 +41,7 @@ spec:
                   secretKeyRef:
                     name: "{{ .Release.Name }}-app"
                     key: username
-              TZ: America/Edmonton
+              TZ: Australia/Melbourne
             envFrom:
               - secretRef:
                   name: "{{ .Release.Name }}"
