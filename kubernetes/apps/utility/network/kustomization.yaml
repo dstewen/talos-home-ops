@@ -11,7 +11,6 @@ resources:
   - ./certificates.yaml
   - ./cloudflare-dns.yaml
   - ./echo.yaml
-  - ./towonel-operator.yaml
   - ./envoy-gateway.yaml
   - ./multus.yaml
   - ./unifi-dns.yaml
