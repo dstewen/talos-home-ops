@@ -19,7 +19,7 @@ spec:
           app:
             image:
               repository: ghcr.io/joryirving/hoymiles-exporter
-              tag: 0.1.1@sha256:c638e6a6fc09e9311be038a2bb4e36e9963973b40421d7e0e9f88c9d744c20ca
+              tag: 0.1.1@sha256:2744b94d30045bf649daca7e9011c721dcc884de0a29ba4a9c33bfb1e8b45a82
             env:
               DTU_HOST: solar.internal
               TZ: America/Edmonton
