@@ -69,8 +69,8 @@ spec:
         existingClaim: "{{ .Release.Name }}"
       media:
         type: nfs
-        server: voyager.internal
-        path: /mnt/akademiya/data
+        server: 192.168.10.15
+        path: /volume2/piNFS01/flux-cluster/media_new/media
         globalMounts:
           - path: /data
             subPath: media
