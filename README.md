@@ -131,16 +131,19 @@ In my clusters there are two instances of [ExternalDNS](https://github.com/kuber
 
 | Name  | Device                  | CPU               | OS Disk    | Local Disk | Rook Disk  | RAM   | OS    | Purpose           |
 | ----- | ----------------------- | ----------------- | ---------- | ---------- | ---------- | ----- | ----- | ----------------- |
-| Ayaka | MS-01                   | i9-13900H         | 960GB NVMe | 1TB NVMe   | 1.92TB U.2 | 128GB | Talos | k8s control-plane |
-| Eula  | MS-01                   | i9-13900H         | 960GB NVMe | 1TB NVMe   | 1.92TB U.2 | 128GB | Talos | k8s control-plane |
-| Ganyu | MS-01                   | i9-13900H         | 960GB NVMe | 1TB NVMe   | 1.92TB U.2 | 128GB | Talos | k8s control-plane |
-| Skirk | Bosgame M5 (Halo Strix) | Ryzen AI Max+ 395 | 500GB NVMe | 2TB NVMe   | -          | 128GB | Talos | k8s worker (LLM)  |
+| ms1 | MS-01                   | i9-13900H         | 500GB NVMe | 2TB NVMe   | 1.92TB U.2 | 96GB | Talos | k8s control-plane |
+| ms2  | MS-01                   | i9-13900H         | 500GB NVMe | 2TB NVMe   | 1.92TB U.2 | 96GB | Talos | k8s control-plane |
+| ms3 | MS-01                   | i9-13900H         | 500GB NVMe | 2TB NVMe   | 1.92TB U.2 | 96GB | Talos | k8s control-plane |
+| nuc1 | Intel NUC NUC7i7DNHE | 8th Gen Intel Core i7-8650U quad-core processor | 500GB NVMe | 500GB SSD   | -          | 64GB | Talos | k8s worker |
+| nuc2 | Intel NUC NUC7i7DNHE | 8th Gen Intel Core i7-8650U quad-core processor | 500GB NVMe | 500GB SSD   | -          | 64GB | Talos | k8s worker |
+| blade5 | CM4 blade |  | 500GB NVMe | -   | 8GB | Talos | k8s worker |
+| blade6 | CM4 blade |  | 500GB NVMe | -   | 8GB | Talos | k8s worker |
+| blade7 | CM4 blade |  | 500GB NVMe | -   | 8GB | Talos | k8s worker |
+| blade8 | CM4 blade |  | 500GB NVMe | -   | 8GB | Talos | k8s worker |
 
 Control Plane OS Disk: m.2 Samsung PM9A3 960GB
 Control Plane Local Disk: m.2 WD SN770 1TB
 Control Plane Rook Disk: u.2 Samsung PM9A3 1.92TB
-Ganyu GPU: NVIDIA RTX 3090 24GB (OCuLink eGPU)
-Skirk GPU: Strix Halo iGPU
 
 Total CPU: 58 Cores/92 Threads
 Total RAM: 512GB
@@ -149,49 +152,41 @@ Total RAM: 512GB
 
 | Name     | Device     | CPU           | OS Disk   | Local Disk | RAM  | OS    | Purpose           |
 | -------- | ---------- | ------------- | --------- | ---------- | ---- | ----- | ----------------- |
-| Celestia | Bosgame P1 | Ryzen 7 5700U | 500GB SSD | 1TB NVMe   | 64GB | Talos | k8s control-plane |
+| blade1 | CM4 blade |  | 500GB NVMe | -   | 8GB | Talos | k8s control-plane |
+| blade2 | CM4 blade |  | 500GB NVMe | -   | 8GB | Talos | k8s control-plane |
+| blade3 | CM4 blade |  | 500GB NVMe | -   | 8GB | Talos | k8s control-plane |
 
-OS Disk: 2.5" Samsung 870 EVO SSD
-Local Disk: m.2 WD SN770 1TB
+OS Disk: m.2 WD Blue SN570 500GB
 
-Total CPU: 8 Cores/16 Threads
-Total RAM: 64GB
+Total CPU: 12 Cores/12 Threads
+Total RAM: 24GB
 
 ### Test Kubernetes Cluster
 
 | Name    | Device         | CPU           | OS Disk      | Local Disk | RAM  | OS    | Purpose           |
 | ------- | -------------- | ------------- | ------------ | ---------- | ---- | ----- | ----------------- |
-| Citlali | Beelink Mini-S | Celeron N5095 | 1TB M.2 SATA | 480GB SSD  | 32GB | Talos | k8s control-plane |
+| blade4 | CM4 blade |  | 500GB NVMe | -   | 8GB | Talos | k8s control-plane |
 
-OS Disk: m.2 Timetec SATA SSD
-Local Disk: 2.5" Kingston SA400 SSD
+OS Disk: m.2 WD Blue SN570 500GB
 
 Total CPU: 4 Cores/4 Threads
-Total RAM: 32GB
+Total RAM: 8GB
 
 ### Supporting Hardware
 
-| Name    | Device            | CPU        | OS Disk    | Data Disk     | RAM   | OS           | Purpose           |
+| Name    | Device            | CPU        | Cache Disks    | Data Disk     | RAM   | OS           | Purpose           |
 | ------- | ----------------- | ---------- | ---------- | ------------- | ----- | ------------ | ----------------- |
-| Voyager | MS-01             | i5-12600H  | 32GB USB   | -             | 96GB  | Unraid       | NAS/NFS/Backup    |
-| DAS     | Lenovo SA120      | -          | -          | 6x14TB Raidz2 | -     | -            | ZFS               |
-| Venti   | Raspberry Pi5     | Cortex A76 | 250GB NVMe | -             | 8GB   | Raspbian     | NUT/SSH (Main)    |
-| Sayu    | Raspberry Pi5     | Cortex A76 | 500GB NVMe | -             | 8GB   | Raspbian     | NUT/SSH (Utility) |
-| PiKVM   | Raspberry Pi4     | Cortex A72 | 64GB mSD   | -             | 4GB   | PiKVM (Arch) | KVM (Main)        |
-| JetKVM  | JetKVM            | RV1106G3   | 8GB EMMC   | -             | 256MB | Linux 5.10   | KVM (Utility)     |
-| PDU     | UniFi USP PDU Pro | -          | -          | -             | -     | -            | PDU               |
-| TESmart | 8 port KVM        | -          | -          | -             | -     | -            | Network KVM       |
+| NAS | Synology DS918+ | Intel Celeron J3455 Quad-Core | 2 x WD_BLACK SN770 500GB | 5 x WD102KFBX-68M95N0 9.1TB | 8GB  | Synology DSM | NAS/NFS/Backup    |
+
 
 ### Networking/UPS Hardware
 
 | Device                      | Purpose              |
 | --------------------------- | -------------------- |
-| Unifi UDM-SE                | Network - Router     |
-| Back-UPS 600                | Network - UPS        |
-| Unifi USW-Enterprise-24-PoE | Server - 2.5G Switch |
+| Ope                | Network - Router     |
+| APC UPS 1500                | Network - UPS        |
+| FS 24-PoE | Server - 1G POE Switch |
 | Unifi USW-Aggregation       | Server - 10G Switch  |
-| Tripp Lite 1500             | Server - UPS         |
-| Ecoflow Delta 3 Plus        | Server - UPS         |
 
 ---
 
