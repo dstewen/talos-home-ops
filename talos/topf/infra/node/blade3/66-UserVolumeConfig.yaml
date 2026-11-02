@@ -1,0 +1,9 @@
+apiVersion: v1alpha1
+kind: UserVolumeConfig
+name: local-hostpath-100gb
+volumeType: partition
+provisioning:
+  diskSelector:
+    match: disk.model == "WD Blue SN570 500GB"
+  minSize: 100GB
+  maxSize: 100GB

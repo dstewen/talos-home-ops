@@ -1,0 +1,6 @@
+# Adds a label to the node to indicate that it has an Intel GPU.
+# This is used by the Intel GPU resource driver to determine which nodes to schedule workloads on.
+apiVersion: v1alpha1
+kind: KubeNodeConfig
+labels:
+  node.kubernetes.io/gpu: "true"

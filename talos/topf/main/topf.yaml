@@ -1,0 +1,111 @@
+---
+clusterName: kubernetes
+clusterEndpoint: https://10.200.15.254:6443
+
+# renovate: datasource=github-releases depName=siderolabs/talos
+talosVersion: v1.14.5
+# renovate: datasource=docker depName=ghcr.io/siderolabs/kubelet
+kubernetesVersion: v1.37.1
+
+secretsPath: secrets.sops.yaml
+
+nodes:
+  - host: "ms1"
+    ip: "10.200.15.51"
+    role: control-plane
+    schematicId: "1dd2cbb33be2acbba7cdabb8a08d6b890592afca55e9456ef15b1e22e7003a2e"
+    data:
+      installDisk: ""
+      installDiskSerial: "1925E20E2038"
+      macAddr: "58:47:ca:77:cf:36"
+      mtu: 1500
+      encryptDisk: false
+      kernelModules: []
+  - host: "ms2"
+    ip: "10.200.15.52"
+    role: control-plane
+    schematicId: "1dd2cbb33be2acbba7cdabb8a08d6b890592afca55e9456ef15b1e22e7003a2e"
+    data:
+      installDisk: ""
+      installDiskSerial: "220628801124"
+      macAddr: "58:47:ca:78:f1:32"
+      mtu: 1500
+      encryptDisk: false
+      kernelModules: []
+  - host: "ms3"
+    ip: "10.200.15.53"
+    role: control-plane
+    schematicId: "1dd2cbb33be2acbba7cdabb8a08d6b890592afca55e9456ef15b1e22e7003a2e"
+    data:
+      installDisk: ""
+      installDiskSerial: "22061X806789"
+      macAddr: "58:47:ca:78:f8:4a"
+      mtu: 1500
+      encryptDisk: false
+      kernelModules: []
+  - host: "blade5"
+    ip: "10.200.15.35"
+    role: worker
+    schematicId: "de1619e16531ddff67ccb4ce636a5e3ba5197eb4fc0e8421f095ec50ce9d26a6"
+    data:
+      installDisk: ""
+      installDiskSerial: "220628800811"
+      macAddr: "e4:5f:01:ec:16:b4"
+      mtu: 1500
+      encryptDisk: false
+      kernelModules: []
+  - host: "blade6"
+    ip: "10.200.15.36"
+    role: worker
+    schematicId: "de1619e16531ddff67ccb4ce636a5e3ba5197eb4fc0e8421f095ec50ce9d26a6"
+    data:
+      installDisk: ""
+      installDiskSerial: "220628800731"
+      macAddr: "e4:5f:01:ec:16:a5"
+      mtu: 1500
+      encryptDisk: false
+      kernelModules: []
+  - host: "blade7"
+    ip: "10.200.15.37"
+    role: worker
+    schematicId: "de1619e16531ddff67ccb4ce636a5e3ba5197eb4fc0e8421f095ec50ce9d26a6"
+    data:
+      installDisk: ""
+      installDiskSerial: "220628800801"
+      macAddr: "e4:5f:01:ec:16:9c"
+      mtu: 1500
+      encryptDisk: false
+      kernelModules: []
+  - host: "blade8"
+    ip: "10.200.15.38"
+    role: worker
+    schematicId: "de1619e16531ddff67ccb4ce636a5e3ba5197eb4fc0e8421f095ec50ce9d26a6"
+    data:
+      installDisk: ""
+      installDiskSerial: "220628800737"
+      macAddr: "e4:5f:01:ec:16:5a"
+      mtu: 1500
+      encryptDisk: false
+      kernelModules: []
+  - host: "nuc1"
+    ip: "10.200.15.61"
+    role: worker
+    schematicId: "a2645a18c249a86ac47646445709014f6e6f5086ee674f77277f79869fee2e7b"
+    data:
+      installDisk: ""
+      installDiskSerial: "BTHH811211KF512D"
+      macAddr: "d4:5d:df:1a:27:fe"
+      mtu: 1500
+      encryptDisk: false
+      kernelModules: []
+  - host: "nuc2"
+    ip: "10.200.15.62"
+    role: worker
+    schematicId: "a2645a18c249a86ac47646445709014f6e6f5086ee674f77277f79869fee2e7b"
+    data:
+      installDisk: ""
+      installDiskSerial: "BTHH81000E09512D"
+      macAddr: "d4:5d:df:1a:28:c4"
+      mtu: 1500
+      encryptDisk: false
+      kernelModules: []

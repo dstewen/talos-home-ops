@@ -1,0 +1,7 @@
+apiVersion: v1alpha1
+kind: UserVolumeConfig
+name: local-hostpath-400gb
+provisioning:
+  diskSelector:
+    match: disk.model == "Samsung SSD 860" && !system_disk
+  minSize: 400GB
