@@ -1,0 +1,19 @@
+---
+customization:
+  extraKernelArgs:
+    - console=ttyS0,115200
+    - i915.enable_guc=3
+    - i915.force_probe=!a7a0
+    - xe.force_probe=a7a0
+    - xe.max_vfs=7
+  systemExtensions:
+    officialExtensions:
+      - siderolabs/gasket-driver
+      - siderolabs/i915
+      - siderolabs/intel-ucode
+      - siderolabs/lldpd
+      - siderolabs/mei
+      - siderolabs/nut-client
+      - siderolabs/thunderbolt
+      - siderolabs/util-linux-tools
+      - siderolabs/xe
