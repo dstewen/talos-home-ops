@@ -84,7 +84,7 @@ bootstrap.apps: CLUSTER ?= 'main'
 # Usage: just talos.apply-node utility NODE=blade1
 talos.apply-node: CLUSTER ?= 'main' NODE ?= ''
     "Apply Talos config to {{ NODE }} in {{ CLUSTER }}"
-    minijinja-cli {{ TALOS_DIR }}/machineconfig.yaml.j2 | op inject | talosctl --nodes {{ NODE }} apply-config --mode auto --talosconfig {{ TALOSCONFIG }}
+    topf apply --config {{ TALOS_DIR }}/topf.yaml --nodes {{ NODE }} --talos-dir {{ TALOS_DIR }} --op inject
 
 # Reset a Talos node
 # Usage: just talos.reset-node main NODE=blade1
