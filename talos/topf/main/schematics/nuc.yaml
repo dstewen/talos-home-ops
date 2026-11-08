@@ -1,0 +1,9 @@
+---
+# Intel NUC schematic (nuc1, nuc2 in main cluster)
+customization:
+  extraKernelArgs:
+    - console=ttyS0,115200
+  systemExtensions:
+    officialExtensions:
+      - siderolabs/nut-client
+      - siderolabs/util-linux-tools
