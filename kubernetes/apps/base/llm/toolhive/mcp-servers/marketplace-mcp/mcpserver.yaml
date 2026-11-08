@@ -5,7 +5,7 @@ kind: MCPServer
 metadata:
   name: marketplace-mcp
 spec:
-  image: ghcr.io/misospace/marketplace-mcp:main@sha256:4ebb19cb183d66cc5fb6b5531d1acf58414a22f0cb0bde041e0121f7aa6788fe
+  image: ghcr.io/misospace/marketplace-mcp:main@sha256:e3923c4f8487491fcb83faa2ce9d0946d9c41150b7eab92fd0848f779cf98a78
   transport: streamable-http
   mcpPort: 8080
   env:
