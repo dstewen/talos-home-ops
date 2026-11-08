@@ -67,7 +67,7 @@ bootstrap.base: CLUSTER ?= 'main'
         sleep 5
     done
     "Applying namespaces + secrets..."
-    minijinja-cli {{ BOOTSTRAP_DIR }}/kustomize/secrets.yaml.tpl --cl-arg CLUSTER={{ CLUSTER }} | op inject | kubectl --context {{ CLUSTER }} apply --server-side --force-conflicts --filename -
+    minijinja-cli {{ BOOTSTRAP_DIR }}/secrets/{{ CLUSTER }}.yaml.tpl | op inject | kubectl --context {{ CLUSTER }} apply --server-side --force-conflicts --filename -
     "Applying CRDs..."
     helmfile --file {{ BOOTSTRAP_DIR }}/helmfile/crds.yaml template | yq ea -r -e 'select(.kind == "CustomResourceDefinition")' | kubectl --context {{ CLUSTER }} apply --server-side --field-manager bootstrap --force-conflicts --filename -
 
