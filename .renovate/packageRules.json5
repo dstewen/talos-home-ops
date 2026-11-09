@@ -8,13 +8,6 @@
       matchPackageNames: ["/mylar3/"],
     },
     {
-      description: ["Custom regex versioning for kyuz0 amd-strix-halo-toolboxes rocm tags"],
-      matchDatasources: ["docker"],
-      matchPackageNames: ["docker.io/kyuz0/amd-strix-halo-toolboxes"],
-      versioning: "regex:^rocm-(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)$",
-      allowedVersions: "/^rocm-6\\./",
-    },
-    {
       description: ["Custom regex versioning for SearXNG CalVer SHA tags"],
       matchDatasources: ["docker"],
       matchPackageNames: ["ghcr.io/searxng/searxng"],
