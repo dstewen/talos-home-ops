@@ -1,0 +1,135 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/inference.llmkube.dev/model_v1alpha1.json
+# Recipe: deepseek-ai/DeepSeek-V4-Flash-Vision-Exp
+# Vision-enabled MoE model on B12X DGX Spark cluster
+apiVersion: inference.llmkube.dev/v1alpha1
+kind: Model
+metadata:
+  name: deepseek-v4-flash-vision-exp
+spec:
+  source: hf://deepseek-ai/DeepSeek-V4-Flash-Vision-Exp
+  sourceSecretRef:
+    name: huggingface
+  format: safetensors
+  quantization: bfloat16
+  hardware:
+    accelerator: cuda
+    gpu:
+      enabled: true
+      vendor: nvidia
+      tensorParallelism: 2
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/inference.llmkube.dev/inferenceservice_v1alpha1.json
+# Recipe: deepseek-ai/DeepSeek-V4-Flash-Vision-Exp
+# Vision-enabled MoE model on B12X DGX Spark cluster
+apiVersion: inference.llmkube.dev/v1alpha1
+kind: InferenceService
+metadata:
+  name: deepseek-v4-flash-vision-exp
+  labels:
+    krr/ignore: "true"
+spec:
+  modelRef: deepseek-v4-flash-vision-exp
+  modelCache:
+    claimName: llmkube-ganyu-cache
+  runtime: vllm
+  image: ghcr.io/eugr/spark-vllm:b12x
+  rolloutPolicy:
+    waitForIdle: true
+    idleTimeoutSeconds: 86400
+  replicas: 1
+  priority: high
+  nodeSelector:
+    nvidia.com/gpu.present: "true"
+  tolerations:
+    - key: nvidia.com/gpu
+      operator: Exists
+      effect: NoSchedule
+  contextSize: 262144
+  maxNumBatchedTokens: 8192
+  maxCudagraphCaptureSize: 48
+  parallelSlots: 2
+  batchSize: 8192
+  uBatchSize: 8192
+  resources:
+    cpu: "2000m"
+    memory: "64Gi"
+    nvidia.com/gpu: "2"
+  endpoint:
+    port: 8000
+    type: ClusterIP
+  extraArgs:
+    - --trust-remote-code
+    - --tensor-parallel-size 2
+    - --kv-cache-dtype fp8
+    - --block-size 256
+    - --max-model-len 262144
+    - --max-num-seqs 8
+    - --max-num-batched-tokens 8192
+    - --gpu-memory-utilization 0.8
+    - --enable-prefix-caching
+    - --tokenizer-mode deepseek_v4
+    - --tool-call-parser deepseek_v4
+    - --enable-auto-tool-choice
+    - --reasoning-parser deepseek_v4
+    - --load-format b12x
+    - --moe-backend b12x
+    - --linear-backend b12x
+    - --attention-backend B12X
+    - --max-cudagraph-capture-size 48
+    - --compilation-config '{"cudagraph_mode":"FULL_AND_PIECEWISE","custom_ops":["all"]}'
+    - --speculative-config '{"method":"dspark","num_speculative_tokens":6,"draft_sample_method":"probabilistic","attention_backend":"B12X"}'
+    - --host 0.0.0.0
+    - --port 8000
+  env:
+    - name: CUTE_DSL_ARCH
+      value: "sm_121a"
+    - name: VLLM_USE_AOT_COMPILE
+      value: "1"
+    - name: VLLM_USE_BREAKABLE_CUDAGRAPH
+      value: "0"
+    - name: VLLM_USE_MEGA_AOT_ARTIFACT
+      value: "1"
+    - name: VLLM_MEMORY_PROFILE_INCLUDE_ATTN
+      value: "1"
+    - name: VLLM_USE_FLASHINFER_SAMPLER
+      value: "1"
+    - name: VLLM_USE_B12X_WO_PROJECTION
+      value: "1"
+    - name: VLLM_USE_B12X_MHC
+      value: "1"
+    - name: VLLM_USE_B12X_FP8_GEMM
+      value: "1"
+    - name: VLLM_USE_B12X_MOE
+      value: "1"
+    - name: VLLM_USE_B12X_SPARSE_INDEXER
+      value: "1"
+    - name: VLLM_USE_V2_MODEL_RUNNER
+      value: "1"
+    - name: VLLM_MOE_SKIP_PADDING
+      value: "0"
+    - name: B12X_MLA_SM120_UNIFIED
+      value: "1"
+    - name: B12X_MOE_FORCE_A8
+      value: "1"
+  probeOverrides:
+    startup:
+      httpGet:
+        path: /health
+        port: 8000
+      periodSeconds: 10
+      failureThreshold: 360
+    liveness:
+      httpGet:
+        path: /health
+        port: 8000
+      initialDelaySeconds: 30
+      periodSeconds: 30
+      failureThreshold: 6
+    readiness:
+      httpGet:
+        path: /health
+        port: 8000
+      initialDelaySeconds: 20
+      periodSeconds: 10
+      failureThreshold: 6
