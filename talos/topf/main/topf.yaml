@@ -116,7 +116,7 @@ nodes:
     schematicId: "@schematics/dgx.yaml"
     data:
       installDisk: ""
-      macAddr: "PLACEHOLDER"
+      macAddr: "4c:bb:47:ec:9d:9e"
       mtu: 1500
       encryptDisk: false
       kernelModules: []
@@ -126,7 +126,7 @@ nodes:
     schematicId: "@schematics/dgx.yaml"
     data:
       installDisk: ""
-      macAddr: "PLACEHOLDER"
+      macAddr: "4c:bb:47:ec:9c:99"
       mtu: 1500
       encryptDisk: false
       kernelModules: []
