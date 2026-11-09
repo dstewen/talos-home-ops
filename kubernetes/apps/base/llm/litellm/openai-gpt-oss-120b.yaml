@@ -1,0 +1,97 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/inference.llmkube.dev/model_v1alpha1.json
+# Recipe: openai/gpt-oss-120b
+# OpenAI's open source 120B MoE model with MXFP4 quantization
+apiVersion: inference.llmkube.dev/v1alpha1
+kind: Model
+metadata:
+  name: openai-gpt-oss-120b
+spec:
+  source: hf://openai/gpt-oss-120b
+  sourceSecretRef:
+    name: huggingface
+  format: safetensors
+  quantization: mxfp4
+  hardware:
+    accelerator: cuda
+    gpu:
+      enabled: true
+      vendor: nvidia
+      tensorParallelism: 1
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/inference.llmkube.dev/inferenceservice_v1alpha1.json
+# Recipe: openai/gpt-oss-120b
+# OpenAI's open source 120B MoE model with MXFP4 quantization
+apiVersion: inference.llmkube.dev/v1alpha1
+kind: InferenceService
+metadata:
+  name: openai-gpt-oss-120b
+  labels:
+    krr/ignore: "true"
+spec:
+  modelRef: openai-gpt-oss-120b
+  modelCache:
+    claimName: llmkube-ganyu-cache
+  runtime: vllm
+  image: ghcr.io/eugr/spark-vllm:mxfp4
+  rolloutPolicy:
+    waitForIdle: true
+    idleTimeoutSeconds: 86400
+  replicas: 1
+  priority: high
+  nodeSelector:
+    nvidia.com/gpu.present: "true"
+  tolerations:
+    - key: nvidia.com/gpu
+      operator: Exists
+      effect: NoSchedule
+  contextSize: 32768
+  parallelSlots: 1
+  batchSize: 8192
+  uBatchSize: 8192
+  resources:
+    cpu: "1000m"
+    memory: "64Gi"
+    nvidia.com/gpu: "1"
+  endpoint:
+    port: 8000
+    type: ClusterIP
+  extraArgs:
+    - --tool-call-parser openai
+    - --reasoning-parser openai_gptoss
+    - --enable-auto-tool-choice
+    - --gpu-memory-utilization 0.8
+    - --enable-prefix-caching
+    - --load-format fastsafetensors
+    - --quantization mxfp4
+    - --mxfp4-backend CUTLASS
+    - --mxfp4-layers moe,qkv,o,lm_head
+    - --attention-backend FLASHINFER
+    - --kv-cache-dtype fp8
+    - --max-num-batched-tokens 8192
+    - --host 0.0.0.0
+    - --port 8000
+  env:
+    - name: VLLM_USE_FLASHINFER_MOE_MXFP4_MXFP8
+      value: "1"
+  probeOverrides:
+    startup:
+      httpGet:
+        path: /health
+        port: 8000
+      periodSeconds: 10
+      failureThreshold: 360
+    liveness:
+      httpGet:
+        path: /health
+        port: 8000
+      initialDelaySeconds: 30
+      periodSeconds: 30
+      failureThreshold: 6
+    readiness:
+      httpGet:
+        path: /health
+        port: 8000
+      initialDelaySeconds: 20
+      periodSeconds: 10
+      failureThreshold: 6

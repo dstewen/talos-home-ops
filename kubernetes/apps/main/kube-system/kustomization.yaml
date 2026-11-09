@@ -16,4 +16,5 @@ resources:
   - ./k8s-gpu-dra-driver.yaml
   - ./metrics-server.yaml
   - ./nvidia-device-plugin.yaml
+  - ./nvidia-gpu-operator.yaml
   - ./nvidia-power-limit.yaml

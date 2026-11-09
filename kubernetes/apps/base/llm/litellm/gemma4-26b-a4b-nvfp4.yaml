@@ -1,0 +1,94 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/inference.llmkube.dev/model_v1alpha1.json
+# Recipe: nvidia/Gemma-4-26B-A4B-NVFP4
+# Gemma4-26B-A4B model in NVFP4 quantization with MTP speculative decoding
+apiVersion: inference.llmkube.dev/v1alpha1
+kind: Model
+metadata:
+  name: gemma4-26b-a4b-nvfp4
+spec:
+  source: hf://nvidia/Gemma-4-26B-A4B-NVFP4
+  sourceSecretRef:
+    name: huggingface
+  format: safetensors
+  quantization: nvfp4
+  hardware:
+    accelerator: cuda
+    gpu:
+      enabled: true
+      vendor: nvidia
+      tensorParallelism: 2
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/inference.llmkube.dev/inferenceservice_v1alpha1.json
+# Recipe: nvidia/Gemma-4-26B-A4B-NVFP4
+# Gemma4-26B-A4B model in NVFP4 quantization with MTP speculative decoding
+apiVersion: inference.llmkube.dev/v1alpha1
+kind: InferenceService
+metadata:
+  name: gemma4-26b-a4b-nvfp4
+  labels:
+    krr/ignore: "true"
+spec:
+  modelRef: gemma4-26b-a4b-nvfp4
+  modelCache:
+    claimName: llmkube-ganyu-cache
+  runtime: vllm
+  image: ghcr.io/eugr/spark-vllm:latest
+  rolloutPolicy:
+    waitForIdle: true
+    idleTimeoutSeconds: 86400
+  replicas: 1
+  priority: high
+  nodeSelector:
+    nvidia.com/gpu.present: "true"
+  tolerations:
+    - key: nvidia.com/gpu
+      operator: Exists
+      effect: NoSchedule
+  contextSize: 262144
+  parallelSlots: 2
+  batchSize: 4096
+  uBatchSize: 4096
+  resources:
+    cpu: "1000m"
+    memory: "16Gi"
+    nvidia.com/gpu: "2"
+  endpoint:
+    port: 8000
+    type: ClusterIP
+  extraArgs:
+    - --max-model-len 262144
+    - --gpu-memory-utilization 0.7
+    - --port 8000
+    - --host 0.0.0.0
+    - --load-format instanttensor
+    - --enable-prefix-caching
+    - --enable-auto-tool-choice
+    - --tool-call-parser gemma4
+    - --reasoning-parser gemma4
+    - --kv-cache-dtype fp8
+    - --max-num-batched-tokens 4096
+    - --tensor-parallel-size 2
+    - --distributed-executor-backend ray
+    - --speculative-config '{"method":"mtp","model":"google/gemma-4-26B-A4B-it-assistant","num_speculative_tokens":4,"moe_backend":"triton"}'
+  probeOverrides:
+    startup:
+      httpGet:
+        path: /health
+        port: 8000
+      periodSeconds: 10
+      failureThreshold: 360
+    liveness:
+      httpGet:
+        path: /health
+        port: 8000
+      initialDelaySeconds: 30
+      periodSeconds: 30
+      failureThreshold: 6
+    readiness:
+      httpGet:
+        path: /health
+        port: 8000
+      initialDelaySeconds: 20
+      periodSeconds: 10
+      failureThreshold: 6
