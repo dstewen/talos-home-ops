@@ -2,21 +2,33 @@
 ## talos-mixed → talos-home-ops
 
 > **Date:** 2026-11-09
-> **Branch:** `multicluster-reset` (pushed to origin)
+> **Last updated:** 2026-11-09 — adapted for justfile system, 1Password topf provider, 3-cluster layout
+> **Branch:** `main` (all config changes merged)
 > **Strategy:** Full wipe-and-rebootstrap of all nodes to validate the new process
+>
+> **IMPORTANT: Prerequisites checked during this session:**
+> - `just` must be installed on the management node (run `just --list` to verify)
+> - `topf` replaces `talosctl gen` for config rendering — ensure it's installed
+> - All Talos secrets are now in 1Password (no SOPS files in git)
+> - Secret provider script at `.justfiles/talos/secrets-provider` is wired into all cluster topf.yaml files
+> - 3 clusters: **utility**, **main**, **test** (no `infra` cluster — it was consolidated into `utility`)
 
 ---
 
 ## Pre-Migration Checklist
 
 - [ ] Confirm volsync replication sources are healthy (check `ReplicationSource` resources in apps that use persistent volumes)
+- [ ] **Verify DGX Spark MAC addresses** in `talos/topf/main/topf.yaml` (currently `PLACEHOLDER` — real values required before main cluster bootstrap)
+- [ ] **Confirm all 1Password Talos items exist** — run `just talos-secrets verify CLUSTER=<cluster>` for each cluster to validate fields
+- [ ] **Confirm all 1Password app items exist** — `1password-{utility,main,test}` items with `OP_SESSION_JSON` and `OP_CONNECT_TOKEN` fields
 - [ ] Confirm CNPG barman backups are current (check `kubectl --context main get backups.postgresql.cnpg.io -n database -o wide` — should show daily completed backups)
 - [ ] Ensure 1Password `kubernetes` vault exists with:
   - `OP_SESSION_JSON` field
   - `OP_CONNECT_TOKEN` field
   - `davidstewen-com-tls` secret (tls.crt, tls.key)
-- [ ] Ensure `just` is installed on the management node
-- [ ] Ensure `talosctl`, `topf`, `op`, `kubectl`, `helmfile`, `minijinja-cli` are available
+- [ ] Ensure `just` is installed on the management node (minimum version 1.55.1)
+- [ ] Ensure `topf` is installed (Postfinance config tool for rendering Talos configs)
+- [ ] Ensure `talosctl`, `op`, `kubectl`, `helmfile`, `minijinja-cli` are available
 - [ ] Verify serial console / IPMI access to all nodes is working
 - [ ] Confirm no one is actively using apps in `talos-mixed` that haven't been backed up
 
@@ -61,15 +73,17 @@ Cluster endpoint: `https://10.200.15.253:6443`
 
 These nodes are control-planes in `talos-mixed`'s main cluster. Wipe them and they'll be removed from that cluster.
 
+> **Note:** Use the `talos` justfile module, not the legacy `task` commands.
+
 ```bash
 # blade1
-just talos.reset-node main NODE=blade1
+just talos reset-node CLUSTER=main NODE=blade1
 
 # blade2
-just talos.reset-node main NODE=blade2
+just talos reset-node CLUSTER=main NODE=blade2
 
 # blade3
-just talos.reset-node main NODE=blade3
+just talos reset-node CLUSTER=main NODE=blade3
 ```
 
 **Verify each node has rebooted into Talos maintenance mode:**
@@ -86,16 +100,16 @@ You should see a Talos CLI prompt at the serial console. If you see a normal she
 ## Step 2 — Bootstrap Utility Cluster
 
 ```bash
-just bootstrap utility
+just bootstrap talos CLUSTER=utility
+just bootstrap apps CLUSTER=utility
 ```
 
-This runs the full pipeline:
+This runs the full pipeline (justfile modules):
 
-1. **`bootstrap.nodes`** — applies topf config to blade1-3, they join the utility cluster
-2. **`bootstrap.k8s`** — runs `talosctl bootstrap` on the control plane (waits for KubeAPI)
-3. **`bootstrap.kubeconfig`** — generates kubeconfig/talosconfig for `utility` context
-4. **`bootstrap.base`** — applies namespaces + secrets (with OP inject) + CRDs
-5. **`bootstrap.apps`** — syncs helmfile core apps (cilium, coredns, cert-manager, external-secrets, onepassword-connect, flux-operator, flux-instance)
+1. **`bootstrap talos`** — generates Talos secrets from 1Password, applies topf config, bootstraps K8s, fetches kubeconfig
+2. **`bootstrap apps`** — applies namespaces, secrets, CRDs, then syncs helmfile core apps
+
+> **Why two commands?** The `just` bootstrap module separates Talos infrastructure bootstrap (secrets, topf apply, kubeconfig) from K8s apps bootstrap (namespaces, CRDs, helmfile sync). This separation allows debugging Talos issues separately from K8s app issues.
 
 **Verify the utility cluster:**
 ```bash
@@ -136,7 +150,7 @@ helmfile --kube-context utility --file bootstrap/helmfile/apps.yaml diff
 ## Step 3 — Wipe Test Node (blade4)
 
 ```bash
-just talos.reset-node main NODE=blade4
+just talos reset-node CLUSTER=main NODE=blade4
 ```
 
 **Verify maintenance mode:**
@@ -149,7 +163,8 @@ talosctl --nodes blade4 get health  # should fail
 ## Step 4 — Bootstrap Test Cluster
 
 ```bash
-just bootstrap test
+just bootstrap talos CLUSTER=test
+just bootstrap apps CLUSTER=test
 ```
 
 Same pipeline as utility but for the single control-plane node.
@@ -165,21 +180,23 @@ kubectl --context test get pods -A | grep -E "cilium|coredns|flux|external-secre
 
 ## Step 5 — Rebootstrap Main Cluster
 
-Main cluster has 10 nodes (3 control-planes + 7 workers). Wipe all of them.
+Main cluster has 10 nodes (3 control-planes + 7 workers) + 2 DGX Spark workers (not yet in main cluster — placeholders).
+
+> **WARNING:** DGX Spark nodes (spark1, spark2) have placeholder MAC addresses. Ensure real MACs are in `talos/topf/main/topf.yaml` **before** bootstrapping main.
 
 ```bash
 # Control-planes
-just talos.reset-node main NODE=ms1
-just talos.reset-node main NODE=ms2
-just talos.reset-node main NODE=ms3
+just talos reset-node CLUSTER=main NODE=ms1
+just talos reset-node CLUSTER=main NODE=ms2
+just talos reset-node CLUSTER=main NODE=ms3
 
 # Workers
-just talos.reset-node main NODE=blade5
-just talos.reset-node main NODE=blade6
-just talos.reset-node main NODE=blade7
-just talos.reset-node main NODE=blade8
-just talos.reset-node main NODE=nuc1
-just talos.reset-node main NODE=nuc2
+just talos reset-node CLUSTER=main NODE=blade5
+just talos reset-node CLUSTER=main NODE=blade6
+just talos reset-node CLUSTER=main NODE=blade7
+just talos reset-node CLUSTER=main NODE=blade8
+just talos reset-node CLUSTER=main NODE=nuc1
+just talos reset-node CLUSTER=main NODE=nuc2
 ```
 
 **Verify all nodes are in maintenance mode:**
@@ -195,7 +212,8 @@ done
 ## Step 6 — Bootstrap Main Cluster
 
 ```bash
-just bootstrap main
+just bootstrap talos CLUSTER=main
+just bootstrap apps CLUSTER=main
 ```
 
 **Verify the main cluster:**
@@ -250,10 +268,12 @@ kubectl --context main get backup -A 2>/dev/null || kubectl --context main get p
 ## Step 8 — Push Configs to 1Password
 
 ```bash
-just op.push
+just template configure  # Render config files (kubeconfig, talosconfig, etc.)
 ```
 
-This updates `KUBECONFIG_MAIN`, `KUBECONFIG_UTILITY`, `KUBECONFIG_TEST`, `TALOSCONFIG_MAIN`, `TALOSCONFIG_UTILITY`, `TALOSCONFIG_TEST` in the OP vault.
+> **Note:** The `op.push` Taskfile task (`.taskfiles/onepassword/Taskfile.yaml`) pushes kubeconfig and talosconfig to 1Password fields: `KUBECONFIG_MAIN`, `KUBECONFIG_UTILITY`, `KUBECONFIG_TEST`, `TALOSCONFIG_MAIN`, `TALOSCONFIG_UTILITY`, `TALOSCONFIG_TEST`, plus combined `KUBECONFIG` and `TALCONFIG` flat files.
+>
+> **Alternative:** `just template init` — initializes configuration files (cluster.toml, age key, deploy key, webhook token).
 
 ---
 
