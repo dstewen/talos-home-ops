@@ -30,7 +30,7 @@ metadata:
   name: onepassword-connect-credentials-secret
   namespace: external-secrets
 data:
-  1password-credentials.json: op://kubernetes/1password-utility/OP_SESSION_JSON
+  1password-credentials.json: op://kubernetes/OP_SESSION_JSON
 ---
 apiVersion: v1
 kind: Secret
@@ -38,7 +38,7 @@ metadata:
   name: onepassword-connect-vault-secret
   namespace: external-secrets
 stringData:
-  OP_CONNECT_TOKEN: op://kubernetes/1password-utility/OP_CONNECT_TOKEN
+  OP_CONNECT_TOKEN: ***
 ---
 apiVersion: v1
 kind: Secret
