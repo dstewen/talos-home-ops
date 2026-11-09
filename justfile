@@ -112,12 +112,57 @@ talos.reboot-node: CLUSTER ?= 'main' NODE ?= ''
     talosctl --nodes {{ NODE }} reboot --talosconfig {{ TALOSCONFIG }}
 
 # ============================================================================
-# Group: kubernetes — Kubernetes operations
+# Group: kube — Kubernetes operations
 # ============================================================================
 
+# Merge kubeconfigs into a single unified config (~/.kube/config)
+kube.merge-configs:
+    "Merge all cluster kubeconfigs into ~/.kube/config"
+    mkdir -p ~/.kube
+    for cluster in {{ CLUSTERS | join " " }}; do
+        if [ -f {{ KUBERNETES_DIR }}/clusters/$$cluster/kubeconfig ]; then
+            KUBECONFIG={{ KUBERNETES_DIR }}/clusters/$$cluster/kubeconfig kubectl config view --flatten --merge > /tmp/kubeconfig-merge-$$$$.yaml
+            if [ -f ~/.kube/config ]; then
+                KUBECONFIG=~/.kube/config /usr/bin/env python3 -c "
+import yaml, sys
+with open(sys.argv[1]) as f:
+    cfg1 = yaml.safe_load(f)
+with open(sys.argv[2]) as f:
+    cfg2 = yaml.safe_load(f)
+# Merge clusters, contexts, users
+cfg1['clusters'] = {k: v for k, v in {**cfg2.get('clusters', []), **{c['name']: c for c in cfg1.get('clusters', [])}}.items()}
+cfg1['contexts'] = {k: v for k, v in {**cfg2.get('contexts', []), **{c['name']: c for c in cfg1.get('contexts', [])}}.items()}
+cfg1['users'] = {k: v for k, v in {**cfg2.get('users', []), **{u['name']: u for u in cfg1.get('users', [])}}.items()}
+if 'current-context' in cfg2:
+    cfg1['current-context'] = cfg2['current-context']
+with open(sys.argv[1], 'w') as f:
+    yaml.dump(cfg1, f)
+" ~/.kube/config /tmp/kubeconfig-merge-$$$$.yaml
+            else
+                cp /tmp/kubeconfig-merge-$$$$.yaml ~/.kube/config
+            fi
+            rm /tmp/kubeconfig-merge-$$$$.yaml
+        fi
+    done
+
+# Merge talosconfigs into a single unified config (~/.talos/config)
+kube.merge-talos:
+    "Merge all cluster talosconfigs into ~/.talos/config"
+    mkdir -p ~/.talos
+    for cluster in {{ CLUSTERS | join " " }}; do
+        if [ -f {{ TALOS_DIR }}/$$cluster/talosconfig ]; then
+            talosctl --talosconfig {{ TALOS_DIR }}/$$cluster/talosconfig config merge {{ TALOS_DIR }}/$$cluster/talosconfig > /tmp/talosconfig-merge-$$$$.yaml
+            if [ -f ~/.talos/config ]; then
+                mv /tmp/talosconfig-merge-$$$$.yaml ~/.talos/config
+            else
+                mv /tmp/talosconfig-merge-$$$$.yaml ~/.talos/config
+            fi
+        fi
+    done
+
 # Apply a Flux Kustomization
-# Usage: just k8s.apply-ks main PATH=cert-manager
-k8s.apply-ks: CLUSTER ?= 'main' PATH ?= ''
+# Usage: just kube.apply-ks main PATH=cert-manager
+kube.apply-ks: CLUSTER ?= 'main' PATH ?= ''
     "Apply Kustomization {{ PATH }} for {{ CLUSTER }}"
     flux build --namespace flux-system ks {{ PATH }} \
         --kustomization-file {{ KUBERNETES_DIR }}/apps/{{ CLUSTER }}/{{ PATH }} \
@@ -125,15 +170,15 @@ k8s.apply-ks: CLUSTER ?= 'main' PATH ?= ''
         | yq 'with(select(.apiVersion == "kustomize.toolkit.fluxcd.io/v1" and .kind == "Kustomization"); .metadata.namespace = "flux-system")' - | kubectl apply --server-side --field-manager=kustomize-controller --filename -
 
 # Force Flux reconciliation
-# Usage: just k8s.reconcile main
-k8s.reconcile: CLUSTER ?= 'main'
+# Usage: just kube.reconcile main
+kube.reconcile: CLUSTER ?= 'main'
     "Force Flux reconciliation for {{ CLUSTER }}"
     flux get ks --no-header -n flux-system --context {{ CLUSTER }} | awk '{print $1, $2}' | xargs -L1 flux reconcile ks -n flux-system --context {{ CLUSTER }}
     flux get ks --all-namespaces --no-header --context {{ CLUSTER }} | awk '{print $1, $2}' | xargs -L1 flux reconcile ks -n $$1 --context {{ CLUSTER }}
 
 # Sync all ExternalSecrets
-# Usage: just k8s.sync-secrets main
-k8s.sync-secrets: CLUSTER ?= 'main'
+# Usage: just kube.sync-secrets main
+kube.sync-secrets: CLUSTER ?= 'main'
     "Sync all ExternalSecrets in {{ CLUSTER }}"
     SECRETS=$(kubectl get externalsecret --all-namespaces --no-headers --output=jsonpath='{range .items[*]}{.metadata.namespace},{.metadata.name}{"\n"}{end}' --context {{ CLUSTER }})
     echo "$SECRETS" | while IFS=',' read -r ns name; do
@@ -141,8 +186,8 @@ k8s.sync-secrets: CLUSTER ?= 'main'
     done
 
 # Restart failed HelmReleases
-# Usage: just k8s.hr-restart main
-k8s.hr-restart: CLUSTER ?= 'main'
+# Usage: just kube.hr-restart main
+kube.hr-restart: CLUSTER ?= 'main'
     "Restart failed HelmReleases in {{ CLUSTER }}"
     kubectl get hr --all-namespaces --context {{ CLUSTER }} | grep False | awk '{print $1, $2}' | while read -r ns hr; do
         flux suspend hr -n "$ns" "$hr" --context {{ CLUSTER }}
@@ -150,31 +195,31 @@ k8s.hr-restart: CLUSTER ?= 'main'
     done
 
 # Delete failed/pending pods
-# Usage: just k8s.delete-failed-pods main
-k8s.delete-failed-pods: CLUSTER ?= 'main'
+# Usage: just kube.delete-failed-pods main
+kube.delete-failed-pods: CLUSTER ?= 'main'
     "Delete failed pods in {{ CLUSTER }}"
     kubectl --context {{ CLUSTER }} delete pods --field-selector status.phase=Failed -A --ignore-not-found=true
     kubectl --context {{ CLUSTER }} delete pods --field-selector status.phase=Pending -A --ignore-not-found=true
 
 # Open a shell on a node
-# Usage: just k8s.node-shell main NODE=blade1
-k8s.node-shell: CLUSTER ?= 'main' NODE ?= ''
+# Usage: just kube.node-shell main NODE=blade1
+kube.node-shell: CLUSTER ?= 'main' NODE ?= ''
     "Shell on {{ NODE }} in {{ CLUSTER }}"
     kubectl node-shell -n kube-system -x {{ NODE }}
 
 # Browse a PVC
-# Usage: just k8s.browse-pvc main CLAIM=my-pvc
-k8s.browse-pvc: CLUSTER ?= 'main' CLAIM ?= ''
+# Usage: just kube.browse-pvc main CLAIM=my-pvc
+kube.browse-pvc: CLUSTER ?= 'main' CLAIM ?= ''
     "Browse PVC {{ CLAIM }} in {{ CLUSTER }}"
     kubectl browse-pvc --namespace default --image docker.io/library/alpine:latest {{ CLAIM }}
 
 # Suspend or resume Kustomizations
-# Usage: just k8s.ks-suspend main | just k8s.ks-resume main
-k8s.ks-suspend: CLUSTER ?= 'main'
+# Usage: just kube.ks-suspend main | just kube.ks-resume main
+kube.ks-suspend: CLUSTER ?= 'main'
     "Suspend all Kustomizations in {{ CLUSTER }}"
     flux suspend ks --all --namespace flux-system --context {{ CLUSTER }}
 
-k8s.ks-resume: CLUSTER ?= 'main'
+kube.ks-resume: CLUSTER ?= 'main'
     "Resume all Kustomizations in {{ CLUSTER }}"
     flux resume ks --all --namespace flux-system --context {{ CLUSTER }}
 
