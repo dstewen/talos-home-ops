@@ -1,0 +1,98 @@
+---
+# Model: Qwen/Qwen3.6-35B-A3B-FP8
+# Native FP8 format for vLLM on DGX Spark (GB10)
+apiVersion: inference.llmkube.dev/v1alpha1
+kind: Model
+metadata:
+  name: qwen36-35b-a3b-fp8
+spec:
+  source: hf://Qwen/Qwen3.6-35B-A3B-FP8
+  sourceSecretRef:
+    name: huggingface
+  format: safetensors
+  quantization: fp8
+  hardware:
+    accelerator: cuda
+    gpu:
+      enabled: true
+      vendor: nvidia
+      tensorParallelism: 2
+---
+# InferenceService: vLLM serving for Qwen3.6-35B-A3B-FP8
+# Matches eugr/spark-vllm-docker recipe: qwen3.6-35b-a3b-fp8.yaml
+apiVersion: inference.llmkube.dev/v1alpha1
+kind: InferenceService
+metadata:
+  name: qwen36-35b-a3b-fp8
+  labels:
+    krr/ignore: "true"
+spec:
+  modelRef: qwen36-35b-a3b-fp8
+  modelCache:
+    claimName: llmkube-ganyu-cache  # or llmkube-skirk-cache depending on your storage
+  runtime: vllm
+  image: ghcr.io/vllm-project/vllm:latest
+  rolloutPolicy:
+    waitForIdle: true
+    idleTimeoutSeconds: 86400
+  replicas: 1
+  priority: high
+  nodeSelector:
+    nvidia.com/gpu.present: "true"
+  tolerations:
+    - key: nvidia.com/gpu
+      operator: Exists
+      effect: NoSchedule
+  contextSize: 262144
+  maxNumBatchedTokens: 4096
+  parallelSlots: 2
+  batchSize: 4096
+  uBatchSize: 4096
+  resources:
+    cpu: "2000m"
+    memory: "32Gi"
+    nvidia.com/gpu: "2"
+  endpoint:
+    port: 8000
+    type: ClusterIP
+  extraArgs:
+    - --host 0.0.0.0
+    - --port 8000
+    - --max-model-len 262144
+    - --max-num-batched-tokens 4096
+    - --gpu-memory-utilization 0.8
+    - --enable-auto-tool-choice
+    - --tool-call-parser qwen3_xml
+    - --reasoning-parser qwen3
+    - --kv-cache-dtype fp8
+    - --load-format fastsafetensors
+    - --attention-backend flashinfer
+    - --enable-prefix-caching
+    - --tensor-parallel-size 2
+    - --distributed-executor-backend ray
+    - --enable-chunked-prefill
+    - --async-scheduling
+  env:
+    - name: VLLM_MARLIN_USE_ATOMIC_ADD
+      value: "1"
+  probeOverrides:
+    startup:
+      httpGet:
+        path: /health
+        port: 8000
+      periodSeconds: 10
+      failureThreshold: 360
+    liveness:
+      httpGet:
+        path: /health
+        port: 8000
+      initialDelaySeconds: 30
+      periodSeconds: 30
+      failureThreshold: 6
+    readiness:
+      httpGet:
+        path: /health
+        port: 8000
+      initialDelaySeconds: 20
+      periodSeconds: 10
+      failureThreshold: 6
