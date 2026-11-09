@@ -1,9 +1,18 @@
----
+# Talos cluster definition for test (Postfinance topf).
+#
+# Node-level config lives in the patch tree next to this file:
+#   all/              every node
+#   control-plane/    blade4 (RPi CM4) — CP only
+#
+# Per-node differences (IP, DHCP, etc.) come from the node
+# entries below, via `ip` and `data`, into the *.tpl patches.
+
 clusterName: test
 clusterEndpoint: https://10.200.15.252:6443
-
-talosVersion: v1.14.5
+# renovate: datasource=docker depName=ghcr.io/siderolabs/kubelet
 kubernetesVersion: v1.37.2
+talosVersion: v1.14.5
+platform: metal
 secretsProvider: ../../../../.justfiles/talos/secrets-provider
 
 nodes:
