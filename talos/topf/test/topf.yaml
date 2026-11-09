@@ -10,7 +10,7 @@ nodes:
   - host: "blade4"
     ip: "10.200.15.34"
     role: control-plane
-    schematicId: "de1619e16531ddff67ccb4ce636a5e3ba5197eb4fc0e8421f095ec50ce9d26a6"
+    schematicId: "@schematics/cm4-blade.yaml"
     data:
       installDisk: ""
       installDiskSerial: "22061X806791"

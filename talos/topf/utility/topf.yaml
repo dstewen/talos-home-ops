@@ -10,7 +10,7 @@ nodes:
   - host: "blade1"
     ip: "10.200.15.31"
     role: control-plane
-    schematicId: "de1619e16531ddff67ccb4ce636a5e3ba5197eb4fc0e8421f095ec50ce9d26a6"
+    schematicId: "@schematics/cm4-blade.yaml"
     data:
       installDisk: ""
       installDiskSerial: "22061X806385"
@@ -21,7 +21,7 @@ nodes:
   - host: "blade2"
     ip: "10.200.15.32"
     role: control-plane
-    schematicId: "de1619e16531ddff67ccb4ce636a5e3ba5197eb4fc0e8421f095ec50ce9d26a6"
+    schematicId: "@schematics/cm4-blade.yaml"
     data:
       installDisk: ""
       installDiskSerial: "220628800784"
@@ -32,7 +32,7 @@ nodes:
   - host: "blade3"
     ip: "10.200.15.33"
     role: control-plane
-    schematicId: "de1619e16531ddff67ccb4ce636a5e3ba5197eb4fc0e8421f095ec50ce9d26a6"
+    schematicId: "@schematics/cm4-blade.yaml"
     data:
       installDisk: ""
       installDiskSerial: "22061X805700"
