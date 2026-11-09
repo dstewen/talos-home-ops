@@ -126,10 +126,10 @@ helmfile --kube-context utility --file bootstrap/helmfile/apps.yaml diff
 - ✅ No failed pods
 
 **If something fails:**
-- Check `talosctl --talosconfig talos/utility/talosconfig logs` on each blade
+- Check `talosctl --nodes blade1 get logs` (or `--nodes blade2`, `--nodes blade3`)
 - Check `kubectl --context utility describe pod <pod> -n <namespace>`
 - Check `op validate` to ensure 1Password login is active
-- Re-run `just bootstrap.utility` (it's idempotent for nodes; the k8s/bootstrap step has an `AlreadyExists` guard)
+- Re-run `just bootstrap utility` (it's idempotent; the k8s/bootstrap step has an `AlreadyExists` guard)
 
 ---
 
