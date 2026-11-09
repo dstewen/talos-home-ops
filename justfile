@@ -8,15 +8,16 @@ set script-interpreter := ['bash', '-euo', 'pipefail']
 [group('bootstrap')]
 mod? bootstrap 'bootstrap'
 
-[group('kubernetes')]
-mod? kube 'kubernetes'
-
 [group('talos')]
 mod? talos 'talos'
 
+# Secret management (per-cluster, 1Password)
+[group('talos-secrets')]
+mod? talos-secrets 'talos-secrets'
+
 # VolSync Recipes
 [group('volSync')]
-mod? volsync ".justfiles/volsync"
+mod? volsync '.justfiles/volsync'
 
 [private]
 log lvl msg *args:
