@@ -14,7 +14,7 @@ clusterEndpoint: https://10.200.15.254:6443
 kubernetesVersion: v1.37.2
 talosVersion: v1.14.5
 platform: metal
-secretsPath: secrets.sops.yaml
+secretsProvider: ../../../../.justfiles/talos/secrets-provider
 
 nodes:
   - host: "blade1"
