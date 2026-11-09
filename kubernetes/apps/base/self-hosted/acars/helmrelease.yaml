@@ -101,7 +101,7 @@ spec:
             image:
               repository: ghcr.io/tyzbit/acars-processor
               # renovate: datasource=docker depName=ghcr.io/tyzbit/acars-processor
-              tag: v1.3.4@sha256:7ee1b66df9097e2a72aeafa1b6fd2d7afd8cbd925c3a593dac9007082615a038
+              tag: v2.0.0@sha256:3a4e338a2adeaf7a1a868dc1ebb5c91adcb65da251587570dd56c5e47d279a0e
             resources:
               requests:
                 cpu: 10m
