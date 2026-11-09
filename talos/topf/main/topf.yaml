@@ -106,3 +106,27 @@ nodes:
       mtu: 1500
       encryptDisk: false
       kernelModules: []
+
+  # DGX Spark (GB10, arm64) — NVIDIA Grace CPU + Blackwell GPU, 128GB unified mem
+  # Connected via Realtek RTL8127 10G copper (enP7s7) for management
+  # ConnectX-7 200G fabric interfaces not yet configured
+  - host: "spark1"
+    ip: "10.200.15.71"
+    role: worker
+    schematicId: "@schematics/dgx.yaml"
+    data:
+      installDisk: ""
+      macAddr: "PLACEHOLDER"
+      mtu: 1500
+      encryptDisk: false
+      kernelModules: []
+  - host: "spark2"
+    ip: "10.200.15.72"
+    role: worker
+    schematicId: "@schematics/dgx.yaml"
+    data:
+      installDisk: ""
+      macAddr: "PLACEHOLDER"
+      mtu: 1500
+      encryptDisk: false
+      kernelModules: []
