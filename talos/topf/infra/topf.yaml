@@ -1,0 +1,52 @@
+---
+# Talos cluster definition for infra (Postfinance topf).
+#
+# Node-level config lives in the patch tree next to this file:
+#   all/              every node
+#   control-plane/    blade1-3 (RPi CM4) — CP only
+#
+# Per-node differences (IP, DHCP, etc.) come from the node
+# entries below, via `ip` and `data`, into the *.tpl patches.
+
+clusterName: infra
+clusterEndpoint: https://10.200.15.254:6443
+# renovate: datasource=docker depName=ghcr.io/siderolabs/kubelet
+kubernetesVersion: v1.37.2
+talosVersion: v1.14.5
+platform: metal
+secretsPath: secrets.sops.yaml
+
+nodes:
+  - host: "blade1"
+    ip: "10.200.15.31"
+    role: control-plane
+    schematicId: "@schematics/cm4-blade.yaml"
+    data:
+      installDisk: ""
+      installDiskSerial: "22061X806385"
+      macAddr: "e4:5f:01:50:27:2d"
+      mtu: 1500
+      encryptDisk: false
+      kernelModules: []
+  - host: "blade2"
+    ip: "10.200.15.32"
+    role: control-plane
+    schematicId: "@schematics/cm4-blade.yaml"
+    data:
+      installDisk: ""
+      installDiskSerial: "220628800784"
+      macAddr: "e4:5f:01:ec:16:54"
+      mtu: 1500
+      encryptDisk: false
+      kernelModules: []
+  - host: "blade3"
+    ip: "10.200.15.33"
+    role: control-plane
+    schematicId: "@schematics/cm4-blade.yaml"
+    data:
+      installDisk: ""
+      installDiskSerial: "22061X805700"
+      macAddr: "e4:5f:01:ec:16:a2"
+      mtu: 1500
+      encryptDisk: false
+      kernelModules: []

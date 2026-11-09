@@ -1,0 +1,7 @@
+apiVersion: v1alpha1
+kind: UserVolumeConfig
+name: local-hostpath-1tb
+provisioning:
+  diskSelector:
+    match: disk.model == "WD_BLACK SN770 2TB" && !system_disk
+  minSize: 1TB
