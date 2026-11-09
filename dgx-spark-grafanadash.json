@@ -1,0 +1,253 @@
+{
+  "title": "DGX Spark Metrics",
+  "uid": "dgx-spark-metrics",
+  "tags": ["talos", "dgx-spark", "gb10"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "30s",
+  "time": { "from": "now-6h", "to": "now" },
+  "templating": {
+    "list": [
+      {
+        "name": "ds",
+        "type": "datasource",
+        "query": "prometheus",
+        "current": {},
+        "hide": 0,
+        "sort": 1
+      },
+      {
+        "name": "node",
+        "type": "query",
+        "datasource": "${ds}",
+        "query": "label_values(sparkdash_up, instance)",
+        "refresh": 2,
+        "multi": true,
+        "includeAll": true,
+        "sort": 1
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "GPU Utilization",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "fieldConfig": {
+        "defaults": { "unit": "percentunit", "min": 0, "max": 1, "thresholds": { "modes": [
+          { "color": "green", "value": null, "operator": ">" },
+          { "color": "orange", "value": 0.5, "operator": ">" },
+          { "color": "red", "value": 0.8, "operator": ">" }
+        ]} }
+      },
+      "targets": [
+        { "expr": "sparkdash_gpu_utilization_ratio", "legendFormat": "{{gpu}}", "datasource": "${ds}" }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "GPU Temperature",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "fieldConfig": {
+        "defaults": { "unit": "celsius", "thresholds": { "modes": [
+          { "color": "green", "value": null, "operator": ">" },
+          { "color": "orange", "value": 70, "operator": ">" },
+          { "color": "red", "value": 85, "operator": ">" }
+        ]} }
+      },
+      "targets": [
+        { "expr": "sparkdash_gpu_temperature_celsius", "legendFormat": "GPU {{gpu}}", "datasource": "${ds}" }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "GPU Power",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "fieldConfig": {
+        "defaults": { "unit": "watt", "thresholds": { "modes": [
+          { "color": "green", "value": null, "operator": ">" },
+          { "color": "orange", "value": 300, "operator": ">" },
+          { "color": "red", "value": 500, "operator": ">" }
+        ]} }
+      },
+      "targets": [
+        { "expr": "sparkdash_gpu_power_watts", "legendFormat": "GPU {{gpu}} draw", "datasource": "${ds}" },
+        { "expr": "sparkdash_gpu_power_limit_watts", "legendFormat": "{{gpu}} limit", "datasource": "${ds}" }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "GPU Memory",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "fieldConfig": {
+        "defaults": { "unit": "bytes", "thresholds": { "modes": [
+          { "color": "green", "value": null, "operator": ">" },
+          { "color": "orange", "value": 8e10, "operator": ">" },
+          { "color": "red", "value": 1.07e11, "operator": ">" }
+        ]} }
+      },
+      "targets": [
+        { "expr": "sparkdash_gpu_memory_used_bytes", "legendFormat": "GPU {{gpu}} used", "datasource": "${ds}" },
+        { "expr": "sparkdash_gpu_memory_total_bytes", "legendFormat": "GPU {{gpu}} total", "datasource": "${ds}" }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "GPU Throttle Events",
+      "type": "stat",
+      "gridPos": { "h": 8, "w": 6, "x": 0, "y": 16 },
+      "fieldConfig": {
+        "defaults": { "thresholds": { "modes": [
+          { "color": "green", "value": null, "operator": ">" },
+          { "color": "red", "value": 1, "operator": ">" }
+        ]} }
+      },
+      "targets": [
+        { "expr": "sparkdash_gpu_throttled > 0", "legendFormat": "GPU {{gpu}} {{reason}}", "datasource": "${ds}" }
+      ],
+      "options": { "colorMode": "background", "textMode": "auto" }
+    },
+    {
+      "id": 6,
+      "title": "CPU Utilization",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 18, "x": 6, "y": 16 },
+      "fieldConfig": {
+        "defaults": { "unit": "percentunit", "min": 0, "max": 1, "thresholds": { "modes": [
+          { "color": "green", "value": null, "operator": ">" },
+          { "color": "orange", "value": 0.7, "operator": ">" },
+          { "color": "red", "value": 0.9, "operator": ">" }
+        ]} }
+      },
+      "targets": [
+        { "expr": "sparkdash_cpu_utilization_ratio", "legendFormat": "CPU", "datasource": "${ds}" }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "CPU Temperature",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 6, "x": 0, "y": 16 },
+      "fieldConfig": {
+        "defaults": { "unit": "celsius", "thresholds": { "modes": [
+          { "color": "green", "value": null, "operator": ">" },
+          { "color": "orange", "value": 70, "operator": ">" },
+          { "color": "red", "value": 85, "operator": ">" }
+        ]} }
+      },
+      "targets": [
+        { "expr": "sparkdash_cpu_temperature_celsius", "legendFormat": "{{sensor}}", "datasource": "${ds}" }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "System Memory",
+      "type": "gauge",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 24 },
+      "fieldConfig": {
+        "defaults": { "unit": "bytes", "min": 0, "max": 1.37e11, "thresholds": { "modes": [
+          { "color": "green", "value": null, "operator": ">" },
+          { "color": "orange", "value": 1.0e11, "operator": ">" },
+          { "color": "red", "value": 1.2e11, "operator": ">" }
+        ]} }
+      },
+      "targets": [
+        { "expr": "sparkdash_ram_used_bytes", "legendFormat": "Used", "datasource": "${ds}" }
+      ],
+      "options": { "showThresholdLabels": false, "showThresholdMarkers": true }
+    },
+    {
+      "id": 9,
+      "title": "Network Throughput",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 24 },
+      "fieldConfig": {
+        "defaults": { "unit": "Bps", "thresholds": { "modes": [
+          { "color": "green", "value": null, "operator": ">" }
+        ]} }
+      },
+      "targets": [
+        { "expr": "sparkdash_network_receive_bytes_per_second", "legendFormat": "RX {{interface}}", "datasource": "${ds}" },
+        { "expr": "sparkdash_network_transmit_bytes_per_second", "legendFormat": "TX {{interface}}", "datasource": "${ds}" }
+      ]
+    },
+    {
+      "id": 10,
+      "title": "Disk Usage",
+      "type": "gauge",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 32 },
+      "fieldConfig": {
+        "defaults": { "unit": "bytes", "thresholds": { "modes": [
+          { "color": "green", "value": null, "operator": ">" },
+          { "color": "orange", "value": 2.8e12, "operator": ">" },
+          { "color": "red", "value": 3.8e12, "operator": ">" }
+        ]} }
+      },
+      "targets": [
+        { "expr": "sparkdash_disk_used_bytes", "legendFormat": "{{mount}} ({{device}}) used", "datasource": "${ds}" }
+      ],
+      "options": { "showThresholdLabels": false, "showThresholdMarkers": true }
+    },
+    {
+      "id": 11,
+      "title": "LLM Endpoints",
+      "type": "state-timeline",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 40 },
+      "fieldConfig": {
+        "defaults": { "thresholds": { "modes": [
+          { "color": "red", "value": null, "operator": ">" },
+          { "color": "green", "value": 1, "operator": ">" }
+        ]} }
+      },
+      "targets": [
+        { "expr": "sparkdash_llm_up", "legendFormat": "{{backend}} (port {{port}})", "datasource": "${ds}" }
+      ],
+      "options": { "showValue": "auto" }
+    },
+    {
+      "id": 12,
+      "title": "LLM Token Throughput",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 48 },
+      "fieldConfig": {
+        "defaults": { "unit": "ops", "thresholds": { "modes": [
+          { "color": "green", "value": null, "operator": ">" }
+        ]} }
+      },
+      "targets": [
+        { "expr": "sparkdash_llm_generation_tokens_per_second", "legendFormat": "{{backend}} (port {{port}})", "datasource": "${ds}" }
+      ]
+    },
+    {
+      "id": 13,
+      "title": "LLM KV Cache Usage",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 56 },
+      "fieldConfig": {
+        "defaults": { "unit": "percentunit", "min": 0, "max": 1, "thresholds": { "modes": [
+          { "color": "green", "value": null, "operator": ">" },
+          { "color": "orange", "value": 0.8, "operator": ">" },
+          { "color": "red", "value": 0.95, "operator": ">" }
+        ]} }
+      },
+      "targets": [
+        { "expr": "sparkdash_llm_kv_cache_usage_ratio", "legendFormat": "{{backend}} (port {{port}})", "datasource": "${ds}" }
+      ]
+    },
+    {
+      "id": 14,
+      "title": "LLM Request Queue",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 64 },
+      "targets": [
+        { "expr": "sparkdash_llm_requests_running", "legendFormat": "{{backend}} running (port {{port}})", "datasource": "${ds}" },
+        { "expr": "sparkdash_llm_requests_waiting", "legendFormat": "{{backend}} waiting (port {{port}})", "datasource": "${ds}" }
+      ]
+    }
+  ]
+}
