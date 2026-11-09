@@ -6,7 +6,7 @@ set default-script
 
 # === Flux operations (per-cluster) ===
 # Usage: just kube reconcile CLUSTER=<cluster>
-# where CLUSTER is one of: infra, main, test, utility (defaults to main)
+# where CLUSTER is one of: utility, main, test (defaults to main)
 
 [doc('Force Flux to pull in changes for cluster [CLUSTER=main]')]
 [group('kube')]

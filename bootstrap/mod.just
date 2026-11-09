@@ -9,7 +9,7 @@ kubernetes_dir := justfile_dir() + '/kubernetes'
 
 # === Talos bootstrap (per-cluster) ===
 # Usage: just bootstrap talos CLUSTER=<cluster>
-# where CLUSTER is one of: infra, main, test, utility
+# where CLUSTER is one of: utility, main, test
 
 [doc('Bootstrap Talos cluster (generates secrets, applies config, fetches kubeconfig)')]
 [group('bootstrap')]

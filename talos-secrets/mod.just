@@ -6,13 +6,13 @@
 #   Vault: Kubernetes
 #   Item: talos
 #   Fields:
-#     infra_id, infra_secret, infra_secrets/bootstrap_token,
-#     infra_secrets/secretbox_encryption_secret, infra_trustdinfo/token,
-#     infra_certs_etcd/cert, infra_certs_etcd/key,
-#     infra_certs_k8s/cert, infra_certs_k8s/key,
-#     infra_certs_k8saggregator/cert, infra_certs_k8saggregator/key,
-#     infra_certs_k8sserviceaccount/key, infra_certs_os/cert, infra_certs_os/key
-#     main_*, test_*, utility_* (same pattern)
+#     utility_id, utility_secret, utility_secrets/bootstrap_token,
+#     utility_secrets/secretbox_encryption_secret, utility_trustdinfo/token,
+#     utility_certs_etcd/cert, utility_certs_etcd/key,
+#     utility_certs_k8s/cert, utility_certs_k8s/key,
+#     utility_certs_k8saggregator/cert, utility_certs_k8saggregator/key,
+#     utility_certs_k8sserviceaccount/key, utility_certs_os/cert, utility_certs_os/key
+#     main_*, test_* (same pattern)
 #
 # Usage: just talos-secrets <command> CLUSTER=<cluster>
 

@@ -6,7 +6,7 @@ set default-script
 
 # === Talos operations (per-cluster) ===
 # Usage: just talos <command> CLUSTER=<cluster>
-# where CLUSTER is one of: infra, main, test, utility
+# where CLUSTER is one of: utility, main, test
 
 # === Per-cluster operations ===
 # Most tasks take CLUSTER=<cluster> as first parameter
