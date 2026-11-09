@@ -9,8 +9,8 @@
 
 ## Pre-Migration Checklist
 
-- [ ] Confirm volsync backups are running (all PersistentVolumeClaims with BackupClass)
-- [ ] Confirm CNPG barman backups are current (check `kubectl --context main get backup`)
+- [ ] Confirm volsync replication sources are healthy (check `ReplicationSource` resources in apps that use persistent volumes)
+- [ ] Confirm CNPG barman backups are current (check `kubectl --context main get backups.postgresql.cnpg.io -n database -o wide` — should show daily completed backups)
 - [ ] Ensure 1Password `kubernetes` vault exists with:
   - `OP_SESSION_JSON` field
   - `OP_CONNECT_TOKEN` field
