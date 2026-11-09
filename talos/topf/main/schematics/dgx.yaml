@@ -1,20 +1,25 @@
 ---
 # NVIDIA DGX Spark (GB10, arm64, secureboot UKI).
+#
+# Hardware: NVIDIA GB10 SoC (Grace 12-core ARM64 + Blackwell GPU via C2C),
+# 128GB unified memory, 4TB NVMe, 2x Mellanox ConnectX-7 QSFP56 + 1x Realtek
+# RTL8127 10G copper.
+#
+# Driver: Proprietary NVIDIA drivers required. Open-source drivers cause CUDA
+# cuInit() error 3. Uses siderolabs/nonfree-kmod-nvidia-production.
+#
+# Kernel: arm64.nobti required to prevent crashes and CUDA library load failures.
+# pci=pcie_bus_safe improves NCCL throughput on ConnectX-7 from ~130-165 Gb/s
+# to ~178-189 Gb/s by raising PCIe MaxPayload to match DevCap (512B).
 customization:
   extraKernelArgs:
     - arm64.nobti
-    # DGX OS default that Talos lacks: the ConnectX-7 (01:00.0/.1) and its root
-    # port negotiate PCIe MaxPayload 128 B although DevCap allows 512 B, which
-    # caps NCCL all-reduce over the 200G link at ~130-165 Gb/s. pcie_bus_safe
-    # raises every device's MPS to the largest value its parent bus supports
-    # (178-189 Gb/s after the fix in the Spark guide's measurements).
     - pci=pcie_bus_safe
   systemExtensions:
     officialExtensions:
       - siderolabs/iscsi-tools
       - siderolabs/lldpd
       - siderolabs/nvidia-container-toolkit-production
-      # Open-source drivers cause CUDA initialization failures in containers (cuInit error 3)
-      # - siderolabs/nvidia-open-gpu-kernel-modules-production
-      # Proprietary drivers required for CUDA to work properly on DGX Spark (GB10)
+      # Proprietary drivers required for CUDA on DGX Spark (GB10)
+      # Open-source drivers cause CUDA initialization failures (cuInit error 3)
       - siderolabs/nonfree-kmod-nvidia-production
