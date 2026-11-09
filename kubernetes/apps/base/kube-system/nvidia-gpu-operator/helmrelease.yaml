@@ -1,0 +1,85 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: nvidia-gpu-operator
+  namespace: kube-system
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: nvidia-gpu-operator
+  interval: 1h
+  timeout: 20m
+  install:
+    crds: CreateReplace
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    crds: CreateReplace
+    remediation:
+      retries: 0
+  values:
+    # ---------------------------------------------------------
+    # Talos manages drivers via systemExtensions in dgx.yaml
+    # ---------------------------------------------------------
+    driver:
+      enabled: false
+
+    # ---------------------------------------------------------
+    # Talos provides container toolkit via systemExtensions
+    # ---------------------------------------------------------
+    toolkit:
+      enabled: false
+
+    # ---------------------------------------------------------
+    # DRA Driver replaces the standard device plugin.
+    # Enables GPU slicing on GB10 (cores, memory, etc.)
+    # ---------------------------------------------------------
+    devicePlugin:
+      enabled: false
+
+    dra:
+      enabled: true
+
+    # ---------------------------------------------------------
+    # Disable operator's NFD — use kube-system NFD instead
+    # ---------------------------------------------------------
+    nfd:
+      enabled: false
+    node-feature-discovery:
+      enabled: false
+
+    # ---------------------------------------------------------
+    # DCGM Exporter for monitoring (kept enabled)
+    # ---------------------------------------------------------
+    dcgmExporter:
+      enabled: true
+      serviceMonitor:
+        enabled: true
+
+    # ---------------------------------------------------------
+    # Talos installs drivers at /usr/local via extensions
+    # ---------------------------------------------------------
+    hostPaths:
+      driverInstallDir: /usr/local
+
+    # ---------------------------------------------------------
+    # Daemonset tolerations (all nodes)
+    # ---------------------------------------------------------
+    daemonsets:
+      tolerations:
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+        - key: node-role.kubernetes.io/worker
+          operator: Exists
+          effect: NoSchedule
+
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        memory: 256Mi

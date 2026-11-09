@@ -1,0 +1,15 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/source.toolkit.fluxcd.io/ocirepository_v1.json
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  name: nvidia-gpu-operator
+  namespace: kube-system
+spec:
+  interval: 1h
+  url: oci://nvcr.io/nvidia/charts/gpu-operator
+  ref:
+    tag: v26.7.2  # Pin to specific version, update with Renovate
+  provider: generic
+  secretRef:
+    name: nvcr-credentials  # Optional: if you need auth for nvcr.io
