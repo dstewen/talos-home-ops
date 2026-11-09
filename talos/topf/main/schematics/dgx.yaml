@@ -23,3 +23,10 @@ customization:
       # Proprietary drivers required for CUDA on DGX Spark (GB10)
       # Open-source drivers cause CUDA initialization failures (cuInit error 3)
       - siderolabs/nonfree-kmod-nvidia-production
+---
+apiVersion: v1alpha1
+kind: SysctlConfig
+params:
+  net.ipv4.conf.all.arp_ignore: "1"          # RoCE: ARP only on receiving interface
+  net.ipv4.conf.all.arp_announce: "2"         # RoCE: respond via best interface for dest
+  vm.compaction_proactiveness: "0"            # GB10: disable proactive compaction to avoid GPU stalls on pinned unified memory
