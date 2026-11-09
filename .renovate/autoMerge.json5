@@ -25,7 +25,6 @@
       automergeType: "pr",
       matchUpdateTypes: ["digest"],
       matchPackageNames: [
-        "docker.io/kyuz0/amd-strix-halo-toolboxes",
         "ghcr.io/ggml-org/llama.cpp",
       ],
       ignoreTests: false,

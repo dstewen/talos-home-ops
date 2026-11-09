@@ -88,13 +88,12 @@
       groupName: "llama.cpp",
       matchDatasources: ["docker"],
       matchPackageNames: [
-        "docker.io/kyuz0/amd-strix-halo-toolboxes",
         "ghcr.io/ggml-org/llama.cpp",
       ],
       group: {
         commitMessageTopic: "{{{groupName}}} group",
       },
-      minimumGroupSize: 2,
+      minimumGroupSize: 1,
     },
     {
       description: "LLMKube Group",
