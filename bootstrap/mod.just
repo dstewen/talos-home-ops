@@ -13,12 +13,12 @@ kubernetes_dir := justfile_dir() + '/kubernetes'
 
 [doc('Bootstrap Talos cluster (generates secrets, applies config, fetches kubeconfig)')]
 [group('bootstrap')]
-talos CLUSTER: talos-secret talos-apply talos-talosconfig talos-kubeconfig
+talos CLUSTER: talos-generate-secrets talos-apply talos-talosconfig talos-kubeconfig
 
 [private]
-[working-directory('talos/topf/{{.CLUSTER}}')]
-talos-secret CLUSTER:
-    just log info "Generating secrets" cluster {{CLUSTER}}
+talos-generate-secrets CLUSTER:
+    just log info "Generating secrets bundle" cluster {{CLUSTER}}
+    just talos-secrets generate CLUSTER={{CLUSTER}} > /dev/null
 
 [private]
 [working-directory('talos/topf/{{.CLUSTER}}')]
@@ -93,13 +93,11 @@ apps-secrets CLUSTER:
 [private]
 apps-ready CLUSTER:
     just log info "Waiting for nodes to register" cluster {{CLUSTER}}
-    if ! kubectl --context {{CLUSTER}} wait nodes --for=condition=Ready=True --all --timeout=10s &>/dev/null; then
-        deadline=$((SECONDS + 600))
-        until kubectl --context {{CLUSTER}} wait nodes --for=condition=Ready=False --all --timeout=10s &>/dev/null; do
-            if (( SECONDS >= deadline )); then
-                just log fatal "Timed out waiting for nodes to register"
-            fi
-            just log info "Nodes not available, waiting. Retrying in 5 seconds..."
-            sleep 5
-        done
-    fi
+    deadline=$((SECONDS + 600))
+    until kubectl --context {{CLUSTER}} wait nodes --for=condition=Ready=True --all --timeout=10s &>/dev/null; do
+        if (( SECONDS >= deadline )); then
+            just log fatal "Timed out waiting for nodes to register"
+        fi
+        just log info "Nodes not available, waiting. Retrying in 5 seconds..."
+        sleep 5
+    done

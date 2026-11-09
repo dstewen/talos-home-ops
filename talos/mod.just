@@ -27,7 +27,6 @@ nodes CLUSTER:
 apply-node CLUSTER NODE:
     just log info "Applying Talos config" cluster {{CLUSTER}} node {{NODE}}
     if [ -f "talos/topf/{{.CLUSTER}}/talosconfig" ]; then
-        minijinja-cli "talos/topf/{{.CLUSTER}}/machineconfig.yaml.j2" 2>/dev/null || true
         talosctl --nodes {{.NODE}} apply-config --mode auto --talosconfig "talos/topf/{{.CLUSTER}}/talosconfig"
     else
         just log fatal "No talosconfig found for cluster {{.CLUSTER}}"
@@ -43,10 +42,8 @@ upgrade-node CLUSTER NODE VERSION:
 [group('talos')]
 upgrade-k8s CLUSTER VERSION:
     just log info "Upgrading Kubernetes" cluster {{CLUSTER}} version {{VERSION}}
-    talosctl --talosconfig "talos/topf/{{.CLUSTER}}/talosconfig" --nodes {{.NODES}} upgrade-k8s --to {{.VERSION}}
-    vars:
-        NODES:
-            sh: kubectl --context {{.CLUSTER}} get nodes --no-headers --output=jsonpath='{.items[0].metadata.name}'
+    nodes=$(kubectl --context {{CLUSTER}} get nodes --no-headers -o jsonpath='{.items[*].metadata.name}' | tr ' ' ',')
+    talosctl --talosconfig "talos/topf/{{CLUSTER}}/talosconfig" --nodes "$nodes" upgrade-k8s --to {{VERSION}}
 
 [doc('Reset Talos on a node [CLUSTER=main] [NODE=required]')]
 [group('talos')]
@@ -59,7 +56,7 @@ reset-node CLUSTER NODE:
 kubeconfig CLUSTER:
     just log info "Generating kubeconfig" cluster {{CLUSTER}}
     if [ -f "talos/topf/{{.CLUSTER}}/talosconfig" ]; then
-        talosctl kubeconfig --talosconfig "talos/topf/{{.CLUSTER}}/talosconfig" --nodes "$(kubectl --context {{.CLUSTER}} get nodes --no-headers -o custom-columns=NAME:.metadata.name | head -1)" "{{.ROOT_DIR}}/kubeconfig-{{.CLUSTER}}"
+        talosctl kubeconfig --talosconfig "talos/topf/{{.CLUSTER}}/talosconfig" --nodes "$(kubectl --context {{CLUSTER}} get nodes --no-headers -o custom-columns=NAME:.metadata.name | head -1)" "{{.ROOT_DIR}}/kubeconfig-{{CLUSTER}}"
     else
         just log fatal "No talosconfig found for cluster {{.CLUSTER}}"
     fi
