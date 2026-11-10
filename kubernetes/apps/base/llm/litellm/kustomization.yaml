@@ -9,7 +9,6 @@ resources:
   - ./embed.yaml
   - ./externalsecret.yaml
   # - ./gemma-4-e4b.yaml  # vision sidecar; only needed while the Strix lane is text-only (GLM). flash-next has its own mmproj
-  # - ./glm-5.3-flash-local.yaml  # commented out for the flash-next swap-back test; skirk holds ONE of these at a time
   - ./grafanadashboard.yaml
   - ./guardrail.yaml
   - ./litellmproxy.yaml
@@ -19,6 +18,5 @@ resources:
   # - ./nemotron-3.5-lightning-30b-a3b.yaml
   - ./nvidia-pool.yaml
   - ./qwen3.8-27b.yaml
-  - ./qwen3.8-flash-next.yaml
   - ./prometheusrule.yaml
   - ./servicemonitor.yaml
