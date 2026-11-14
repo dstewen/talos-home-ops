@@ -1,11 +1,12 @@
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/inference.llmkube.dev/model_v1alpha1.json
-# Model: Qwen/Qwen3.6-35B-A3B-FP8
-# Native FP8 format for vLLM on DGX Spark (GB10)
+# Model: Qwen/Qwen3.6-35B-A3B-FP8 + DFlash draft
+# Recipe: qwen3.6-35b-a3b-fp8-dflash.yaml
+# Single-node TP=2, FP8 KV cache, DFlash speculative decoding
 apiVersion: inference.llmkube.dev/v1alpha1
 kind: Model
 metadata:
-  name: qwen36-35b-a3b-fp8
+  name: qwen36-35b-a3b-fp8-dflash
 spec:
   source: hf://Qwen/Qwen3.6-35B-A3B-FP8
   sourceSecretRef:
@@ -17,23 +18,22 @@ spec:
     gpu:
       enabled: true
       vendor: nvidia
-      tensorParallelism: 2
+      count: 2
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/inference.llmkube.dev/inferenceservice_v1alpha1.json
-# InferenceService: vLLM serving for Qwen3.6-35B-A3B-FP8
-# Matches eugr/spark-vllm-docker recipe: qwen3.6-35b-a3b-fp8.yaml
+# InferenceService: vLLM serving with DFlash speculative decoding
 apiVersion: inference.llmkube.dev/v1alpha1
 kind: InferenceService
 metadata:
-  name: qwen36-35b-a3b-fp8
+  name: qwen36-35b-a3b-fp8-dflash
   labels:
     krr/ignore: "true"
 spec:
-  modelRef: qwen36-35b-a3b-fp8
+  modelRef: qwen36-35b-a3b-fp8-dflash
   modelCache:
-    claimName: llmkube-ganyu-cache  # or llmkube-skirk-cache depending on your storage
+    claimName: llmkube-ganyu-cache
   runtime: vllm
-  image: ghcr.io/vllm-project/vllm:latest
+  image: eugr/spark-vllm:latest
   rolloutPolicy:
     waitForIdle: true
     idleTimeoutSeconds: 86400
@@ -69,11 +69,10 @@ spec:
     - --kv-cache-dtype fp8
     - --load-format fastsafetensors
     - --attention-backend flashinfer
-    - --enable-prefix-caching
     - --tensor-parallel-size 2
-    - --distributed-executor-backend ray
     - --enable-chunked-prefill
     - --async-scheduling
+    - --speculative-config '{"method":"dflash","model":"Qwen/Qwen3.6-35B-A3B-DFlash2","num_speculative_tokens":8}'
   env:
     - name: VLLM_MARLIN_USE_ATOMIC_ADD
       value: "1"

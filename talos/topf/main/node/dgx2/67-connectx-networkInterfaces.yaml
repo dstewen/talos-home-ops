@@ -1,0 +1,15 @@
+---
+# ConnectX-7 fabric interfaces for spark2
+# Direct DAC link to spark1, MTU 9000 for NCCL jumbo frames
+# GID index 3 confirmed (10.20.0.12 / 10.20.1.12)
+apiVersion: v1alpha1
+kind: MachineNetworkConfig
+networkInterfaces:
+  - interface: enp1s0f1np1
+    mtu: 9000
+    addresses:
+      - 10.20.0.12/24
+  - interface: enP2p1s0f1np1
+    mtu: 9000
+    addresses:
+      - 10.20.1.12/24
