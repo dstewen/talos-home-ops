@@ -49,7 +49,7 @@ upgrade-k8s CLUSTER VERSION:
 [group('talos')]
 reset-node CLUSTER NODE:
     just log info "Resetting Talos node" cluster {{CLUSTER}} node {{NODE}}
-    talosctl --talosconfig "talos/topf/{{.CLUSTER}}/talosconfig" reset --nodes {{.NODE}} --graceful=false --reboot
+    talosctl --talosconfig "talos/topf/{{.CLUSTER}}/talosconfig" reset --nodes {{.NODE}} --graceful --system-labels-to-wipe STATE --system-labels-to-wipe EPHEMERAL --reboot --wait --timeout 30m
 
 [doc('Generate kubeconfig for cluster [CLUSTER=main]')]
 [group('talos')]
