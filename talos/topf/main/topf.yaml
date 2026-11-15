@@ -115,8 +115,7 @@ nodes:
     role: worker
     schematicId: "@schematics/dgx.yaml"
     data:
-      installDisk: ""
-      installDiskSerial: "S8C2NE0L208715"
+      installDisk: "nvme0n1"
       macAddr: "4c:bb:47:ec:9d:9e"
       mtu: 1500
       encryptDisk: false
