@@ -1,7 +1,10 @@
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/inference.llmkube.dev/model_v1alpha1.json
-# Recipe: openai/gpt-oss-120b
-# OpenAI's open source 120B MoE model with MXFP4 quantization
+# Model: openai/gpt-oss-120b
+# Recipe: gpt-oss-120b.yaml
+# Cluster-only: TP=2 across 2 DGX Spark nodes
+# NOTE: Requires multiNode configuration with RDMA fabric
+# NOTE: Uses MXFP4 quantization (--exp-mxfp4 build profile)
 apiVersion: inference.llmkube.dev/v1alpha1
 kind: Model
 metadata:
@@ -17,11 +20,10 @@ spec:
     gpu:
       enabled: true
       vendor: nvidia
-      tensorParallelism: 1
+      count: 2
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/inference.llmkube.dev/inferenceservice_v1alpha1.json
-# Recipe: openai/gpt-oss-120b
-# OpenAI's open source 120B MoE model with MXFP4 quantization
+# InferenceService: vLLM serving, multi-node TP=2
 apiVersion: inference.llmkube.dev/v1alpha1
 kind: InferenceService
 metadata:
@@ -33,11 +35,11 @@ spec:
   modelCache:
     claimName: llmkube-ganyu-cache
   runtime: vllm
-  image: ghcr.io/eugr/spark-vllm:mxfp4
+  image: eugr/spark-vllm:latest
   rolloutPolicy:
     waitForIdle: true
     idleTimeoutSeconds: 86400
-  replicas: 1
+  replicas: 2
   priority: high
   nodeSelector:
     nvidia.com/gpu.present: "true"
@@ -45,8 +47,8 @@ spec:
     - key: nvidia.com/gpu
       operator: Exists
       effect: NoSchedule
-  contextSize: 32768
-  parallelSlots: 1
+  contextSize: 131072
+  maxNumBatchedTokens: 8192
   batchSize: 8192
   uBatchSize: 8192
   resources:
@@ -57,23 +59,19 @@ spec:
     port: 8000
     type: ClusterIP
   extraArgs:
-    - --tool-call-parser openai
-    - --reasoning-parser openai_gptoss
-    - --enable-auto-tool-choice
-    - --gpu-memory-utilization 0.8
-    - --enable-prefix-caching
-    - --load-format fastsafetensors
-    - --quantization mxfp4
-    - --mxfp4-backend CUTLASS
-    - --mxfp4-layers moe,qkv,o,lm_head
-    - --attention-backend FLASHINFER
-    - --kv-cache-dtype fp8
-    - --max-num-batched-tokens 8192
     - --host 0.0.0.0
     - --port 8000
-  env:
-    - name: VLLM_USE_FLASHINFER_MOE_MXFP4_MXFP8
-      value: "1"
+    - --max-model-len 131072
+    - --max-num-batched-tokens 8192
+    - --gpu-memory-utilization 0.7
+    - --kv-cache-dtype fp8
+    - --load-format fastsafetensors
+    - --attention-backend flashinfer
+    - --tensor-parallel-size 2
+    - --enable-prefix-caching
+    - --enable-auto-tool-choice
+    - --tool-call-parser openai
+    - --reasoning-parser openai_gptoss
   probeOverrides:
     startup:
       httpGet:
@@ -95,3 +93,21 @@ spec:
       initialDelaySeconds: 20
       periodSeconds: 10
       failureThreshold: 6
+  multiNode:
+    rdmaResource: rdma/rdma_shared_device_a
+    ibGIDIndex: 3
+    members:
+      - node: spark1
+        fabric:
+          address: 10.200.15.71
+          socketInterface: enP7s7
+          ibHCA: "rocep1s0f0,rocep1s0f1,roceP2p1s0f0,roceP2p1s0f1"
+        modelCache:
+          claimName: spark1-model-cache
+      - node: spark2
+        fabric:
+          address: 10.200.15.72
+          socketInterface: enP7s7
+          ibHCA: "rocep1s0f0,rocep1s0f1,roceP2p1s0f0,roceP2p1s0f1"
+        modelCache:
+          claimName: spark2-model-cache

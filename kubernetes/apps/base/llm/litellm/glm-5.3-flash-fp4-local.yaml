@@ -1,0 +1,143 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/inference.llmkube.dev/model_v1alpha1.json
+# Model: nvidia/GLM-5.3-Flash-NVFP4-Spark
+# Recipe: glm-5.3-flash.yaml
+# B12X-optimized cluster serving, TP=2 across 2 DGX Spark nodes
+# NOTE: Requires multiNode configuration with RDMA fabric
+apiVersion: inference.llmkube.dev/v1alpha1
+kind: Model
+metadata:
+  name: glm-5.3-flash-fp4-local
+spec:
+  source: hf://nvidia/GLM-5.3-Flash-NVFP4-Spark
+  sourceSecretRef:
+    name: huggingface
+  format: safetensors
+  quantization: fp4
+  hardware:
+    accelerator: cuda
+    gpu:
+      enabled: true
+      vendor: nvidia
+      count: 2
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/inference.llmkube.dev/inferenceservice_v1alpha1.json
+# InferenceService: vLLM serving, B12X image, multi-node TP=2
+apiVersion: inference.llmkube.dev/v1alpha1
+kind: InferenceService
+metadata:
+  name: glm-5.3-flash-fp4-local
+  labels:
+    krr/ignore: "true"
+spec:
+  modelRef: glm-5.3-flash-fp4-local
+  modelCache:
+    claimName: llmkube-ganyu-cache
+  runtime: vllm
+  image: eugr/spark-vllm-b12x:latest
+  rolloutPolicy:
+    waitForIdle: true
+    idleTimeoutSeconds: 86400
+  replicas: 2
+  priority: high
+  nodeSelector:
+    nvidia.com/gpu.present: "true"
+  tolerations:
+    - key: nvidia.com/gpu
+      operator: Exists
+      effect: NoSchedule
+  contextSize: 262144
+  maxNumBatchedTokens: 4096
+  batchSize: 4096
+  uBatchSize: 4096
+  resources:
+    cpu: "1000m"
+    memory: "64Gi"
+    nvidia.com/gpu: "1"
+  endpoint:
+    port: 8000
+    type: ClusterIP
+  extraArgs:
+    - --host 0.0.0.0
+    - --port 8000
+    - --max-model-len 262144
+    - --max-num-batched-tokens 4096
+    - --gpu-memory-utilization 0.8
+    - --kv-cache-dtype fp8
+    - --load-format b12x
+    - --moe-backend b12x
+    - --linear-backend b12x
+    - --attention-backend B12X
+    - --tensor-parallel-size 2
+    - --enable-prefix-caching
+    - --enable-chunked-prefill
+    - --async-scheduling
+    - --speculative-config '{"method":"mtp","num_speculative_tokens":4}'
+  env:
+    - name: CUTE_DSL_ARCH
+      value: "sm_121a"
+    - name: VLLM_USE_AOT_COMPILE
+      value: "1"
+    - name: VLLM_USE_BREAKABLE_CUDAGRAPH
+      value: "0"
+    - name: VLLM_USE_MEGA_AOT_ARTIFACT
+      value: "1"
+    - name: VLLM_USE_FLASHINFER_SAMPLER
+      value: "1"
+    - name: VLLM_USE_B12X_WO_PROJECTION
+      value: "1"
+    - name: VLLM_USE_B12X_MHC
+      value: "1"
+    - name: VLLM_USE_B12X_FP8_GEMM
+      value: "1"
+    - name: VLLM_USE_B12X_MOE
+      value: "1"
+    - name: VLLM_USE_B12X_SPARSE_INDEXER
+      value: "1"
+    - name: VLLM_USE_V2_MODEL_RUNNER
+      value: "1"
+    - name: VLLM_MOE_SKIP_PADDING
+      value: "0"
+    - name: B12X_MLA_SM120_UNIFIED
+      value: "1"
+    - name: B12X_MOE_FORCE_A8
+      value: "1"
+  probeOverrides:
+    startup:
+      httpGet:
+        path: /health
+        port: 8000
+      periodSeconds: 10
+      failureThreshold: 360
+    liveness:
+      httpGet:
+        path: /health
+        port: 8000
+      initialDelaySeconds: 30
+      periodSeconds: 30
+      failureThreshold: 6
+    readiness:
+      httpGet:
+        path: /health
+        port: 8000
+      initialDelaySeconds: 20
+      periodSeconds: 10
+      failureThreshold: 6
+  multiNode:
+    rdmaResource: rdma/rdma_shared_device_a
+    ibGIDIndex: 3
+    members:
+      - node: spark1
+        fabric:
+          address: 10.200.15.71
+          socketInterface: enP7s7
+          ibHCA: "rocep1s0f0,rocep1s0f1,roceP2p1s0f0,roceP2p1s0f1"
+        modelCache:
+          claimName: spark1-model-cache
+      - node: spark2
+        fabric:
+          address: 10.200.15.72
+          socketInterface: enP7s7
+          ibHCA: "rocep1s0f0,rocep1s0f1,roceP2p1s0f0,roceP2p1s0f1"
+        modelCache:
+          claimName: spark2-model-cache

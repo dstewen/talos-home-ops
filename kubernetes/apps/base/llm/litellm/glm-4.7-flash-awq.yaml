@@ -1,0 +1,94 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/inference.llmkube.dev/model_v1alpha1.json
+# Model: cyankiwi/GLM-4.7-Flash-AWQ-4bit
+# Recipe: glm-4.7-flash-awq.yaml
+# Single-node TP=1, AWQ quantization
+apiVersion: inference.llmkube.dev/v1alpha1
+kind: Model
+metadata:
+  name: glm-4.7-flash-awq
+spec:
+  source: hf://cyankiwi/GLM-4.7-Flash-AWQ-4bit
+  sourceSecretRef:
+    name: huggingface
+  format: safetensors
+  quantization: awq
+  hardware:
+    accelerator: cuda
+    gpu:
+      enabled: true
+      vendor: nvidia
+      count: 1
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/inference.llmkube.dev/inferenceservice_v1alpha1.json
+# InferenceService: vLLM serving with AWQ
+apiVersion: inference.llmkube.dev/v1alpha1
+kind: InferenceService
+metadata:
+  name: glm-4.7-flash-awq
+  labels:
+    krr/ignore: "true"
+spec:
+  modelRef: glm-4.7-flash-awq
+  modelCache:
+    claimName: llmkube-ganyu-cache
+  runtime: vllm
+  image: eugr/spark-vllm:latest
+  rolloutPolicy:
+    waitForIdle: true
+    idleTimeoutSeconds: 86400
+  replicas: 1
+  priority: high
+  nodeSelector:
+    nvidia.com/gpu.present: "true"
+  tolerations:
+    - key: nvidia.com/gpu
+      operator: Exists
+      effect: NoSchedule
+  contextSize: 202752
+  maxNumBatchedTokens: 4096
+  parallelSlots: 1
+  batchSize: 4096
+  uBatchSize: 4096
+  resources:
+    cpu: "1000m"
+    memory: "32Gi"
+    nvidia.com/gpu: "1"
+  endpoint:
+    port: 8000
+    type: ClusterIP
+  extraArgs:
+    - --host 0.0.0.0
+    - --port 8000
+    - --max-model-len 202752
+    - --max-num-batched-tokens 4096
+    - --max-num-seqs 64
+    - --gpu-memory-utilization 0.7
+    - --kv-cache-dtype fp8
+    - --load-format fastsafetensors
+    - --attention-backend flashinfer
+    - --enable-prefix-caching
+    - --enable-auto-tool-choice
+    - --tool-call-parser glm47
+    - --reasoning-parser glm45
+  probeOverrides:
+    startup:
+      httpGet:
+        path: /health
+        port: 8000
+      periodSeconds: 10
+      failureThreshold: 360
+    liveness:
+      httpGet:
+        path: /health
+        port: 8000
+      initialDelaySeconds: 30
+      periodSeconds: 30
+      failureThreshold: 6
+    readiness:
+      httpGet:
+        path: /health
+        port: 8000
+      initialDelaySeconds: 20
+      periodSeconds: 10
+      failureThreshold: 6
