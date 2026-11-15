@@ -2,7 +2,7 @@
 ## talos-mixed → talos-home-ops
 
 > **Date:** 2026-11-09
-> **Last updated:** 2026-11-09 — adapted for justfile system, 1Password topf provider, 3-cluster layout
+> **Last updated:** 2026-11-15 — DGX Spark MAC addresses confirmed, node inventory updated with spark1/spark2 workers, wipe/bootstrap steps include DGX nodes
 > **Branch:** `main` (all config changes merged)
 > **Strategy:** Full wipe-and-rebootstrap of all nodes to validate the new process
 >
@@ -12,13 +12,15 @@
 > - All Talos secrets are now in 1Password (no SOPS files in git)
 > - Secret provider script at `.justfiles/talos/secrets-provider` is wired into all cluster topf.yaml files
 > - 3 clusters: **utility**, **main**, **test** (no `infra` cluster — it was consolidated into `utility`)
+> - **DGX Spark MAC addresses confirmed** in `talos/topf/main/topf.yaml` — no longer placeholders
+> - **DGX Spark /home/dstewen backup** in progress (rsync to NFS) to avoid re-downloading ~900GB model files
 
 ---
 
 ## Pre-Migration Checklist
 
 - [ ] Confirm volsync replication sources are healthy (check `ReplicationSource` resources in apps that use persistent volumes)
-- [ ] **Verify DGX Spark MAC addresses** in `talos/topf/main/topf.yaml` (currently `PLACEHOLDER` — real values required before main cluster bootstrap)
+- [x] **Verify DGX Spark MAC addresses** in `talos/topf/main/topf.yaml` ✅ Confirmed correct
 - [ ] **Confirm all 1Password Talos items exist** — run `just talos-secrets verify CLUSTER=<cluster>` for each cluster to validate fields
 - [ ] **Confirm all 1Password app items exist** — `1password-{utility,main,test}` items with `OP_SESSION_JSON` and `OP_CONNECT_TOKEN` fields
 - [ ] Confirm CNPG barman backups are current (check `kubectl --context main get backups.postgresql.cnpg.io -n database -o wide` — should show daily completed backups)
@@ -52,7 +54,7 @@ Cluster endpoint: `https://10.200.15.251:6443`
 
 Cluster endpoint: `https://10.200.15.252:6443`
 
-### Main Cluster (ms1-3, blade5-8, nuc1-2)
+### Main Cluster (ms1-3, blade5-8, nuc1-2, spark1-2)
 | Host | IP | Role | MAC Address | Disk Serial |
 |---|---|---|---|---|
 | ms1 | 10.200.15.51 | control-plane | 58:47:ca:77:cf:36 | 1925E20E2038 |
@@ -64,6 +66,8 @@ Cluster endpoint: `https://10.200.15.252:6443`
 | blade8 | 10.200.15.38 | worker | e4:5f:01:ec:16:5a | 220628800737 |
 | nuc1 | 10.200.15.61 | worker | d4:5d:df:1a:27:fe | BTHH811211KF512D |
 | nuc2 | 10.200.15.62 | worker | d4:5d:df:1a:28:c4 | BTHH81000E09512D |
+| spark1 | 10.200.15.71 | worker | (DGX mgmt link) | — |
+| spark2 | 10.200.15.72 | worker | (DGX mgmt link) | — |
 
 Cluster endpoint: `https://10.200.15.253:6443`
 
@@ -180,9 +184,10 @@ kubectl --context test get pods -A | grep -E "cilium|coredns|flux|external-secre
 
 ## Step 5 — Rebootstrap Main Cluster
 
-Main cluster has 10 nodes (3 control-planes + 7 workers) + 2 DGX Spark workers (not yet in main cluster — placeholders).
+Main cluster has 12 nodes (3 control-planes + 7 workers + 2 DGX Spark workers).
 
-> **WARNING:** DGX Spark nodes (spark1, spark2) have placeholder MAC addresses. Ensure real MACs are in `talos/topf/main/topf.yaml` **before** bootstrapping main.
+> **Note:** DGX Spark MAC addresses confirmed in `talos/topf/main/topf.yaml` — no longer placeholders.
+> **Note:** `/home/dstewen` backup (including ~900GB HuggingFace cache) to NFS is in progress to avoid re-downloading model files after reboot.
 
 ```bash
 # Control-planes
@@ -197,11 +202,15 @@ just talos reset-node CLUSTER=main NODE=blade7
 just talos reset-node CLUSTER=main NODE=blade8
 just talos reset-node CLUSTER=main NODE=nuc1
 just talos reset-node CLUSTER=main NODE=nuc2
+
+# DGX Spark workers
+just talos reset-node CLUSTER=main NODE=spark1
+just talos reset-node CLUSTER=main NODE=spark2
 ```
 
 **Verify all nodes are in maintenance mode:**
 ```bash
-for node in ms1 ms2 ms3 blade5 blade6 blade7 blade8 nuc1 nuc2; do
+for node in ms1 ms2 ms3 blade5 blade6 blade7 blade8 nuc1 nuc2 spark1 spark2; do
   echo -n "$node: "
   talosctl --nodes $node get health 2>&1 | head -1
 done
@@ -300,7 +309,8 @@ If a cluster fails to bootstrap and needs rollback:
 ## Notes
 
 - **Schematic IDs** are set in `talos/topf/<CLUSTER>/topf.yaml`. CM4 blades use `de1619e1...`, NUCs use `a2645a18...`, DGX Sparks use `1dd2cbb3...`
-- **Talos version:** v1.14.5 / Kubernetes v1.37.1
+- **DGX Spark workers** (spark1, spark2) are configured as workers in the main cluster with confirmed MAC addresses in `talos/topf/main/topf.yaml`
+- **Talos version:** v1.14.5 / Kubernetes v1.37.2
 - **Disk encryption:** disabled (`encryptDisk: false`) for all nodes
 - **MTU:** 1500 for all nodes
 - **`topf`** generates the machine config from `talos/topf/<CLUSTER>/` and applies via `talosctl`
