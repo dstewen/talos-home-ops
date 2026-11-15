@@ -33,7 +33,7 @@ spec:
   modelCache:
     claimName: llmkube-ganyu-cache
   runtime: llamacpp
-  image: ghcr.io/ggml-org/llama.cpp:server-cuda@sha256:4b554057c7cf0cb87e0724b6de9d7ca9bb24a3b72716af11e4c0fecad62c506b
+  image: ghcr.io/ggml-org/llama.cpp:server-cuda@sha256:22bd49f4cf68236a63c5a187d7d1867ffb08472611ddfbf0392b6842a1b30d44
   rolloutPolicy:
     waitForIdle: true
     idleTimeoutSeconds: 86400
