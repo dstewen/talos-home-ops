@@ -20,7 +20,7 @@ data:
 
     mkdir -p "$${HOME}/projects"
     if [[ ! -d "$${HOME}/projects/home-ops/.git" ]]; then
-      git clone --filter=blob:none https://github.com/joryirving/home-ops.git "$${HOME}/projects/home-ops" \
+      git clone --filter=blob:none https://github.com/dstewen/talos-home-ops.git "$${HOME}/projects/home-ops" \
         || echo "WARN: home-ops clone failed; clone it from a session instead"
     fi
 
@@ -98,7 +98,7 @@ data:
             "timeout": 1800000
           },
           "models": {
-            
+
             "qwen3.8-flash-next-chat": { "name": "Qwen3.8-Flash-Next non-thinking (Strix)", "limit": { "context": 245760, "output": 16384 } },
             "qwen3.8-flash-next": { "name": "Qwen3.8-Flash-Next IQ4_NL (Strix ROCm, vision)", "limit": { "context": 245760, "output": 16384 } },
             "qwen3.8-27b": { "name": "Qwen3.8-27B W4A16 (3090 vLLM)", "limit": { "context": 147456, "output": 24576 } },

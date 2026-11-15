@@ -25,8 +25,8 @@ spec:
         containers:
           app:
             image:
-              repository: ghcr.io/joryirving/prowlarr
-              tag: 3.0.1.5752@sha256:5483895e4b883e60ad9c16505df25f81b0559a51613a5d2fe53187ddcd1b065d
+              repository: ghcr.io/home-operations/prowlarr
+              tag: 3.0.1@sha256:83cc967a3b7b754634e31773d4d58ea606714490b7e8592d41b608f7c249afe6
             env:
               TZ: Australia/Melbourne
               PROWLARR__APP__INSTANCENAME: "{{ .Release.Name }}"

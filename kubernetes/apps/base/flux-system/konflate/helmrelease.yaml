@@ -17,7 +17,7 @@ spec:
       statusCheckName: "Konflate (${CLUSTER})"
       prComments: ${KONFLATE_PR_COMMENTS:=true}
       publicUrl: "https://${SUBDOMAIN}${SUBDOMAIN_SUFFIX:=}.davidstewen.com"
-      repo: github://joryirving/home-ops
+      repo: github://dstewen/talos-home-ops
       mcp: true
     persistence:
       enabled: false

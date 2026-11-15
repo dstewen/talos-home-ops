@@ -2,12 +2,6 @@
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
   packageRules: [
     {
-      description: ["Custom versioning for mylar3"],
-      matchDatasources: ["docker"],
-      versioning: "regex:^version-v(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)$",
-      matchPackageNames: ["/mylar3/"],
-    },
-    {
       description: ["Custom regex versioning for SearXNG CalVer SHA tags"],
       matchDatasources: ["docker"],
       matchPackageNames: ["ghcr.io/searxng/searxng"],

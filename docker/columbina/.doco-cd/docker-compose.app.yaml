@@ -15,7 +15,7 @@ services:
       HTTP_PORT: 8880
       LOG_LEVEL: info
       POLL_CONFIG: |-
-        - url: https://github.com/joryirving/home-ops.git
+        - url: https://github.com/dstewen/talos-home-ops.git
           reference: main
           interval: 3600
       TZ: Australia/Melbourne

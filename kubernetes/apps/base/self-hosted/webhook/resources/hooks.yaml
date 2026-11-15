@@ -1,10 +1,10 @@
 ---
-- id: github-joryirving-renovate
+- id: github-dstewen-renovate
   execute-command: /config/renovate-operator.sh
   pass-arguments-to-command:
     - # job name
       source: string
-      name: joryirving
+      name: dstewen
     - # namespace
       source: string
       name: renovate
@@ -24,10 +24,10 @@
           parameter:
             source: header
             name: x-hub-signature
-      - # Trigger only for the joryirving repo owner
+      - # Trigger only for the dstewen repo owner
         match:
           type: value
-          value: joryirving
+          value: dstewen
           parameter:
             source: payload
             name: repository.owner.login

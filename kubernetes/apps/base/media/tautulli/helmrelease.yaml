@@ -25,8 +25,8 @@ spec:
         containers:
           app:
             image:
-              repository: ghcr.io/joryirving/tautulli
-              tag: 2.19.1@sha256:0dcf3fd7a6718c2d8491bbe7719a59150cea64404ebf3a3d887aba2e662dbd7c
+              repository: ghcr.io/home-operations/tautulli
+              tag: 2.19.1@sha256:de490b2e01593b4efa062ebe8ceb802a2bc119d727df0e545629394ac3667eb0
             env:
               TZ: Australia/Melbourne
               TAUTULLI_HTTP_BASE_URL: "https://{{ .Release.Name }}.davidstewen.com"

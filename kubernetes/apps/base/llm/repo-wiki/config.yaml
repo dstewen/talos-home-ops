@@ -5,8 +5,8 @@ metadata:
   name: repo-wiki
 data:
   repos.txt: |
-    joryirving/home-ops
-    joryirving/containers
+    dstewen/talos-home-ops
+    dstewen/containers
     misospace/alert-triage
     misospace/dispatch
     misospace/miso-gallery

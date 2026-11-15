@@ -14,7 +14,7 @@ spec:
     gitea:
       admin:
         passwordMode: initialOnlyRequireReset
-        username: joryirving
+        username: dstewen
       config:
         indexer:
           REPO_INDEXER_ENABLED: true

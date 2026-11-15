@@ -25,8 +25,8 @@ spec:
         containers:
           app:
             image:
-              repository: ghcr.io/joryirving/radarr
-              tag: 7.0.2.10888@sha256:3268baf5555093c0a22015819454310b67fafc2b7aed266ec8816096c8c8ac9e
+              repository: ghcr.io/home-operations/radarr
+              tag: 7.0.2.10888@sha256:69ea515df6e2a3ea1490cfa127ffaaf9597a9db84fffa2fa150a6fae98fe04cb
             env:
               RADARR__APP__INSTANCENAME: Radarr
               RADARR__APP__THEME: dark

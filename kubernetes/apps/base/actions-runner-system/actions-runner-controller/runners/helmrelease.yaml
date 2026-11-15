@@ -23,14 +23,14 @@ spec:
       name: actions-runner-controller
       namespace: actions-runner-system
     githubConfigSecret: home-ops-runner-secret
-    githubConfigUrl: https://github.com/joryirving/home-ops
+    githubConfigUrl: https://github.com/dstewen/talos-home-ops
     maxRunners: ${maxRunners:=2} #Double total nodes
     minRunners: ${minRunners:=1}
     template:
       spec:
         containers:
           - name: runner
-            image: ghcr.io/joryirving/actions-runner:2.338.2@sha256:2f40f06fd679865f93dc355d7e4692574ef1086dfd025e63013aaa47031157a3
+            image: ghcr.io/dstewen/actions-runner:2.338.2@sha256:2f40f06fd679865f93dc355d7e4692574ef1086dfd025e63013aaa47031157a3
             command: ["/home/runner/run.sh"]
             env:
               - name: ACTIONS_RUNNER_REQUIRE_JOB_CONTAINER

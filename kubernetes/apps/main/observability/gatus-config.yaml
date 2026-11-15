@@ -78,12 +78,12 @@ ui:
   title: Health Status
   header: Health Status
   logo: https://avatars.githubusercontent.com/u/46251616
-  link: https://github.com/joryirving
+  link: https://github.com/dstewen
   buttons:
     - name: Github
-      link: https://github.com/joryirving
+      link: https://github.com/dstewen
     - name: Homelab
-      link: https://github.com/joryirving/home-ops
+      link: https://github.com/dstewen/talos-home-ops
     - name: Utility Status
       link: https://status-utility.davidstewen.com
     - name: Columbina Status
