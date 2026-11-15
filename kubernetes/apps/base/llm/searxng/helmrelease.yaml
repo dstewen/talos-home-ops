@@ -21,7 +21,7 @@ spec:
           main:
             image:
               repository: ghcr.io/searxng/searxng
-              tag: 2026.11.8-74418092d@sha256:7add5ffe7933e6b46aa3a26bed8a0c342c9a45ec331d9a8cf145e46b04b24f36
+              tag: 2026.11.14-fd718fe0b@sha256:200a0971ef7082aa8784fafcba6f9112b265c68ea1eb32e71ad39e64e818252a
             env:
               SEARXNG_BASE_URL: https://search.davidstewen.com
               SEARXNG_PORT: &port 8080
