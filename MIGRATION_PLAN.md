@@ -182,6 +182,32 @@ kubectl --context test get pods -A | grep -E "cilium|coredns|flux|external-secre
 
 ---
 
+## Step 4.5 — Configure DGX Spark Network (Between Steps 4 and 5)
+
+> **CRITICAL:** Before bootstrapping the main cluster, set up **Opnsense static DHCP reservations** for the DGX Spark nodes.
+
+The DGX Spark nodes (spark1, spark2) need fixed IP addresses on the LAN so:
+- They appear correctly in the main cluster inventory
+- Network management tools (Firewall, DNS, monitoring) can locate them
+- Talos node discovery doesn't fail due to IP changes
+
+**Actions:**
+1. Log into Opnsense firewall (`https://<opnsense-ip>`)
+2. Navigate to **Services → DHCP Server → DHCP Static Mappings**
+3. Add static reservations:
+   - **spark1** — MAC: `4c:bb:47:ec:9d:9e` → IP: `10.200.15.71`
+   - **spark2** — MAC: `4c:bb:47:ec:9c:99` → IP: `10.200.15.72`
+4. Restart DHCP server if needed: `Services → DHCP Server → Restart`
+5. Verify reservations appear in **Status → DHCP Leases**
+
+**Why before main cluster bootstrap?**
+The DGX Spark nodes are part of the main cluster. If they receive different IPs after being added to the cluster, it can cause:
+- CNI (Cilium) pod networking failures
+- Inconsistent node addresses in `kubectl get nodes`
+- Flux reconciliation issues
+
+---
+
 ## Step 5 — Rebootstrap Main Cluster
 
 Main cluster has 12 nodes (3 control-planes + 7 workers + 2 DGX Spark workers).
