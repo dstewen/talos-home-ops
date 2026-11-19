@@ -23,7 +23,7 @@ spec:
           config:
             image:
               repository: ghcr.io/lemonade-sdk/lemonade-server
-              tag: latest@sha256:9e2127fca73ac53faed00aeb4077ecf0e6547d96e0a000cd7b4bcd858111b680
+              tag: latest@sha256:715fbf048ad52c352fbcef37e4645603828119b8d750fb8a4c386e909f10913f
             command:
               - sh
               - -c
@@ -42,7 +42,7 @@ spec:
           app:
             image:
               repository: ghcr.io/lemonade-sdk/lemonade-server
-              tag: latest@sha256:9e2127fca73ac53faed00aeb4077ecf0e6547d96e0a000cd7b4bcd858111b680
+              tag: latest@sha256:715fbf048ad52c352fbcef37e4645603828119b8d750fb8a4c386e909f10913f
             # Vulkan on the Strix Halo iGPU needs /dev/kfd and /dev/dri; this is
             # the same access pattern the whisper deployment on this node uses.
             securityContext:
