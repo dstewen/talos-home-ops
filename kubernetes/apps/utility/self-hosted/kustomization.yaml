@@ -8,12 +8,12 @@ components:
 replacements:
   - path: ../../../components/replacements/ks.yaml
 resources:
-  - ./acars-externalsecret.yaml
-  - ./acars.yaml
   - ./free-game-notifier.yaml
   - ./hypermind.yaml
   - ./it-tools.yaml
   - ./meshcentral.yaml
+  - ./netboot.yaml
+  - ./paperless-scan.yaml
   - ./rss-forwarder.yaml
   - ./scanservjs.yaml
   - ./thelounge.yaml
