@@ -19,6 +19,7 @@ spec:
     cleanupOnFail: true
     remediation:
       retries: 3
+  dependsOn: []
   values:
     defaultPodOptions:
       priorityClassName: system-cluster-critical

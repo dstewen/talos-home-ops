@@ -9,6 +9,7 @@ spec:
     kind: OCIRepository
     name: netboot
   interval: 1h
+  dependsOn: []
   values:
     controllers:
       netboot:

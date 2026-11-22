@@ -19,6 +19,7 @@ spec:
   upgrade:
     remediation:
       retries: -1
+  dependsOn: []
   values:
     defaultPodOptions:
       hostUsers: false

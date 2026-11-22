@@ -9,6 +9,7 @@ spec:
   chartRef:
     kind: OCIRepository
     name: paperless-scan
+  dependsOn: []
   values:
     controllers:
       paperless-scan:
