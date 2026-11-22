@@ -32,9 +32,9 @@ home-ops/
 
 ## Cluster Architecture
 
-- **main** - 3x MS-01 + 1x Bosgame M5 (i9-13900H x3, Ryzen AI Max+ 395 x1, 128GB RAM), hyper-converged storage
-- **utility** - 1x Bosgame P1 (Ryzen 7 5700U), low-power services
-- **test** - 1x Beelink Mini-S (Celeron N5095), testing
+- **main** - 3x MS-01 + 1x Bosgame M5 (i9-13900H x3, DGX Spark 128GB x2), hyper-converged storage
+- **utility** - 3 x Raspberry Pi CM4 blades, low-power services
+- **test** - 1x Raspberry Pi CM4 blade, testing
 
 ## Key Technologies
 

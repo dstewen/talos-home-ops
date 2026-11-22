@@ -7,8 +7,8 @@ This repository is a **Home Operations monorepo** managing 3 Kubernetes clusters
 | Cluster   | Purpose                                        | Hardware                                                                      |
 | --------- | ---------------------------------------------- | ----------------------------------------------------------------------------- |
 | `main`    | Production workloads + hyper-converged storage | 3x MS-01 + 1x Bosgame M5 (i9-13900H x3, Ryzen AI Max+ 395 x1, 128GB RAM each) |
-| `utility` | Low-power services                             | Bosgame P1 (Ryzen 7 5700U)                                                    |
-| `test`    | Testing changes                                | Beelink Mini-S (Celeron N5095)                                                |
+| `utility` | Low-power services                             | 3 x Raspberry Pi CM4 blades                                                    |
+| `test`    | Testing changes                                | 1 x Raspberry Pi CM4 blade                                               |
 
 ---
 
