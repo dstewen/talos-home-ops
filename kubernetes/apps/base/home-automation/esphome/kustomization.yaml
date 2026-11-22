@@ -6,6 +6,3 @@ resources:
   - ./externalsecret.yaml
   - ./helmrelease.yaml
   - ./ocirepository.yaml
-#  - ./pvc.yaml
-#  - ./volsync_backblazeb2.yaml
-#  - ./volsync_nas_openebs_local.yaml
