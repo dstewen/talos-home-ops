@@ -9,8 +9,10 @@ replacements:
   - path: ../../../components/replacements/ks.yaml
 resources:
   # - ./alert-triage.yaml
+  - ./alloy.yaml
   - ./gatus.yaml
   - ./kube-prometheus-stack.yaml
+  - ./loki.yaml
   - ./prometheus-adapter.yaml
   - ./silence-operator.yaml
   - ./silences.yaml

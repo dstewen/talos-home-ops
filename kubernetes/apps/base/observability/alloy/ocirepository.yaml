@@ -1,0 +1,11 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/source.toolkit.fluxcd.io/ocirepository_v1beta2.json
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: OCIRepository
+metadata:
+  name: alloy
+spec:
+  interval: 30m
+  url: oci://ghcr.io/home-operations/charts-mirror/alloy
+  ref:
+    semver: 1.15.0
