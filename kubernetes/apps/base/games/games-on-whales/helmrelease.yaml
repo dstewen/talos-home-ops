@@ -30,7 +30,7 @@ spec:
             command:
               - /app/moonlight-proxy
             env:
-              ALLOWED_HOSTS: 10.69.10.43
+              ALLOWED_HOSTS: 192.168.20.43
               POD_NAME:
                 valueFrom:
                   fieldRef:
@@ -287,7 +287,7 @@ spec:
       moonlight:
         type: LoadBalancer
         annotations:
-          lbipam.cilium.io/ips: 10.69.10.43
+          lbipam.cilium.io/ips: 192.168.20.43
           lbipam.cilium.io/sharing-key: direwolf
         controller: moonlight-proxy
         ports:
@@ -300,7 +300,7 @@ spec:
       stream:
         type: LoadBalancer
         annotations:
-          lbipam.cilium.io/ips: 10.69.10.43
+          lbipam.cilium.io/ips: 192.168.20.43
           lbipam.cilium.io/sharing-key: direwolf
         controller: wolf-agent
         ports:

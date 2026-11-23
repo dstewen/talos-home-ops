@@ -15,7 +15,7 @@ spec:
     - games-on-whales
     - games-on-whales.games.svc
   ipAddresses:
-    - 10.69.10.43
+    - 192.168.20.43
   issuerRef:
     kind: Issuer
     name: games-on-whales-selfsigned

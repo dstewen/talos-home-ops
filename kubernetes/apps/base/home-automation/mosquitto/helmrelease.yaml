@@ -71,7 +71,7 @@ spec:
           external-dns.kubernetes.io/hostname: mqtt.davidstewen.com
           gatus.home-operations.com/endpoint: |-
             group: services
-          lbipam.cilium.io/ips: 10.69.10.134
+          lbipam.cilium.io/ips: 192.168.20.134
         externalTrafficPolicy: Local
         ports:
           mqtt:

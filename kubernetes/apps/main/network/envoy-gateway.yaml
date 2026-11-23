@@ -32,8 +32,8 @@ spec:
       EXTERNAL_DOMAIN: external
       INTERNAL_DOMAIN: internal
       REPLICAS: "2"
-      SVC_GATEWAY_EXTERNAL: 10.69.10.32
-      SVC_GATEWAY_INTERNAL: 10.69.10.31
+      SVC_GATEWAY_EXTERNAL: 192.168.20.32
+      SVC_GATEWAY_INTERNAL: 192.168.20.31
   wait: false
   prune: true
   sourceRef:

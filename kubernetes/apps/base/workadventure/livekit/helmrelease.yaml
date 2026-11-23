@@ -60,7 +60,7 @@ spec:
         controller: livekit
         type: LoadBalancer
         annotations:
-          lbipam.cilium.io/ips: 10.69.10.45
+          lbipam.cilium.io/ips: 192.168.20.45
           towonel.io/tunnel: enable
           towonel.io/tunnel-ref: network/towonel-main
           towonel.io/rtc-tcp.public-port: "7881"

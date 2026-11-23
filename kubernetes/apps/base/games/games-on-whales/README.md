@@ -93,13 +93,13 @@ so its copied certificate matches the proxy; Moonlight may require re-pairing.
    These are temporary live operations; this change does not stop flash-next.
 3. Enable `./games-on-whales.yaml` in the main games overlay. Check the CRD and
    app Kustomizations, HelmRelease, and all three Deployments. Verify the two
-   Services receive the same address, `10.69.10.43`, and the Wolf driver publishes
+   Services receive the same address, `192.168.20.43`, and the Wolf driver publishes
    a ResourceSlice for Skirk with two lobby slots. Readiness probes check socket
    presence; they do not prove encoding or a working stream.
 
 ## Pairing and streaming
 
-Add `10.69.10.43` in Moonlight, then follow the pairing URL in the
+Add `192.168.20.43` in Moonlight, then follow the pairing URL in the
 `games-on-whales-moonlight-proxy` logs. Treat pairing URLs/codes as credentials;
 do not paste them into public test reports. Get the resulting Pairing name:
 

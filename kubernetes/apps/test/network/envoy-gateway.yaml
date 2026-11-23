@@ -29,8 +29,8 @@ spec:
     substitute:
       EXTERNAL_DOMAIN: ${CLUSTER}-external
       INTERNAL_DOMAIN: ${CLUSTER}-internal
-      SVC_GATEWAY_EXTERNAL: 10.69.10.232
-      SVC_GATEWAY_INTERNAL: 10.69.10.231
+      SVC_GATEWAY_EXTERNAL: 192.168.20.232
+      SVC_GATEWAY_INTERNAL: 192.168.20.231
   wait: false
   prune: true
   sourceRef:

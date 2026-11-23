@@ -19,7 +19,7 @@ spec:
       minecraft:
         type: LoadBalancer
         annotations:
-          lbipam.cilium.io/ips: 10.69.10.40
+          lbipam.cilium.io/ips: 192.168.20.40
           external-dns.kubernetes.io/hostname: mc.davidstewen.com,
             takocraft.davidstewen.com, create.davidstewen.com, vibecraft.davidstewen.com,
             jellycraft.davidstewen.com, cobbleverse.davidstewen.com
