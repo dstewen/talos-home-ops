@@ -6,7 +6,7 @@ metadata:
 spec:
   allowFirstLastIPs: "No"
   blocks:
-    - cidr: 10.69.10.0/24
+    - cidr: 10.200.15.0/24
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumbgpadvertisement_v2.json
 apiVersion: cilium.io/v2
