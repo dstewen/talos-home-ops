@@ -17,6 +17,7 @@ spec:
         name: &name alloy-configmap
         key: config.alloy
       enableReporting: false
+      stabilityLevel: "experimental"
       extraPorts:
         - name: tcp-syslog
           port: 514
