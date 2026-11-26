@@ -19,7 +19,7 @@ metadata:
 spec:
   modelRef: memini-rerank
   runtime: llamacpp
-  image: ghcr.io/ggml-org/llama.cpp:server@sha256:b0cd5490eefff30b40dcd47f7249a7d7211136908f73fe440a2a86b35a22b23b
+  image: ghcr.io/ggml-org/llama.cpp:server@sha256:ce3817b50dae557848c3a5b7df6264f25b08792c9fc39d35b4e67e1d19b15b20
   rolloutPolicy:
     waitForIdle: true
     idleTimeoutSeconds: 86400
@@ -95,7 +95,7 @@ metadata:
 spec:
   modelRef: memini-rerank
   runtime: llamacpp
-  image: ghcr.io/ggml-org/llama.cpp:server@sha256:b0cd5490eefff30b40dcd47f7249a7d7211136908f73fe440a2a86b35a22b23b
+  image: ghcr.io/ggml-org/llama.cpp:server@sha256:ce3817b50dae557848c3a5b7df6264f25b08792c9fc39d35b4e67e1d19b15b20
   rolloutPolicy:
     waitForIdle: true
     idleTimeoutSeconds: 86400
@@ -171,7 +171,7 @@ metadata:
 spec:
   modelRef: memini-rerank
   runtime: llamacpp
-  image: ghcr.io/ggml-org/llama.cpp:server@sha256:b0cd5490eefff30b40dcd47f7249a7d7211136908f73fe440a2a86b35a22b23b
+  image: ghcr.io/ggml-org/llama.cpp:server@sha256:ce3817b50dae557848c3a5b7df6264f25b08792c9fc39d35b4e67e1d19b15b20
   rolloutPolicy:
     waitForIdle: true
     idleTimeoutSeconds: 86400
